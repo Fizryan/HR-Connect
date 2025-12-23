@@ -48,5 +48,6 @@ app.*.map.json
 */firebase
 firebase.json
 firestore.indexes.json
+firebase_options.dart
 *.rules
 google-services.json

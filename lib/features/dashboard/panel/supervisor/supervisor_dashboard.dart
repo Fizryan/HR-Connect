@@ -30,7 +30,9 @@ class _SupervisorDashboardState extends State<SupervisorDashboard> {
         attendanceController.fetchAttendance();
         attendanceController.fetchTodayAttendance(widget.user.uid);
         leaveController.fetchLeaves();
-        context.read<ReportsController>().fetchReportData();
+        context.read<ReportsController>().fetchReportData(
+          forRole: widget.user.role,
+        );
       }
     });
   }
@@ -56,7 +58,10 @@ class _SupervisorDashboardState extends State<SupervisorDashboard> {
           onRefresh: () async {
             await attendanceController.fetchAttendance(forceRefresh: true);
             await leaveController.fetchLeaves(forceRefresh: true);
-            await reportsController.fetchReportData(forceRefresh: true);
+            await reportsController.fetchReportData(
+              forceRefresh: true,
+              forRole: widget.user.role,
+            );
           },
           child: LayoutBuilder(
             builder: (context, constraints) {
@@ -132,8 +137,8 @@ class _SupervisorDashboardState extends State<SupervisorDashboard> {
     return Consumer<ReportsController>(
       builder: (context, controller, _) {
         final data = controller.reportData;
-        final totalEmployees = data?.totalEmployees ?? 0;
-        final activeEmployees = data?.activeEmployees ?? 0;
+        final totalMembers = controller.teamMemberCount;
+        final activeMembers = controller.activeTeamMemberCount;
         final attendanceRate = data?.attendanceRate ?? 0.0;
 
         return Column(
@@ -148,8 +153,8 @@ class _SupervisorDashboardState extends State<SupervisorDashboard> {
                     icon: Icons.people_rounded,
                     iconColor: Colors.blue,
                     title: 'Team Members',
-                    value: '$totalEmployees',
-                    subtitle: '$activeEmployees active',
+                    value: '$totalMembers',
+                    subtitle: '$activeMembers active',
                   ),
                 ),
                 SizedBox(width: 12.w),
