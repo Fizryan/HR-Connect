@@ -4,6 +4,7 @@ import 'package:hr_connect/core/theme/theme_provider.dart';
 import 'package:hr_connect/features/auth/controllers/auth_controller.dart';
 import 'package:hr_connect/features/auth/views/login_view.dart';
 import 'package:hr_connect/features/dashboard/controllers/dashboard_controller.dart';
+import 'package:hr_connect/features/firebase/firebase_options.dart';
 import 'package:hr_connect/features/navigation/views/menu_view.dart';
 import 'package:hr_connect/features/settings/controllers/settings_controller.dart';
 import 'package:hr_connect/features/user_management/controllers/user_management_controller.dart';
@@ -11,7 +12,6 @@ import 'package:hr_connect/features/attendance/controllers/attendance_controller
 import 'package:hr_connect/features/leave/controllers/leave_controller.dart';
 import 'package:hr_connect/features/reports/controllers/reports_controller.dart';
 import 'package:hr_connect/features/reimbursement/controllers/reimbursement_controller.dart';
-import 'package:hr_connect/firebase/firebase_options.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
