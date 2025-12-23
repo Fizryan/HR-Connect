@@ -66,6 +66,10 @@ class ReportsController extends ChangeNotifier {
   DateTime _endDate = DateTime.now();
   UserRole? _currentUserRole;
 
+  int _teamMemberCount = 0;
+  int _activeTeamMemberCount = 0;
+  List<String> _teamMemberIds = [];
+
   bool _isDisposed = false;
 
   static const double totalAnnualBudget = 1000000000.0;
@@ -76,6 +80,10 @@ class ReportsController extends ChangeNotifier {
   DateTime get startDate => _startDate;
   DateTime get endDate => _endDate;
   UserRole? get currentUserRole => _currentUserRole;
+
+  int get teamMemberCount => _teamMemberCount;
+  int get activeTeamMemberCount => _activeTeamMemberCount;
+  List<String> get teamMemberIds => _teamMemberIds;
 
   double get remainingBudget {
     final used = _reportData?.paidReimbursementAmount ?? 0;
@@ -139,8 +147,15 @@ class ReportsController extends ChangeNotifier {
     }
   }
 
-  Future<void> fetchReportData({bool forceRefresh = false}) async {
+  Future<void> fetchReportData({
+    bool forceRefresh = false,
+    UserRole? forRole,
+  }) async {
     if (_isDisposed) return;
+
+    if (forRole != null) {
+      _currentUserRole = forRole;
+    }
 
     _isLoading = true;
     _safeNotify();
@@ -208,19 +223,47 @@ class ReportsController extends ChangeNotifier {
 
       if (_isDisposed) return;
 
-      final totalEmployees = usersSnapshot.docs.length;
-      final activeEmployees = usersSnapshot.docs
-          .where((doc) => doc.data()['isActive'] == true)
+      final allUsers = usersSnapshot.docs.map((doc) => doc.data()).toList();
+
+      List<Map<String, dynamic>> filteredUsers;
+      if (_currentUserRole == UserRole.supervisor) {
+        filteredUsers = allUsers
+            .where((user) => user['role'] == UserRole.employee.name)
+            .toList();
+        _teamMemberIds = filteredUsers.map((u) => u['uid'] as String).toList();
+      } else {
+        filteredUsers = allUsers;
+        _teamMemberIds = allUsers.map((u) => u['uid'] as String).toList();
+      }
+
+      final totalEmployees = filteredUsers.length;
+      final activeEmployees = filteredUsers
+          .where((user) => user['isActive'] == true)
           .length;
 
+      _teamMemberCount = totalEmployees;
+      _activeTeamMemberCount = activeEmployees;
+
+      final filteredAttendanceRecords = _currentUserRole == UserRole.supervisor
+          ? attendanceRecords
+                .where((r) => _teamMemberIds.contains(r.uid))
+                .toList()
+          : attendanceRecords;
+
+      final filteredLeaveRecords = _currentUserRole == UserRole.supervisor
+          ? leaveRecords
+                .where((l) => l.requesterRole == UserRole.employee)
+                .toList()
+          : leaveRecords;
+
       final attendanceByStatus = <String, int>{};
-      for (var record in attendanceRecords) {
+      for (var record in filteredAttendanceRecords) {
         final status = record.status.name;
         attendanceByStatus[status] = (attendanceByStatus[status] ?? 0) + 1;
       }
 
       final leaveByType = <String, int>{};
-      for (var leave in leaveRecords) {
+      for (var leave in filteredLeaveRecords) {
         final type = leave.type.name;
         leaveByType[type] = (leaveByType[type] ?? 0) + 1;
       }
@@ -232,14 +275,14 @@ class ReportsController extends ChangeNotifier {
       }
 
       final presentCount = attendanceByStatus['present'] ?? 0;
-      final totalAttendance = attendanceRecords.length;
+      final totalAttendance = filteredAttendanceRecords.length;
       final attendanceRate = totalAttendance > 0
           ? (presentCount / totalAttendance) * 100
           : 0.0;
 
       double totalHours = 0;
       int countWithHours = 0;
-      for (var record in attendanceRecords) {
+      for (var record in filteredAttendanceRecords) {
         if (record.checkIn != null && record.checkOut != null) {
           final hours =
               record.checkOut!.difference(record.checkIn!).inMinutes / 60;
@@ -251,18 +294,18 @@ class ReportsController extends ChangeNotifier {
           ? totalHours / countWithHours
           : 0.0;
 
-      final pendingLeaves = leaveRecords
+      final pendingLeaves = filteredLeaveRecords
           .where((l) => l.status == LeaveStatus.pending)
           .length;
-      final approvedLeaves = leaveRecords
+      final approvedLeaves = filteredLeaveRecords
           .where((l) => l.status == LeaveStatus.approved)
           .length;
-      final rejectedLeaves = leaveRecords
+      final rejectedLeaves = filteredLeaveRecords
           .where((l) => l.status == LeaveStatus.rejected)
           .length;
 
-      final leaveUtilization = leaveRecords.isNotEmpty
-          ? (approvedLeaves / leaveRecords.length) * 100
+      final leaveUtilization = filteredLeaveRecords.isNotEmpty
+          ? (approvedLeaves / filteredLeaveRecords.length) * 100
           : 0.0;
 
       final pendingReimbursements = allYearReimbursements
@@ -301,8 +344,8 @@ class ReportsController extends ChangeNotifier {
         pendingLeaves: pendingLeaves,
         approvedLeaves: approvedLeaves,
         rejectedLeaves: rejectedLeaves,
-        attendanceRecords: attendanceRecords,
-        leaveRecords: leaveRecords,
+        attendanceRecords: filteredAttendanceRecords,
+        leaveRecords: filteredLeaveRecords,
         reimbursementRecords: reimbursementRecords,
         attendanceByStatus: attendanceByStatus.isNotEmpty
             ? attendanceByStatus

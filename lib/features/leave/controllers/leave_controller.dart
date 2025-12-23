@@ -99,7 +99,11 @@ class LeaveController extends ChangeNotifier {
       } else if (_currentUserRole == UserRole.hrd) {
         query = query.where(
           'requesterRole',
-          whereIn: [UserRole.supervisor.name, UserRole.finance.name],
+          whereIn: [
+            UserRole.supervisor.name,
+            UserRole.finance.name,
+            UserRole.admin.name,
+          ],
         );
       } else if (_currentUserRole == UserRole.admin) {
         query = query.where('requesterRole', isEqualTo: UserRole.hrd.name);
