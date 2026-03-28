@@ -1,0 +1,1 @@
+enum UserRole { admin, director, manager, supervisor, staff }

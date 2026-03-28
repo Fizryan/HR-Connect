@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hr_connect/core/const/shared_preferences.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ThemeProvider extends ChangeNotifier {
@@ -16,6 +17,6 @@ class ThemeProvider extends ChangeNotifier {
 
   Future<void> _saveTheme() async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('isDarkMode', _isDarkMode);
+    await prefs.setBool(SharedPrefs.isDarkMode, _isDarkMode);
   }
 }
