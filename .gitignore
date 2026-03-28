@@ -51,3 +51,6 @@ firestore.indexes.json
 firebase_options.dart
 *.rules
 google-services.json
+
+# Env
+.env

@@ -7,10 +7,7 @@ import 'package:hr_connect/core/widgets/shared/header.dart';
 class MainScreen extends StatefulWidget {
   final UserRole role;
 
-  const MainScreen({
-    super.key,
-    required this.role,
-  });
+  const MainScreen({super.key, required this.role});
 
   @override
   State<MainScreen> createState() => _MainScreenState();
@@ -24,13 +21,24 @@ class _MainScreenState extends State<MainScreen> {
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            Header(colorScheme: colorScheme, name: 'Fizryan', role: UserRole.admin), // TODO: Replace with actual data
-            SizedBox(height: 16.h),
-            _buildDashboardContent(colorScheme),
-          ],
+      body: SafeArea(
+        child: SingleChildScrollView(
+          physics: const BouncingScrollPhysics(),
+          child: Padding(
+            padding: EdgeInsets.symmetric(horizontal: 20.w),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Header(
+                  colorScheme: colorScheme,
+                  name: 'User',
+                  role: widget.role,
+                ), // TODO : Change to actual user data
+                SizedBox(height: 16.h),
+                _buildDashboardContent(colorScheme),
+              ],
+            ),
+          ),
         ),
       ),
     );
@@ -39,7 +47,7 @@ class _MainScreenState extends State<MainScreen> {
   Widget _buildDashboardContent(ColorScheme colorScheme) {
     switch (widget.role) {
       case UserRole.admin:
-        return AdminDashboard.buildAdminDashboard(colorScheme);
+        return AdminDashboard(colorScheme: colorScheme);
       default:
         return const SizedBox.shrink();
     }

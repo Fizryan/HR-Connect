@@ -21,11 +21,6 @@ dependencies:
   provider: ^6.1.5+1
   path_provider: ^2.1.5
 
-  # Firebase
-  firebase_core: ^4.6.0
-  firebase_auth: ^6.3.0
-  cloud_firestore: ^6.2.0
-
   # Localization 
   intl: ^0.20.2
 
@@ -34,26 +29,33 @@ dependencies:
   printing: ^5.14.3
   open_file: ^3.5.11
 
+  # Utils
+  logger: ^2.7.0
+  json_annotation: ^4.11.0
+  freezed_annotation: ^3.1.0
+  fpdart: ^1.2.0
+  flutter_dotenv: ^6.0.0
+
   # Connection
   connectivity_plus: ^7.0.0
   url_launcher: ^6.3.2
   get_it: ^9.2.1
   go_router: ^17.1.0
+  dio: ^5.9.2
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^5.0.0
   flutter_launcher_icons: ^0.13.1
+  build_runner: ^2.13.1
+  freezed: ^3.2.5
+  json_serializable: ^6.13.1
 
 flutter:
   uses-material-design: true
   
   assets:
     - assets/
-
-flutter_launcher_icons:
-  android: "launcher_icon"
-  ios: true
-  image_path: "assets/logo_icon.png"
+    - .env
   min_sdk_android: 21
