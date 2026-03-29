@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:hr_connect/core/const/enums.dart';
-import 'package:hr_connect/core/widgets/admin_dashboard.dart';
-import 'package:hr_connect/core/widgets/shared/header.dart';
+import 'package:hr_connect/features/widgets/dashboard.dart';
+import 'package:hr_connect/features/widgets/shared/header.dart';
 
 class MainScreen extends StatefulWidget {
   final UserRole role;
