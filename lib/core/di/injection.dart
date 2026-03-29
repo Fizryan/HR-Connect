@@ -3,10 +3,10 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:hr_connect/core/const/shared_preferences.dart';
 import 'package:hr_connect/core/network/api_client.dart';
 
-import 'package:hr_connect/features/auth/data/datasources/auth_remote.dart';
-import 'package:hr_connect/features/auth/domain/repositories/auth_repository.dart';
-import 'package:hr_connect/features/auth/data/repositories/auth_repository_impl.dart';
-import 'package:hr_connect/features/auth/presentation/providers/auth_provider.dart';
+import 'package:hr_connect/features/user_management/data/datasources/user_remote.dart';
+import 'package:hr_connect/features/user_management/domain/repositories/user_repository.dart';
+import 'package:hr_connect/features/user_management/data/repositories/user_repository_impl.dart';
+import 'package:hr_connect/features/user_management/presentation/providers/user_provider.dart';
 
 import 'package:hr_connect/core/theme/theme_provider.dart';
 
@@ -17,8 +17,8 @@ Future<void> initDI() async {
 
   sl.registerLazySingleton<SharedPreferences>(() => sharedPreferences);
   sl.registerLazySingleton<ApiClient>(() => ApiClient());
-  sl.registerLazySingleton<AuthRemote>(() => AuthRemoteImpl(apiClient: sl()));
-  sl.registerLazySingleton<AuthRepository>(() => AuthRepositoryImpl(remoteDataSource: sl()));
+  sl.registerLazySingleton<UserRemote>(() => UserRemoteImpl(apiClient: sl()));
+  sl.registerLazySingleton<UserRepository>(() => UserRepositoryImpl(remoteDataSource: sl()));
 
   sl.registerFactory<ThemeProvider>(
     () => ThemeProvider(
@@ -26,7 +26,7 @@ Future<void> initDI() async {
     ),
   );
 
-  sl.registerFactory<AuthProvider>(
-    () => AuthProvider(repository: sl())
+  sl.registerFactory<UserProvider>(
+    () => UserProvider(repository: sl())
   );
 }

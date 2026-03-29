@@ -1,19 +1,19 @@
 import 'package:dio/dio.dart';
 import 'package:hr_connect/core/error/failures.dart';
-import 'package:hr_connect/features/auth/data/models/user_model.dart';
+import 'package:hr_connect/features/user_management/data/models/user_model.dart';
 import 'package:hr_connect/core/network/api_client.dart';
 
-abstract class AuthRemote {
-  Future<UserModel> getUserProfile();
+abstract class UserRemote {
+  Future<UserModel> getUsers();
 }
 
-class AuthRemoteImpl implements AuthRemote {
+class UserRemoteImpl implements UserRemote {
   final ApiClient apiClient;
 
-  AuthRemoteImpl({required this.apiClient});
+  UserRemoteImpl({required this.apiClient});
 
   @override
-  Future<UserModel> getUserProfile() async {
+  Future<UserModel> getUsers() async {
     try {
       final response = await apiClient.dio.get('/users');
       final userData = response.data['data'];

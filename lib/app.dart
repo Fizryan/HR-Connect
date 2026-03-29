@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:hr_connect/core/di/injection.dart';
-import 'package:hr_connect/features/auth/presentation/providers/auth_provider.dart';
 import 'package:hr_connect/core/routes/app_router.dart';
 import 'package:hr_connect/core/theme/app_theme.dart';
 import 'package:hr_connect/core/theme/theme_provider.dart';
+import 'package:hr_connect/features/user_management/presentation/providers/user_provider.dart';
 import 'package:provider/provider.dart';
 
 class MainApp extends StatelessWidget {
@@ -15,7 +15,7 @@ class MainApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => sl<ThemeProvider>()),
-        ChangeNotifierProvider(create: (_) => sl<AuthProvider>()),
+        ChangeNotifierProvider(create: (_) => sl<UserProvider>()),
       ],
       child: ScreenUtilInit(
         designSize: const Size(393, 830),
