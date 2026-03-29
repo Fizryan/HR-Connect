@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:hr_connect/core/const/enums.dart';
-import 'package:hr_connect/features/widgets/dashboard.dart';
-import 'package:hr_connect/features/widgets/shared/header.dart';
+import 'package:hr_connect/features/widgets/dashboard_widgets.dart';
+import 'package:hr_connect/features/widgets/shared_widgets.dart';
 
 class MainScreen extends StatefulWidget {
   final UserRole role;
@@ -29,7 +29,7 @@ class _MainScreenState extends State<MainScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Header(
+                HeaderWidgets(
                   colorScheme: colorScheme,
                   name: 'User',
                   role: widget.role,

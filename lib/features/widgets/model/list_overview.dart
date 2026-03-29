@@ -1,17 +1,15 @@
 import 'package:flutter/material.dart';
 
-class ListMenu {
+class ListOverview {
   final String title;
+  final String subtitle;
   final IconData icon;
   final Color iconColor;
-  final bool isNew;
-  final Function()? onTap;
 
-  ListMenu({
+  ListOverview({
     required this.title,
+    required this.subtitle,
     required this.icon,
     required this.iconColor,
-    this.isNew = false,
-    this.onTap,
   });
-} 
+}

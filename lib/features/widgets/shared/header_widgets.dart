@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:hr_connect/core/const/enums.dart';
+import 'package:hr_connect/core/theme/theme_provider.dart';
+import 'package:provider/provider.dart';
 
-class Header extends StatelessWidget {
+class HeaderWidgets extends StatelessWidget {
   final ColorScheme colorScheme;
   final String name;
   final UserRole role;
 
-  const Header({
+  const HeaderWidgets({
     super.key,
     required this.colorScheme,
     required this.name,
@@ -24,12 +26,12 @@ class Header extends StatelessWidget {
       child: Row(
         children: [
           CircleAvatar(
-            backgroundColor: colorScheme.surface,
+            backgroundColor: colorScheme.primary,
             radius: 20.r,
             child: Text(
               role.name[0].toUpperCase(),
               style: TextStyle(
-                color: colorScheme.primary,
+                color: colorScheme.surface,
                 fontWeight: FontWeight.bold,
                 fontSize: 16.sp,
               ),
@@ -70,12 +72,16 @@ class Header extends StatelessWidget {
             ),
           ),
           IconButton(
-            icon: Icon(Icons.settings_outlined, color: colorScheme.onSurface),
+            icon: Icon(
+              colorScheme.brightness == Brightness.dark
+                  ? Icons.light_mode_outlined
+                  : Icons.dark_mode_outlined,
+              color: colorScheme.onSurface,
+            ),
             onPressed: () {
-              // TODO: Implement settings functionality
+              context.read<ThemeProvider>().toggleTheme();
             },
           ),
-          SizedBox(width: 8.w),
           IconButton(
             icon: Icon(
               Icons.exit_to_app_outlined,
