@@ -8,7 +8,6 @@ part 'user_model.g.dart';
 abstract class UserModel with _$UserModel {
   const factory UserModel({
     required String uid,
-    required String email,
     required String firstName,
     required String lastName,
     required UserRole role,
@@ -16,8 +15,8 @@ abstract class UserModel with _$UserModel {
     @JsonKey(name: 'is_active', defaultValue: true) required bool isActive,
     @JsonKey(name: 'created_at') DateTime? createdAt,
     @JsonKey(name: 'updated_at') DateTime? updatedAt,
-
   }) = _UserModel;
 
-  factory UserModel.fromJson(Map<String, dynamic> json) => _$UserModelFromJson(json);
+  factory UserModel.fromJson(Map<String, dynamic> json) =>
+      _$UserModelFromJson(json);
 }

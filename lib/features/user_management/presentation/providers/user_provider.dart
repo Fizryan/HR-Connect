@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hr_connect/features/user_management/data/models/user_model.dart';
-import 'package:hr_connect/features/user_management/domain/repositories/user_repository.dart';
+import 'package:hr_connect/features/user_management/data/repositories/user_repository.dart';
 import 'package:hr_connect/features/user_management/presentation/providers/user_state.dart';
 
 class UserProvider extends ValueNotifier<UserState> {

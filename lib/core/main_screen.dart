@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:hr_connect/core/const/enums.dart';
+import 'package:hr_connect/features/user_management/data/models/user_model.dart';
 import 'package:hr_connect/features/widgets/dashboard_widgets.dart';
 import 'package:hr_connect/features/widgets/shared_widgets.dart';
 
 class MainScreen extends StatefulWidget {
-  final UserRole role;
+  final UserModel user;
 
-  const MainScreen({super.key, required this.role});
+  const MainScreen({super.key, required this.user});
 
   @override
   State<MainScreen> createState() => _MainScreenState();
@@ -18,6 +19,7 @@ class _MainScreenState extends State<MainScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final role = widget.user.role;
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
@@ -31,11 +33,11 @@ class _MainScreenState extends State<MainScreen> {
               children: [
                 HeaderWidgets(
                   colorScheme: colorScheme,
-                  name: 'User',
-                  role: widget.role,
-                ), // TODO : Change to actual user data
+                  name: widget.user.firstName,
+                  role: role,
+                ),
                 SizedBox(height: 16.h),
-                _buildDashboardContent(colorScheme),
+                _buildDashboardContent(colorScheme, role),
               ],
             ),
           ),
@@ -44,12 +46,18 @@ class _MainScreenState extends State<MainScreen> {
     );
   }
 
-  Widget _buildDashboardContent(ColorScheme colorScheme) {
-    switch (widget.role) {
+  Widget _buildDashboardContent(ColorScheme colorScheme, UserRole role) {
+    switch (role) {
       case UserRole.admin:
         return AdminDashboard(colorScheme: colorScheme);
-      default:
-        return const SizedBox.shrink();
+      case UserRole.director:
+        return DirectorDashboard(colorScheme: colorScheme);
+      case UserRole.manager:
+        return ManagerDashboard(colorScheme: colorScheme);
+      case UserRole.supervisor:
+        return SupervisorDashboard(colorScheme: colorScheme);
+      case UserRole.staff:
+        return StaffDashboard(colorScheme: colorScheme);
     }
   }
 }

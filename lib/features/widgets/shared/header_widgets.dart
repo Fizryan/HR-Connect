@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:hr_connect/core/const/enums.dart';
 import 'package:hr_connect/core/theme/theme_provider.dart';
+import 'package:hr_connect/features/auth/presentation/providers/auth_provider.dart';
 import 'package:provider/provider.dart';
 
 class HeaderWidgets extends StatelessWidget {
@@ -88,7 +89,7 @@ class HeaderWidgets extends StatelessWidget {
               color: colorScheme.onSurface.withValues(alpha: 0.6),
             ),
             onPressed: () {
-              // TODO: Implement logout functionality
+              context.read<AuthProvider>().logout();
             },
           ),
         ],

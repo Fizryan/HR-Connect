@@ -2,7 +2,7 @@ import 'package:fpdart/fpdart.dart';
 import 'package:hr_connect/core/error/failures.dart';
 import 'package:hr_connect/features/user_management/data/datasources/user_remote.dart';
 import 'package:hr_connect/features/user_management/data/models/user_model.dart';
-import 'package:hr_connect/features/user_management/domain/repositories/user_repository.dart';
+import 'package:hr_connect/features/user_management/data/repositories/user_repository.dart';
 
 class UserRepositoryImpl implements UserRepository {
   final UserRemote remoteDataSource;
