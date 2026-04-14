@@ -5,7 +5,6 @@ import 'package:hr_connect/core/theme/app_colors.dart';
 import 'package:hr_connect/features/auth/presentation/providers/auth_provider.dart';
 import 'package:hr_connect/features/auth/presentation/providers/auth_state.dart';
 import 'package:provider/provider.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -100,11 +99,6 @@ class _LoginScreenState extends State<LoginScreen> {
             onPressed: () => Navigator.pop(context),
             child: const Text('Close'),
           ),
-          ElevatedButton.icon(
-            onPressed: () => _launchEmail(_supportEmail),
-            icon: const Icon(Icons.email, size: 18),
-            label: const Text('Email Support'),
-          ),
         ],
       ),
     );
@@ -128,38 +122,7 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  void _showContactSupportDialog() {
-    _launchEmailDirectly();
-  }
-
-  Future<void> _launchEmailDirectly() async {
-    final uri = Uri(
-      scheme: 'mailto',
-      path: _supportEmail,
-      queryParameters: {
-        'subject': 'HR Connect - Account Request',
-        'body':
-            '''Hello HR Team,\n\nI would like to request access to HR Connect app.\n\nMy Details:\n- Name: \n- Department: \n- Position: \n- Employee ID (if available): \n\nThank you.''',
-      },
-    );
-
-    try {
-      final launched = await launchUrl(
-        uri,
-        mode: LaunchMode.externalApplication,
-      );
-
-      if (!launched && mounted) {
-        _showContactInfoFallback();
-      }
-    } catch (e) {
-      if (mounted) {
-        _showContactInfoFallback();
-      }
-    }
-  }
-
-  void _showContactInfoFallback() {
+  void _showContactInfo() {
     final theme = Theme.of(context);
     showDialog(
       context: context,
@@ -184,7 +147,7 @@ class _LoginScreenState extends State<LoginScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Could not open email app. Please contact HR manually:',
+              'Please contact the HR Administrator or IT Support:',
               style: TextStyle(
                 color: theme.colorScheme.onSurface.withValues(alpha: 0.8),
               ),
@@ -203,21 +166,6 @@ class _LoginScreenState extends State<LoginScreen> {
         ],
       ),
     );
-  }
-
-  Future<void> _launchEmail(String email) async {
-    final uri = Uri.parse('mailto:$email?subject=HR Connect Support Request');
-    try {
-      if (await canLaunchUrl(uri)) {
-        await launchUrl(uri, mode: LaunchMode.externalApplication);
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Could not open email: $email')));
-      }
-    }
   }
 
   @override
@@ -357,7 +305,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         TextButton(
                           onPressed: isLoading
                               ? null
-                              : _showContactSupportDialog,
+                              : _showContactInfo,
                           style: TextButton.styleFrom(
                             padding: EdgeInsets.zero,
                             minimumSize: Size.zero,

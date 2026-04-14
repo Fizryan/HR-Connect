@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hr_connect/core/di/injection.dart';
-import 'package:hr_connect/core/main_screen.dart';
+import 'package:hr_connect/features/widgets/main_screen.dart';
 import 'package:hr_connect/features/auth/presentation/providers/auth_provider.dart';
 import 'package:hr_connect/features/auth/presentation/providers/auth_state.dart';
 import 'package:hr_connect/features/auth/presentation/screens/login_screen.dart';
