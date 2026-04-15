@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:hr_connect/core/const/support_information.dart';
+import 'package:hr_connect/core/theme/theme_provider.dart';
 import 'package:hr_connect/features/auth/presentation/providers/auth_provider.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:provider/provider.dart';
@@ -8,7 +9,7 @@ import 'package:provider/provider.dart';
 class DialogWidget {
   static final String _supportEmail = SupportInformation.supportEmail;
   static final String _supportPhone = SupportInformation.supportPhone;
-  
+
   static void showSupportDialog(BuildContext context, ColorScheme colorScheme) {
     showDialog(
       context: context,
@@ -57,7 +58,11 @@ class DialogWidget {
             SizedBox(height: 8.h),
             Row(
               children: [
-                Icon(Icons.phone_in_talk_outlined, size: 18.sp, color: colorScheme.primary),
+                Icon(
+                  Icons.phone_in_talk_outlined,
+                  size: 18.sp,
+                  color: colorScheme.primary,
+                ),
                 SizedBox(width: 8.w),
                 Expanded(
                   child: Text(
@@ -192,6 +197,70 @@ class DialogWidget {
           ),
         ],
       ),
+    );
+  }
+
+  static void showThemeDialog(BuildContext context, ColorScheme colorScheme) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return Consumer<ThemeProvider>(
+          builder: (context, themeProvider, _) {
+            return AlertDialog(
+              backgroundColor: colorScheme.surface,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16.r),
+              ),
+              title: Row(
+                children: [
+                  Icon(
+                    Icons.color_lens_outlined,
+                    color: colorScheme.primary,
+                    size: 24.sp,
+                  ),
+                  SizedBox(width: 12.w),
+                  const Text('Select Theme'),
+                ],
+              ),
+              content: RadioGroup<ThemeMode>(
+                groupValue: themeProvider.themeMode,
+                onChanged: (ThemeMode? value) {
+                  if (value != null) {
+                    themeProvider.setThemeMode(value);
+                    Navigator.pop(context);
+                  }
+                },
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    RadioListTile<ThemeMode>(
+                      title: const Text('System Default'),
+                      value: ThemeMode.system,
+                      activeColor: colorScheme.primary,
+                    ),
+                    RadioListTile<ThemeMode>(
+                      title: const Text('Light'),
+                      value: ThemeMode.light,
+                      activeColor: colorScheme.primary,
+                    ),
+                    RadioListTile<ThemeMode>(
+                      title: const Text('Dark'),
+                      value: ThemeMode.dark,
+                      activeColor: colorScheme.primary,
+                    ),
+                  ],
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text('Close'),
+                ),
+              ],
+            );
+          },
+        );
+      },
     );
   }
 }

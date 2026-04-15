@@ -1,61 +1,10 @@
-import 'package:hr_connect/core/const/enums.dart';
 import 'package:hr_connect/core/error/failures.dart';
+import 'package:hr_connect/features/testing/shared/user_data.dart';
 import 'package:hr_connect/features/user_management/data/datasources/user_remote.dart';
 import 'package:hr_connect/features/user_management/data/models/user_model.dart';
 
 class UserDummyRemote implements UserRemote {
-  final List<UserModel> _dummyUsers = [
-    UserModel(
-      uid: 'USR-001',
-      firstName: 'Hafizryandin',
-      lastName: 'Haykal Matondang',
-      role: UserRole.admin,
-      avatarUrl: 'https://i.pravatar.cc/150?img=1',
-      isActive: true,
-      createdAt: DateTime.now().subtract(const Duration(days: 30)),
-      updatedAt: DateTime.now().subtract(const Duration(days: 15)),
-    ),
-    UserModel(
-      uid: 'USR-002',
-      firstName: 'Muhammad Fathir',
-      lastName: 'Rizky Salam',
-      role: UserRole.director,
-      avatarUrl: 'https://i.pravatar.cc/150?img=2',
-      isActive: true,
-      createdAt: DateTime.now().subtract(const Duration(days: 22)),
-      updatedAt: DateTime.now().subtract(const Duration(days: 15)),
-    ),
-    UserModel(
-      uid: 'USR-003',
-      firstName: 'Hafidz Naufal',
-      lastName: 'Pradana',
-      role: UserRole.manager,
-      avatarUrl: 'https://i.pravatar.cc/150?img=3',
-      isActive: true,
-      createdAt: DateTime.now().subtract(const Duration(days: 25)),
-      updatedAt: DateTime.now().subtract(const Duration(days: 12)),
-    ),
-    UserModel(
-      uid: 'USR-004',
-      firstName: 'Haidar Zahran',
-      lastName: 'Haryono',
-      role: UserRole.supervisor,
-      avatarUrl: 'https://i.pravatar.cc/150?img=4',
-      isActive: true,
-      createdAt: DateTime.now().subtract(const Duration(days: 18)),
-      updatedAt: DateTime.now().subtract(const Duration(days: 11)),
-    ),
-    UserModel(
-      uid: 'USR-005',
-      firstName: 'Cecep Wijaya',
-      lastName: 'Antonio Lopez',
-      role: UserRole.staff,
-      avatarUrl: 'https://i.pravatar.cc/150?img=5',
-      isActive: true,
-      createdAt: DateTime.now().subtract(const Duration(days: 8)),
-      updatedAt: DateTime.now().subtract(const Duration(days: 5)),
-    ),
-  ];
+  final List<UserModel> _dummyUsers = UserData.dummyUsers.values.toList();
 
   Future<void> _simulatedNetworkDelay() async {
     await Future.delayed(const Duration(seconds: 2));

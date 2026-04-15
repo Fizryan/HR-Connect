@@ -3,20 +3,23 @@ import 'package:hr_connect/core/const/shared_preferences.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ThemeProvider extends ChangeNotifier {
-  bool _isDarkMode;
+  ThemeMode _themeMode;
 
-  bool get isDarkMode => _isDarkMode;
+  ThemeMode get themeMode => _themeMode;
 
-  ThemeProvider({bool isDarkMode = false}) : _isDarkMode = isDarkMode;
+  bool get isDarkMode => _themeMode == ThemeMode.dark;
 
-  void toggleTheme() {
-    _isDarkMode = !_isDarkMode;
+  ThemeProvider({ThemeMode themeMode = ThemeMode.system}) : _themeMode = themeMode;
+
+  void setThemeMode(ThemeMode mode) {
+    if (_themeMode == mode) return;
+    _themeMode = mode;
     _saveTheme();
     notifyListeners();
   }
 
   Future<void> _saveTheme() async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool(SharedPrefs.isDarkMode, _isDarkMode);
+    await prefs.setString(SharedPrefs.themeMode, _themeMode.name);
   }
 }

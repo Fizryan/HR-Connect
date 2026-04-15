@@ -1,5 +1,5 @@
 class SharedPrefs {
   SharedPrefs._();
 
-  static const String isDarkMode = 'is_dark_mode';
+  static const String themeMode = 'theme_mode';
 }

@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get_it/get_it.dart';
@@ -5,8 +6,6 @@ import 'package:hr_connect/features/auth/data/datasource/auth_remote.dart';
 import 'package:hr_connect/features/auth/data/repositories/auth_repository.dart';
 import 'package:hr_connect/features/auth/data/repositories/auth_repository_impl.dart';
 import 'package:hr_connect/features/auth/presentation/providers/auth_provider.dart';
-import 'package:hr_connect/features/auth/data/datasource/testing/auth_dummy_remote.dart';
-import 'package:hr_connect/features/user_management/data/datasources/testing/user_dummy_remote.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:hr_connect/core/const/shared_preferences.dart';
 import 'package:hr_connect/core/network/api_client.dart';
@@ -15,6 +14,8 @@ import 'package:hr_connect/features/user_management/data/repositories/user_repos
 import 'package:hr_connect/features/user_management/data/repositories/user_repository_impl.dart';
 import 'package:hr_connect/features/user_management/presentation/providers/user_provider.dart';
 import 'package:hr_connect/core/theme/theme_provider.dart';
+
+import '../../features/testing/export.dart';
 
 final sl = GetIt.instance;
 
@@ -52,10 +53,14 @@ Future<void> initDI() async {
 
   // Providers
   sl.registerLazySingleton<ThemeProvider>(
-    () => ThemeProvider(
-      isDarkMode:
-          sl<SharedPreferences>().getBool(SharedPrefs.isDarkMode) ?? false,
-    ),
+    () {
+      final themeStr = sl<SharedPreferences>().getString(SharedPrefs.themeMode);
+      ThemeMode mode = ThemeMode.system;
+      if (themeStr == ThemeMode.light.name) mode = ThemeMode.light;
+      if (themeStr == ThemeMode.dark.name) mode = ThemeMode.dark;
+      
+      return ThemeProvider(themeMode: mode);
+    },
   );
 
   sl.registerLazySingleton<AuthProvider>(

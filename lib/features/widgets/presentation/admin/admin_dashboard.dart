@@ -24,7 +24,6 @@ class _AdminDashboardState extends State<AdminDashboard> {
 
   @override
   void dispose() {
-    _userProvider.dispose();
     super.dispose();
   }
 

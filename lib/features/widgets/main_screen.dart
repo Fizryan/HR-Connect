@@ -2,13 +2,11 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:hr_connect/core/const/enums.dart';
-import 'package:hr_connect/core/theme/theme_provider.dart';
 import 'package:hr_connect/features/user_management/data/models/user_model.dart';
 import 'package:hr_connect/features/widgets/presentation/admin/admin_control.dart';
 import 'package:hr_connect/features/widgets/role_widgets.dart';
 import 'package:hr_connect/features/widgets/shared/dialog_widget.dart';
 import 'package:hr_connect/features/widgets/shared/profile_menu_tile_widgets.dart';
-import 'package:provider/provider.dart';
 
 class MainScreen extends StatefulWidget {
   final UserModel user;
@@ -195,11 +193,9 @@ class _MainScreenState extends State<MainScreen> {
               onTap: () => DialogWidget.showAboutDialog(context, colorScheme),
             ),
             ProfileMenuTile(
-              icon: colorScheme.brightness == Brightness.dark
-                  ? Icons.light_mode_outlined
-                  : Icons.dark_mode_outlined,
-              title: 'Toggle Theme',
-              onTap: () => context.read<ThemeProvider>().toggleTheme(),
+              icon: Icons.color_lens_outlined,
+              title: 'Theme Settings',
+              onTap: () => DialogWidget.showThemeDialog(context, colorScheme),
             ),
             Divider(),
             ProfileMenuTile(
