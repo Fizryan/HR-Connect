@@ -19,9 +19,9 @@ class OverviewWidgets extends StatelessWidget {
     return Container(
       padding: EdgeInsets.all(16.w),
       decoration: BoxDecoration(
-        color: colorScheme.onPrimary.withValues(alpha: 0.8),
+        color: colorScheme.onPrimary.withValues(alpha: 0.4),
         borderRadius: BorderRadius.circular(8.r),
-        border: Border.all(color: colorScheme.onSurface.withValues(alpha: 0.4)),
+        border: Border.all(color: colorScheme.primary.withValues(alpha: 0.4)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -34,7 +34,7 @@ class OverviewWidgets extends StatelessWidget {
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 14.sp,
-                  color: colorScheme.onSurface,
+                  color: colorScheme.primary,
                 ),
               ),
             ],
@@ -71,7 +71,7 @@ class OverviewWidgets extends StatelessWidget {
           height: 48.w,
           width: 48.w,
           decoration: BoxDecoration(
-            color: colorScheme.onSurface.withValues(alpha: 0.1),
+            color: colorScheme.primary.withValues(alpha: 0.1),
             shape: BoxShape.circle,
           ),
           child: Icon(overview.icon, color: overview.iconColor, size: 24.sp),
@@ -84,7 +84,7 @@ class OverviewWidgets extends StatelessWidget {
           softWrap: true,
           overflow: TextOverflow.visible,
           style: TextStyle(
-            color: colorScheme.onSurface,
+            color: colorScheme.primary,
             fontSize: 12.sp,
             height: 1.2,
             fontWeight: FontWeight.w500,
@@ -98,7 +98,7 @@ class OverviewWidgets extends StatelessWidget {
           softWrap: true,
           overflow: TextOverflow.visible,
           style: TextStyle(
-            color: colorScheme.onSurface,
+            color: colorScheme.primary,
             fontSize: 12.sp,
             height: 1.2,
             fontWeight: FontWeight.w500,

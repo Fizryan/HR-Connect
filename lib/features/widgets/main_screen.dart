@@ -201,9 +201,9 @@ class _MainScreenState extends State<MainScreen> {
             ProfileMenuTile(
               icon: Icons.logout_outlined,
               title: 'Logout',
-              iconColor: colorScheme.error,
-              textColor: colorScheme.error,
-              backgroundColor: colorScheme.errorContainer.withValues(alpha: 0.3),
+              iconColor: colorScheme.primary,
+              textColor: colorScheme.primary,
+              backgroundColor: colorScheme.error.withValues(alpha: 0.8),
               onTap: () => DialogWidget.showLogoutDialog(context, colorScheme),
             ),
           ],

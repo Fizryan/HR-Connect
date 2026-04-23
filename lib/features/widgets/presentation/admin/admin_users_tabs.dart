@@ -6,12 +6,17 @@ import 'package:hr_connect/features/user_management/data/models/user_model.dart'
 import 'package:hr_connect/features/user_management/presentation/providers/user_provider.dart';
 import 'package:hr_connect/features/user_management/presentation/providers/user_state.dart';
 import 'package:hr_connect/features/widgets/presentation/admin/admin_user_card.dart';
+import 'package:hr_connect/features/widgets/shared/information_widgets.dart';
 
 class AdminUsersTab extends StatefulWidget {
   final ColorScheme colorScheme;
   final UserProvider userProvider;
 
-  const AdminUsersTab({super.key, required this.colorScheme, required this.userProvider});
+  const AdminUsersTab({
+    super.key,
+    required this.colorScheme,
+    required this.userProvider,
+  });
 
   @override
   State<AdminUsersTab> createState() => _AdminUsersTabState();
@@ -27,6 +32,15 @@ class _AdminUsersTabState extends State<AdminUsersTab> {
   Widget build(BuildContext context) {
     return Column(
       children: [
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 4.h),
+          child: InformationWidgets(
+            colorScheme: widget.colorScheme,
+            desciption: 'Type Name or Use Filter Role',
+            icon: Icons.info_outline_rounded,
+            iconColor: widget.colorScheme.primary,
+          ),
+        ),
         _buildFilterSection(widget.colorScheme),
         Expanded(
           child: ValueListenableBuilder<UserState>(

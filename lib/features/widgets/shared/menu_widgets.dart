@@ -20,9 +20,9 @@ class MenuWidgets extends StatelessWidget {
     return Container(
       padding: EdgeInsets.all(16.w),
       decoration: BoxDecoration(
-        color: colorScheme.onPrimary.withValues(alpha: 0.8),
+        color: colorScheme.onPrimary.withValues(alpha: 0.4),
         borderRadius: BorderRadius.circular(8.r),
-        border: Border.all(color: colorScheme.onSurface.withValues(alpha: 0.4)),
+        border: Border.all(color: colorScheme.primary.withValues(alpha: 0.4)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -35,10 +35,10 @@ class MenuWidgets extends StatelessWidget {
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 14.sp,
-                  color: colorScheme.onSurface,
+                  color: colorScheme.primary,
                 ),
               ),
-              Icon(icon, color: colorScheme.onSurface, size: 24.sp)
+              Icon(icon, color: colorScheme.primary, size: 24.sp)
             ],
           ),
           SizedBox(height: 8.h),

@@ -1,3 +1,4 @@
+import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:hr_connect/core/theme/app_colors.dart';
@@ -8,61 +9,62 @@ class AppTheme {
   static final _baseTextStyle = TextStyle(
     fontSize: 14.sp,
     fontWeight: FontWeight.normal,
-    color: AppColors.textPrimary,
+    color: AppColors.textLight,
   );
 
-  static final ThemeData lightTheme = ThemeData(
+  static final ThemeData lightTheme = FlexThemeData.light(
+    colors: AppColors.lightDefault,
+    surfaceMode: FlexSurfaceMode.highSurfaceLowScaffold,
+    blendLevel: 10,
+    scaffoldBackground: AppColors.lightBackground,
     useMaterial3: true,
-    scaffoldBackgroundColor: AppColors.background,
-    colorScheme: ColorScheme.fromSeed(
-      seedColor: AppColors.primary,
-      brightness: Brightness.light,
-      surface: AppColors.surface,
-      onSurface: AppColors.textPrimary
-    ),
-    appBarTheme: AppBarTheme(
-      backgroundColor: AppColors.surface,
-      foregroundColor: AppColors.textPrimary,
-      elevation: 0,
-      centerTitle: true,
-      titleTextStyle: _baseTextStyle.copyWith(
-        fontSize: 18.sp,
-        fontWeight: FontWeight.bold
-      ),
+    subThemesData: const FlexSubThemesData(
+      blendOnLevel: 10,
+      blendOnColors: false,
+      useMaterial3Typography: true,
+      useM2StyleDividerInM3: true,
+      defaultRadius: 12.0,
+      inputDecoratorBorderType: FlexInputBorderType.outline,
+      inputDecoratorUnfocusedHasBorder: true,
+      cardElevation: 2.0,
+      cardRadius: 16.0,
     ),
     textTheme: TextTheme(
       displayLarge: _baseTextStyle.copyWith(fontSize: 28.sp, fontWeight: FontWeight.bold),
       bodyLarge: _baseTextStyle.copyWith(fontSize: 16.sp),
       bodyMedium: _baseTextStyle,
-      titleMedium: _baseTextStyle.copyWith(fontSize: 16.sp, fontWeight: FontWeight.w600)
-    )
+      titleMedium: _baseTextStyle.copyWith(fontSize: 16.sp, fontWeight: FontWeight.w600),
+    ).apply(
+      bodyColor: AppColors.textDark,
+      displayColor: AppColors.textDark,
+    ),
   );
 
-  static final ThemeData darkTheme = ThemeData(
+  static final ThemeData darkTheme = FlexThemeData.dark(
+    colors: AppColors.darkDefault,
+    surfaceMode: FlexSurfaceMode.highSurfaceLowScaffold,
+    blendLevel: 10,
+    scaffoldBackground: AppColors.darkBackground,
     useMaterial3: true,
-    scaffoldBackgroundColor: AppColors.darkBackground,
-    colorScheme: ColorScheme.fromSeed(
-      seedColor: AppColors.primary,
-      brightness: Brightness.dark,
-      surface: AppColors.darkSurface,
-      onSurface: AppColors.darkTextPrimary
-    ),
-    appBarTheme: AppBarTheme(
-      backgroundColor: AppColors.darkSurface,
-      foregroundColor: AppColors.darkTextPrimary,
-      elevation: 0,
-      centerTitle: true,
-      titleTextStyle: _baseTextStyle.copyWith(
-        fontSize: 18.sp,
-        fontWeight: FontWeight.bold,
-        color: AppColors.darkTextPrimary
-      ),
+    subThemesData: const FlexSubThemesData(
+      blendOnLevel: 10,
+      blendOnColors: false,
+      useMaterial3Typography: true,
+      useM2StyleDividerInM3: true,
+      defaultRadius: 12.0,
+      inputDecoratorBorderType: FlexInputBorderType.outline,
+      inputDecoratorUnfocusedHasBorder: true,
+      cardElevation: 2.0,
+      cardRadius: 16.0,
     ),
     textTheme: TextTheme(
-      displayLarge: _baseTextStyle.copyWith(fontSize: 28.sp, fontWeight: FontWeight.bold, color: AppColors.darkTextPrimary),
-      bodyLarge: _baseTextStyle.copyWith(fontSize: 16.sp, color: AppColors.darkTextPrimary),
-      bodyMedium: _baseTextStyle.copyWith(color: AppColors.darkTextPrimary),
-      titleMedium: _baseTextStyle.copyWith(fontSize: 16.sp, fontWeight: FontWeight.w600, color: AppColors.darkTextPrimary),
-    )
+      displayLarge: _baseTextStyle.copyWith(fontSize: 28.sp, fontWeight: FontWeight.bold),
+      bodyLarge: _baseTextStyle.copyWith(fontSize: 16.sp),
+      bodyMedium: _baseTextStyle,
+      titleMedium: _baseTextStyle.copyWith(fontSize: 16.sp, fontWeight: FontWeight.w600),
+    ).apply(
+      bodyColor: AppColors.textLight,
+      displayColor: AppColors.textLight,
+    ),
   );
 }

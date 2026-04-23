@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:hr_connect/core/const/support_information.dart';
-import 'package:hr_connect/core/theme/app_colors.dart';
 import 'package:hr_connect/features/auth/presentation/providers/auth_provider.dart';
 import 'package:hr_connect/features/auth/presentation/providers/auth_state.dart';
 import 'package:provider/provider.dart';
@@ -224,7 +223,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     Container(
                       padding: EdgeInsets.all(24.w),
                       decoration: BoxDecoration(
-                        color: theme.colorScheme.surface,
+                        color: theme.colorScheme.surface.withValues(alpha: 0.6),
                         borderRadius: BorderRadius.circular(24.r),
                         boxShadow: [
                           BoxShadow(
@@ -276,7 +275,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 child: Text(
                                   'Forgot Password?',
                                   style: TextStyle(
-                                    color: AppColors.accent,
+                                    color: theme.colorScheme.secondary.withValues(alpha: 0.8),
                                     fontSize: 12.sp,
                                     fontWeight: FontWeight.w600,
                                   ),
@@ -314,7 +313,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           child: Text(
                             'Contact Support',
                             style: TextStyle(
-                              color: theme.colorScheme.primary,
+                              color: theme.colorScheme.secondary.withValues(alpha: 0.8),
                               fontWeight: FontWeight.w600,
                               fontSize: 14.sp,
                             ),

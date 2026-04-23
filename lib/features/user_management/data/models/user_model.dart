@@ -8,6 +8,7 @@ part 'user_model.g.dart';
 abstract class UserModel with _$UserModel {
   const factory UserModel({
     required String uid,
+    required String email,
     required String firstName,
     required String lastName,
     required UserRole role,
