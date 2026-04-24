@@ -1,22 +1,16 @@
 import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:hr_connect/core/theme/app_colors.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class AppTheme {
   AppTheme._();
-
-  static final _baseTextStyle = TextStyle(
-    fontSize: 14.sp,
-    fontWeight: FontWeight.normal,
-    color: AppColors.textLight,
-  );
 
   static final ThemeData lightTheme = FlexThemeData.light(
     colors: AppColors.lightDefault,
     surfaceMode: FlexSurfaceMode.highSurfaceLowScaffold,
     blendLevel: 10,
-    scaffoldBackground: AppColors.lightBackground,
+    scaffoldBackground: AppColors.lightPallet4,
     useMaterial3: true,
     subThemesData: const FlexSubThemesData(
       blendOnLevel: 10,
@@ -29,14 +23,9 @@ class AppTheme {
       cardElevation: 2.0,
       cardRadius: 16.0,
     ),
-    textTheme: TextTheme(
-      displayLarge: _baseTextStyle.copyWith(fontSize: 28.sp, fontWeight: FontWeight.bold),
-      bodyLarge: _baseTextStyle.copyWith(fontSize: 16.sp),
-      bodyMedium: _baseTextStyle,
-      titleMedium: _baseTextStyle.copyWith(fontSize: 16.sp, fontWeight: FontWeight.w600),
-    ).apply(
-      bodyColor: AppColors.textDark,
-      displayColor: AppColors.textDark,
+    textTheme: GoogleFonts.interTextTheme().apply(
+      bodyColor: AppColors.darkPallet1,
+      displayColor: AppColors.darkPallet1,
     ),
   );
 
@@ -44,7 +33,7 @@ class AppTheme {
     colors: AppColors.darkDefault,
     surfaceMode: FlexSurfaceMode.highSurfaceLowScaffold,
     blendLevel: 10,
-    scaffoldBackground: AppColors.darkBackground,
+    scaffoldBackground: AppColors.darkPallet1,
     useMaterial3: true,
     subThemesData: const FlexSubThemesData(
       blendOnLevel: 10,
@@ -57,14 +46,9 @@ class AppTheme {
       cardElevation: 2.0,
       cardRadius: 16.0,
     ),
-    textTheme: TextTheme(
-      displayLarge: _baseTextStyle.copyWith(fontSize: 28.sp, fontWeight: FontWeight.bold),
-      bodyLarge: _baseTextStyle.copyWith(fontSize: 16.sp),
-      bodyMedium: _baseTextStyle,
-      titleMedium: _baseTextStyle.copyWith(fontSize: 16.sp, fontWeight: FontWeight.w600),
-    ).apply(
-      bodyColor: AppColors.textLight,
-      displayColor: AppColors.textLight,
+    textTheme: GoogleFonts.interTextTheme().apply(
+      bodyColor: AppColors.lightPallet4,
+      displayColor: AppColors.lightPallet4,
     ),
   );
 }

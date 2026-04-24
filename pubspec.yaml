@@ -14,7 +14,7 @@ dependencies:
   flutter_screenutil: ^5.9.3
   dropdown_button2: ^3.0.0
   flex_color_scheme: ^8.4.0
-
+  google_fonts: ^8.0.2
 
   # Local Storage
   shared_preferences: ^2.5.5

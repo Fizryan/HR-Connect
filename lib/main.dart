@@ -5,34 +5,22 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:hr_connect/app.dart';
 import 'package:hr_connect/core/di/injection.dart';
 
-void main() {
-  runZonedGuarded(
-    () async {
-      WidgetsFlutterBinding.ensureInitialized();
-      
-      await dotenv.load(fileName: ".env");
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
 
-      await initDI();
+  await dotenv.load(fileName: ".env");
+  await initDI();
 
-      FlutterError.onError = (FlutterErrorDetails details) {
-        FlutterError.presentError(details);
-        debugPrint('[FlutterError]: ${details.exception}');
-        if (details.stack != null) {
-          debugPrint('[StackTrace]: ${details.stack}');
-        }
-      };
+  FlutterError.onError = (FlutterErrorDetails details) {
+    FlutterError.presentError(details);
+    debugPrint('[FlutterError]: ${details.exception}');
+  };
 
-      PlatformDispatcher.instance.onError = (error, stack) {
-        debugPrint('[PlatformDispatcherError]: $error');
-        debugPrint('[StackTrace]: $stack');
-        return true;
-      };
+  PlatformDispatcher.instance.onError = (error, stack) {
+    debugPrint('[PlatformDispatcherError]: $error');
+    debugPrint('[StackTrace]: $stack');
+    return true;
+  };
 
-      runApp(const MainApp());
-    },
-    (error, stackTrace) {
-      debugPrint('[ZonedGuardedError]: $error');
-      debugPrint('[StackTrace]: $stackTrace');
-    },
-  );
+  runApp(const MainApp());
 }

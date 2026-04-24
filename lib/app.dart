@@ -26,6 +26,12 @@ class _MainAppState extends State<MainApp> {
   }
 
   @override
+  void dispose() {
+    _router.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
@@ -38,17 +44,14 @@ class _MainAppState extends State<MainApp> {
         minTextAdapt: true,
         splitScreenMode: true,
         builder: (context, child) {
-          return Consumer<ThemeProvider>(
-            builder: (context, themeProvider, _) {
-              return MaterialApp.router(
-                title: 'HR Connect',
-                debugShowCheckedModeBanner: false,
-                themeMode: themeProvider.themeMode,
-                theme: AppTheme.lightTheme,
-                darkTheme: AppTheme.darkTheme,
-                routerConfig: _router,
-              );
-            }
+          final themeMode = context.select((ThemeProvider p) => p.themeMode);
+          return MaterialApp.router(
+            title: 'HR Connect',
+            debugShowCheckedModeBanner: false,
+            themeMode: themeMode,
+            theme: AppTheme.lightTheme,
+            darkTheme: AppTheme.darkTheme,
+            routerConfig: _router,
           );
         },
       ),

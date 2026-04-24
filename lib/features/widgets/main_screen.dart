@@ -97,11 +97,11 @@ class _MainScreenState extends State<MainScreen> {
         ),
       ),
       bottomNavigationBar: NavigationBar(
-        backgroundColor: colorScheme.onSecondary.withValues(alpha: 0.4),
+        backgroundColor: colorScheme.secondary,
         height: 74.h,
         elevation: 0,
         animationDuration: const Duration(seconds: 2),
-        indicatorColor: colorScheme.primary.withValues(alpha: 0.4),
+        indicatorColor: colorScheme.onSecondary.withValues(alpha: 0.4),
         selectedIndex: safeIndex,
         onDestinationSelected: (int index) {
           setState(() {
@@ -110,8 +110,8 @@ class _MainScreenState extends State<MainScreen> {
         },
         destinations: navigationItems.map((item) {
           return NavigationDestination(
-            icon: Icon(item.icon, color: colorScheme.onSurface),
-            selectedIcon: Icon(item.selectedIcon, color: colorScheme.primary),
+            icon: Icon(item.icon, color: colorScheme.onSecondary.withValues(alpha: 0.2)),
+            selectedIcon: Icon(item.selectedIcon, color: colorScheme.onSecondary),
             label: item.label,
           );
         }).toList(),
@@ -149,7 +149,7 @@ class _MainScreenState extends State<MainScreen> {
               placeholder: (context, url) => Text(
                 "No image",
                 style: TextStyle(
-                  color: colorScheme.onSurface,
+                  color: colorScheme.onSecondary.withValues(alpha: 0.6),
                   fontWeight: FontWeight.bold,
                   fontSize: 14.sp,
                 ),
@@ -160,7 +160,7 @@ class _MainScreenState extends State<MainScreen> {
             Text(
               '${widget.user.firstName} ${widget.user.lastName}',
               style: TextStyle(
-                color: colorScheme.onSurface,
+                color: colorScheme.onSecondary,
                 fontWeight: FontWeight.bold,
                 fontSize: 16.sp,
               ),
@@ -172,12 +172,12 @@ class _MainScreenState extends State<MainScreen> {
                 Text(
                   'HRConnect | ${_capitalize(role.name)}',
                   style: TextStyle(
-                    color: colorScheme.onSurface.withValues(alpha: 0.6),
+                    color: colorScheme.onSecondary.withValues(alpha: 0.6),
                     fontSize: 16.sp,
                   ),
                 ),
                 SizedBox(width: 4.w),
-                Icon(Icons.verified, color: colorScheme.primary, size: 18.sp),
+                Icon(Icons.verified, color: colorScheme.onSecondary, size: 18.sp),
               ],
             ),
             SizedBox(height: 16.h),
@@ -201,8 +201,8 @@ class _MainScreenState extends State<MainScreen> {
             ProfileMenuTile(
               icon: Icons.logout_outlined,
               title: 'Logout',
-              iconColor: colorScheme.primary,
-              textColor: colorScheme.primary,
+              iconColor: colorScheme.onSecondary,
+              textColor: colorScheme.onSecondary,
               backgroundColor: colorScheme.error.withValues(alpha: 0.8),
               onTap: () => DialogWidget.showLogoutDialog(context, colorScheme),
             ),

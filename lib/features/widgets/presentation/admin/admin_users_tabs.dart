@@ -5,6 +5,7 @@ import 'package:hr_connect/core/const/enums.dart';
 import 'package:hr_connect/features/user_management/data/models/user_model.dart';
 import 'package:hr_connect/features/user_management/presentation/providers/user_provider.dart';
 import 'package:hr_connect/features/user_management/presentation/providers/user_state.dart';
+import 'package:hr_connect/features/widgets/presentation/admin/admin_edit_user_screen.dart';
 import 'package:hr_connect/features/widgets/presentation/admin/admin_user_card.dart';
 import 'package:hr_connect/features/widgets/shared/information_widgets.dart';
 
@@ -92,14 +93,14 @@ class _AdminUsersTabState extends State<AdminUsersTab> {
                   border: Border.all(color: colorScheme.outline),
                   borderRadius: BorderRadius.circular(12.r),
                   color: _selectedRole != null
-                      ? colorScheme.primaryContainer
-                      : colorScheme.surface,
+                      ? colorScheme.secondary
+                      : colorScheme.secondary.withValues(alpha: 0.1),
                 ),
                 child: Icon(
                   Icons.filter_list,
                   color: _selectedRole != null
-                      ? colorScheme.onPrimaryContainer
-                      : colorScheme.onSurfaceVariant,
+                      ? colorScheme.onSecondary
+                      : colorScheme.onSecondary.withValues(alpha: 0.4),
                 ),
               ),
               items: [
@@ -172,17 +173,13 @@ class _AdminUsersTabState extends State<AdminUsersTab> {
                 user: paginatedUsers[index],
                 colorScheme: colorScheme,
                 onTap: () {
-                  // TODO: Route to actual edit user page instead of this placeholder
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (_) => Scaffold(
-                        appBar: AppBar(title: const Text('Edit User')),
-                        body: Center(
-                          child: Text(
-                            'Edit User: ${paginatedUsers[index].firstName}',
-                          ),
-                        ),
+                      builder: (_) => AdminEditUserScreen(
+                        colorScheme: colorScheme,
+                        user: paginatedUsers[index],
+                        userProvider: widget.userProvider,
                       ),
                     ),
                   );

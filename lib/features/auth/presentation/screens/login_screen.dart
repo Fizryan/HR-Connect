@@ -195,7 +195,7 @@ class _LoginScreenState extends State<LoginScreen> {
               height: 300.w,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: theme.colorScheme.secondary.withValues(alpha: 0.1),
+                color: theme.colorScheme.onSecondary.withValues(alpha: 0.06),
               ),
             ),
           ),
@@ -207,7 +207,7 @@ class _LoginScreenState extends State<LoginScreen> {
               height: 200.w,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: theme.colorScheme.primary.withValues(alpha: 0.05),
+                color: theme.colorScheme.onSecondary.withValues(alpha: 0.05),
               ),
             ),
           ),
@@ -223,7 +223,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     Container(
                       padding: EdgeInsets.all(24.w),
                       decoration: BoxDecoration(
-                        color: theme.colorScheme.surface.withValues(alpha: 0.6),
+                        color: theme.colorScheme.secondary,
                         borderRadius: BorderRadius.circular(24.r),
                         boxShadow: [
                           BoxShadow(
@@ -275,7 +275,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 child: Text(
                                   'Forgot Password?',
                                   style: TextStyle(
-                                    color: theme.colorScheme.secondary.withValues(alpha: 0.8),
+                                    color: theme.colorScheme.onPrimary.withValues(alpha: 0.6),
                                     fontSize: 12.sp,
                                     fontWeight: FontWeight.w600,
                                   ),
@@ -295,7 +295,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         Text(
                           "Don't have an account? ",
                           style: TextStyle(
-                            color: theme.colorScheme.onSurface.withValues(
+                            color: theme.colorScheme.onSecondary.withValues(
                               alpha: 0.6,
                             ),
                             fontSize: 14.sp,
@@ -313,7 +313,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           child: Text(
                             'Contact Support',
                             style: TextStyle(
-                              color: theme.colorScheme.secondary.withValues(alpha: 0.8),
+                              color: theme.colorScheme.onPrimary.withValues(alpha: 0.8),
                               fontWeight: FontWeight.w600,
                               fontSize: 14.sp,
                             ),
@@ -337,13 +337,13 @@ class _LoginScreenState extends State<LoginScreen> {
         Container(
           padding: EdgeInsets.all(16.w),
           decoration: BoxDecoration(
-            color: theme.colorScheme.secondary.withValues(alpha: 0.1),
+            color: theme.colorScheme.secondary.withValues(alpha: 0.8),
             shape: BoxShape.circle,
           ),
           child: Icon(
             Icons.people_alt_rounded,
             size: 40.sp,
-            color: theme.colorScheme.secondary,
+            color: theme.colorScheme.onSecondary,
           ),
         ),
         SizedBox(height: 24.h),
@@ -352,7 +352,7 @@ class _LoginScreenState extends State<LoginScreen> {
           style: TextStyle(
             fontSize: 28.sp,
             fontWeight: FontWeight.bold,
-            color: theme.colorScheme.onSurface,
+            color: theme.colorScheme.onSecondary.withValues(alpha: 0.8),
             letterSpacing: -0.5,
           ),
         ),
@@ -361,7 +361,7 @@ class _LoginScreenState extends State<LoginScreen> {
           'Sign in to access your HR Connect',
           style: TextStyle(
             fontSize: 16.sp,
-            color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+            color: theme.colorScheme.onSecondary.withValues(alpha: 0.6),
           ),
         ),
       ],
@@ -384,23 +384,23 @@ class _LoginScreenState extends State<LoginScreen> {
       textInputAction: isPassword ? TextInputAction.done : TextInputAction.next,
       enabled: !isLoading,
       style: TextStyle(
-        color: theme.colorScheme.onSurface,
+        color: theme.colorScheme.onPrimary,
         fontSize: 14.sp,
         fontWeight: FontWeight.w500,
       ),
       decoration: InputDecoration(
         filled: true,
-        fillColor: theme.colorScheme.surfaceContainerHighest.withValues(
+        fillColor: theme.colorScheme.surfaceContainerHigh.withValues(
           alpha: 0.3,
         ),
         hintText: hint,
         hintStyle: TextStyle(
-          color: theme.colorScheme.onSurface.withValues(alpha: 0.4),
+          color: theme.colorScheme.onSecondary.withValues(alpha: 0.4),
           fontSize: 14.sp,
         ),
         prefixIcon: Icon(
           icon,
-          color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
+          color: theme.colorScheme.onSecondary.withValues(alpha: 0.5),
           size: 20.sp,
         ),
         suffixIcon: isPassword
@@ -409,7 +409,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   _isPasswordObscured
                       ? Icons.visibility_outlined
                       : Icons.visibility_off_outlined,
-                  color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
+                  color: theme.colorScheme.onSecondary.withValues(alpha: 0.5),
                   size: 20.sp,
                 ),
                 onPressed: isLoading

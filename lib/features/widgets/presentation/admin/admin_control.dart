@@ -62,7 +62,7 @@ class _AdminControlState extends State<AdminControl> {
           elevation: 0,
           title: Text(
             'Admin Control',
-            style: TextStyle(color: colorScheme.onSurface),
+            style: TextStyle(color: colorScheme.onSecondary),
           ),
         ),
         body: const Center(child: Text('No modules available.')),
@@ -76,9 +76,9 @@ class _AdminControlState extends State<AdminControl> {
           backgroundColor: AppColors.transparent,
           elevation: 0,
           title: TabBar(
-            indicatorColor: colorScheme.primary,
-            labelColor: colorScheme.primary,
-            unselectedLabelColor: colorScheme.onSurface,
+            indicatorColor: colorScheme.onSecondary,
+            labelColor: colorScheme.onSecondary,
+            unselectedLabelColor: colorScheme.onSecondary.withValues(alpha: 0.6),
             indicatorWeight: 3.h,
             labelStyle: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.bold),
             tabs: tabs.map((tab) => Tab(text: tab.title)).toList(),

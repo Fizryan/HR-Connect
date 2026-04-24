@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:hr_connect/core/theme/app_colors.dart';
 import 'package:hr_connect/features/user_management/data/models/user_model.dart';
 
 class AdminUserCard extends StatelessWidget {
@@ -39,7 +40,7 @@ class AdminUserCard extends StatelessWidget {
                 child: Icon(
                   Icons.person,
                   size: 48.sp,
-                  color: colorScheme.onSurfaceVariant,
+                  color: colorScheme.onSecondary,
                 ),
               ),
             ),
@@ -54,8 +55,8 @@ class AdminUserCard extends StatelessWidget {
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
                     colors: [
-                      Colors.transparent,
-                      Colors.black.withValues(alpha: 0.8),
+                      AppColors.transparent,
+                      AppColors.darkPallet2,
                     ],
                   ),
                 ),
@@ -66,7 +67,7 @@ class AdminUserCard extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 13.sp,
                     fontWeight: FontWeight.bold,
-                    color: Colors.white,
+                    color: AppColors.lightPallet4,
                     height: 1.2,
                   ),
                   textAlign: TextAlign.center,
@@ -81,7 +82,7 @@ class AdminUserCard extends StatelessWidget {
               child: Container(
                 padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 2.h),
                 decoration: BoxDecoration(
-                  color: colorScheme.primaryContainer.withValues(alpha: 0.9),
+                  color: colorScheme.secondary.withValues(alpha: 0.8),
                   borderRadius: BorderRadius.circular(6.r),
                   boxShadow: [
                     BoxShadow(
@@ -96,7 +97,7 @@ class AdminUserCard extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 9.sp,
                     fontWeight: FontWeight.bold,
-                    color: colorScheme.onPrimaryContainer,
+                    color: colorScheme.onSecondary,
                   ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
