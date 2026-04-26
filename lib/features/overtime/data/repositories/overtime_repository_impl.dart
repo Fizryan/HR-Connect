@@ -10,7 +10,7 @@ class OvertimeRepositoryImpl implements OvertimeRepository {
   OvertimeRepositoryImpl({required this.remoteDataSource});
 
   @override
-  Future<Either<Failure, List<OvertimeModel>>> getAllOvertimeRequests() async { 
+  Future<Either<Failure, List<OvertimeModel>>> getAllOvertimeRequests() async {
     try {
       final result = await remoteDataSource.getAllOvertimesRequests();
       return Right(result);
@@ -36,9 +36,11 @@ class OvertimeRepositoryImpl implements OvertimeRepository {
     OvertimeModel overtime,
   ) async {
     try {
-      final result = await remoteDataSource.createOvertimeRequest(overtime.toJson());
+      final result = await remoteDataSource.createOvertimeRequest(
+        overtime.toJson(),
+      );
       return Right(result);
-    } catch (e) { 
+    } catch (e) {
       if (e is ServerFailure || e is NetworkFailure) return Left(e as Failure);
       return Left(ServerFailure(e.toString()));
     }
@@ -49,7 +51,10 @@ class OvertimeRepositoryImpl implements OvertimeRepository {
     OvertimeModel overtime,
   ) async {
     try {
-      final result = await remoteDataSource.updateOvertimeStatus(overtime.uid, overtime.toJson());
+      final result = await remoteDataSource.updateOvertimeStatus(
+        overtime.uid,
+        overtime.toJson(),
+      );
       return Right(result);
     } catch (e) {
       if (e is ServerFailure || e is NetworkFailure) return Left(e as Failure);

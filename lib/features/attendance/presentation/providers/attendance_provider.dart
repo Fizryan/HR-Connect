@@ -6,7 +6,8 @@ import 'package:hr_connect/features/attendance/presentation/providers/attendance
 class AttendanceProvider extends ValueNotifier<AttendanceState> {
   final AttendanceRepository repository;
 
-  AttendanceProvider({required this.repository}) : super(const AttendanceState.initial());
+  AttendanceProvider({required this.repository})
+    : super(const AttendanceState.initial());
 
   Future<void> fetchAllAttendances() async {
     value = const AttendanceState.loading();
@@ -31,7 +32,9 @@ class AttendanceProvider extends ValueNotifier<AttendanceState> {
     final result = await repository.createAttendance(attendanceData);
     result.fold(
       (failure) => value = AttendanceState.error(failure.message),
-      (attendance) => value = const AttendanceState.success('Attendance created successfully'),
+      (attendance) => value = const AttendanceState.success(
+        'Attendance created successfully',
+      ),
     );
   }
 
@@ -40,7 +43,9 @@ class AttendanceProvider extends ValueNotifier<AttendanceState> {
     final result = await repository.deleteAttendance(uid);
     result.fold(
       (failure) => value = AttendanceState.error(failure.message),
-      (_) => value = const AttendanceState.success('Attendance deleted successfully'),
+      (_) => value = const AttendanceState.success(
+        'Attendance deleted successfully',
+      ),
     );
   }
 }

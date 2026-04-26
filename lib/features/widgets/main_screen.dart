@@ -52,7 +52,7 @@ class _MainScreenState extends State<MainScreen> {
         label: 'Requests',
         icon: Icons.file_open_outlined,
         selectedIcon: Icons.file_open_rounded,
-        page: Scaffold(),
+        page: const Scaffold(),
       ),
     ];
 
@@ -111,7 +111,10 @@ class _MainScreenState extends State<MainScreen> {
         },
         destinations: navigationItems.map((item) {
           return NavigationDestination(
-            icon: Icon(item.icon, color: colorScheme.onSurface.withValues(alpha: 0.6)),
+            icon: Icon(
+              item.icon,
+              color: colorScheme.onSurface.withValues(alpha: 0.6),
+            ),
             selectedIcon: Icon(item.selectedIcon, color: colorScheme.surface),
             label: item.label,
           );
@@ -148,7 +151,7 @@ class _MainScreenState extends State<MainScreen> {
               imageBuilder: (context, imageProvider) =>
                   CircleAvatar(radius: 60.r, backgroundImage: imageProvider),
               placeholder: (context, url) => Text(
-                "No image",
+                'No image',
                 style: TextStyle(
                   color: colorScheme.onSurface.withValues(alpha: 0.6),
                   fontWeight: FontWeight.bold,
@@ -182,7 +185,7 @@ class _MainScreenState extends State<MainScreen> {
               ],
             ),
             SizedBox(height: 16.h),
-            Divider(),
+            const Divider(),
             ProfileMenuTile(
               icon: Icons.support_agent_outlined,
               title: 'Support',
@@ -198,7 +201,7 @@ class _MainScreenState extends State<MainScreen> {
               title: 'Theme Settings',
               onTap: () => DialogWidget.showThemeDialog(context, colorScheme),
             ),
-            Divider(),
+            const Divider(),
             ProfileMenuTile(
               icon: Icons.logout_outlined,
               title: 'Logout',
@@ -218,13 +221,13 @@ class _MainScreenState extends State<MainScreen> {
       case UserRole.admin:
         return AdminDashboard(colorScheme: colorScheme);
       case UserRole.director:
-        return Scaffold();
+        return const Scaffold();
       case UserRole.manager:
-        return Scaffold();
+        return const Scaffold();
       case UserRole.supervisor:
-        return Scaffold();
+        return const Scaffold();
       case UserRole.staff:
-        return Scaffold();
+        return const Scaffold();
     }
   }
 }

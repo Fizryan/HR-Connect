@@ -21,7 +21,9 @@ class AttendanceRepositoryImpl implements AttendanceRepository {
   }
 
   @override
-  Future<Either<Failure, AttendanceModel>> getAttendanceByUid(String uid) async {
+  Future<Either<Failure, AttendanceModel>> getAttendanceByUid(
+    String uid,
+  ) async {
     try {
       final result = await remoteDataSource.getAttendanceByUid(uid);
       return Right(result);
@@ -33,9 +35,12 @@ class AttendanceRepositoryImpl implements AttendanceRepository {
 
   @override
   Future<Either<Failure, AttendanceModel>> createAttendance(
-      AttendanceModel attendance) async {
+    AttendanceModel attendance,
+  ) async {
     try {
-      final result = await remoteDataSource.createAttendance(attendance.toJson());
+      final result = await remoteDataSource.createAttendance(
+        attendance.toJson(),
+      );
       return Right(result);
     } catch (e) {
       if (e is ServerFailure || e is NetworkFailure) return Left(e as Failure);

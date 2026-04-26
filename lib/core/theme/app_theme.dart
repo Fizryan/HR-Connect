@@ -23,7 +23,7 @@ class AppTheme {
     blendLevel: 10,
     useMaterial3: true,
     subThemesData: _subThemesData,
-    textTheme: GoogleFonts.interTextTheme(ThemeData.light().textTheme)
+    textTheme: GoogleFonts.interTextTheme(ThemeData.light().textTheme),
   );
 
   static final ThemeData darkTheme = FlexThemeData.dark(
@@ -32,6 +32,6 @@ class AppTheme {
     blendLevel: 10,
     useMaterial3: true,
     subThemesData: _subThemesData,
-    textTheme: GoogleFonts.interTextTheme(ThemeData.dark().textTheme)
+    textTheme: GoogleFonts.interTextTheme(ThemeData.dark().textTheme),
   );
 }

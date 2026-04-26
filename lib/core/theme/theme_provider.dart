@@ -9,7 +9,8 @@ class ThemeProvider extends ChangeNotifier {
 
   bool get isDarkMode => _themeMode == ThemeMode.dark;
 
-  ThemeProvider({ThemeMode themeMode = ThemeMode.system}) : _themeMode = themeMode;
+  ThemeProvider({ThemeMode themeMode = ThemeMode.system})
+    : _themeMode = themeMode;
 
   void setThemeMode(ThemeMode mode) {
     if (_themeMode == mode) return;

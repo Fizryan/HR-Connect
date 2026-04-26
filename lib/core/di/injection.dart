@@ -15,7 +15,10 @@ import '../../features/testing/export.dart';
 final sl = GetIt.instance;
 
 Future<void> initDI() async {
-  final secureStorage = const FlutterSecureStorage();
+  const secureStorage = FlutterSecureStorage(
+    aOptions: AndroidOptions(encryptedSharedPreferences: true),
+    iOptions: IOSOptions(accessibility: KeychainAccessibility.first_unlock),
+  );
   final sharedPreferences = await SharedPreferences.getInstance();
 
   // Shared Preferences & Secure Storage
@@ -48,33 +51,43 @@ Future<void> initDI() async {
 
   // Data Sources
   if (dotenv.env['USE_MOCK_DATA'] == 'true') {
-    sl.registerLazySingleton<AuthRemote>(() => AuthDummyRemote());
-    sl.registerLazySingleton<UserRemote>(() => UserDummyRemote());
+    sl.registerLazySingleton<AuthRemote>(AuthDummyRemote.new);
+    sl.registerLazySingleton<UserRemote>(UserDummyRemote.new);
   } else {
     sl.registerLazySingleton<AuthRemote>(() => AuthRemoteImpl(apiClient: sl()));
     sl.registerLazySingleton<UserRemote>(() => UserRemoteImpl(apiClient: sl()));
-    sl.registerLazySingleton<AttendanceRemote>(() => AttendanceRemoteImpl(apiClient: sl()));
-    sl.registerLazySingleton<LeaveRemote>(() => LeaveRemoteImpl(apiClient: sl()));
-    sl.registerLazySingleton<OvertimeRemote>(() => OvertimeRemoteImpl(apiClient: sl()));
+    sl.registerLazySingleton<AttendanceRemote>(
+      () => AttendanceRemoteImpl(apiClient: sl()),
+    );
+    sl.registerLazySingleton<LeaveRemote>(
+      () => LeaveRemoteImpl(apiClient: sl()),
+    );
+    sl.registerLazySingleton<OvertimeRemote>(
+      () => OvertimeRemoteImpl(apiClient: sl()),
+    );
   }
 
   // Providers
-  sl.registerLazySingleton<ThemeProvider>(
-    () {
-      final themeStr = sl<SharedPreferences>().getString(SharedPrefs.themeMode);
-      ThemeMode mode = ThemeMode.system;
-      if (themeStr == ThemeMode.light.name) mode = ThemeMode.light;
-      if (themeStr == ThemeMode.dark.name) mode = ThemeMode.dark;
-      
-      return ThemeProvider(themeMode: mode);
-    },
-  );
+  sl.registerLazySingleton<ThemeProvider>(() {
+    final themeStr = sl<SharedPreferences>().getString(SharedPrefs.themeMode);
+    ThemeMode mode = ThemeMode.system;
+    if (themeStr == ThemeMode.light.name) mode = ThemeMode.light;
+    if (themeStr == ThemeMode.dark.name) mode = ThemeMode.dark;
+
+    return ThemeProvider(themeMode: mode);
+  });
 
   sl.registerLazySingleton<AuthProvider>(
     () => AuthProvider(repository: sl(), secureStorage: sl()),
   );
   sl.registerLazySingleton<UserProvider>(() => UserProvider(repository: sl()));
-  sl.registerLazySingleton<AttendanceProvider>(() => AttendanceProvider(repository: sl()));
-  sl.registerLazySingleton<LeaveProvider>(() => LeaveProvider(repository: sl()));
-  sl.registerLazySingleton<OvertimeProvider>(() => OvertimeProvider(repository: sl()));
+  sl.registerLazySingleton<AttendanceProvider>(
+    () => AttendanceProvider(repository: sl()),
+  );
+  sl.registerLazySingleton<LeaveProvider>(
+    () => LeaveProvider(repository: sl()),
+  );
+  sl.registerLazySingleton<OvertimeProvider>(
+    () => OvertimeProvider(repository: sl()),
+  );
 }

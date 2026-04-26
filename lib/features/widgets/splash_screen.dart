@@ -12,9 +12,12 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
+  late Future<PackageInfo> _packageInfoFuture;
+
   @override
   void initState() {
     super.initState();
+    _packageInfoFuture = PackageInfo.fromPlatform();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _initializeSplash();
     });
@@ -43,8 +46,7 @@ class _SplashScreenState extends State<SplashScreen> {
                 TweenAnimationBuilder<double>(
                   tween: Tween<double>(begin: 0.0, end: 1.0),
                   duration: const Duration(milliseconds: 1000),
-                  curve: Curves
-                      .easeOutBack,
+                  curve: Curves.easeOutBack,
                   builder: (context, value, child) {
                     return Opacity(
                       opacity: value.clamp(0.0, 1.0),
@@ -77,10 +79,7 @@ class _SplashScreenState extends State<SplashScreen> {
                     return Opacity(
                       opacity: value,
                       child: Transform.translate(
-                        offset: Offset(
-                          0,
-                          20 * (1 - value),
-                        ),
+                        offset: Offset(0, 20 * (1 - value)),
                         child: child,
                       ),
                     );
@@ -105,11 +104,7 @@ class _SplashScreenState extends State<SplashScreen> {
             child: TweenAnimationBuilder<double>(
               tween: Tween<double>(begin: 0.0, end: 1.0),
               duration: const Duration(milliseconds: 1000),
-              curve: const Interval(
-                0.6,
-                1.0,
-                curve: Curves.easeIn,
-              ),
+              curve: const Interval(0.6, 1.0, curve: Curves.easeIn),
               builder: (context, value, child) {
                 return Opacity(opacity: value, child: child);
               },
@@ -120,12 +115,14 @@ class _SplashScreenState extends State<SplashScreen> {
                     height: 4.w,
                     child: LinearProgressIndicator(
                       color: colorScheme.primary.withValues(alpha: 0.6),
-                      backgroundColor: colorScheme.onSurface.withValues(alpha: 0.1),
+                      backgroundColor: colorScheme.onSurface.withValues(
+                        alpha: 0.1,
+                      ),
                     ),
                   ),
                   SizedBox(height: 16.h),
                   FutureBuilder<PackageInfo>(
-                    future: PackageInfo.fromPlatform(),
+                    future: _packageInfoFuture,
                     builder: (context, snapshot) {
                       final versionStr = snapshot.hasData
                           ? '${snapshot.data!.version} (${snapshot.data!.buildNumber})'

@@ -6,6 +6,7 @@ abstract class AttendanceRepository {
   Future<Either<Failure, List<AttendanceModel>>> getAllAttendances();
   Future<Either<Failure, AttendanceModel>> getAttendanceByUid(String uid);
   Future<Either<Failure, AttendanceModel>> createAttendance(
-      AttendanceModel attendance);
+    AttendanceModel attendance,
+  );
   Future<Either<Failure, void>> deleteAttendance(String uid);
 }

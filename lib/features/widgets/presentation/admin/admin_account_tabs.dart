@@ -5,7 +5,11 @@ class AdminAccountTabs extends StatefulWidget {
   final ColorScheme colorScheme;
   final AuthProvider authProvider;
 
-  const AdminAccountTabs({super.key, required this.colorScheme, required this.authProvider});
+  const AdminAccountTabs({
+    super.key,
+    required this.colorScheme,
+    required this.authProvider,
+  });
 
   @override
   State<AdminAccountTabs> createState() => _AdminAccountTabsState();
@@ -14,7 +18,7 @@ class AdminAccountTabs extends StatefulWidget {
 class _AdminAccountTabsState extends State<AdminAccountTabs> {
   @override
   Widget build(BuildContext context) {
-    return Column(
+    return const Column(
       // TODO: CRUD
     );
   }

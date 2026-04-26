@@ -38,6 +38,7 @@ class AuthRepositoryImpl implements AuthRepository {
 
       if (token != null && token.isNotEmpty) {
         await secureStorage.write(key: 'auth_token', value: token);
+        apiClient.updateToken(token);
       }
 
       return const Right(null);
@@ -52,6 +53,7 @@ class AuthRepositoryImpl implements AuthRepository {
   Future<Either<Failure, void>> logout() async {
     try {
       await secureStorage.delete(key: 'auth_token');
+      apiClient.clearToken();
       return const Right(null);
     } catch (e) {
       return Left(ServerFailure(e.toString()));

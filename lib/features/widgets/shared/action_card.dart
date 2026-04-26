@@ -22,9 +22,7 @@ class ActionCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: colorScheme.surface,
         borderRadius: BorderRadius.circular(16.r),
-        border: Border.all(
-          color: colorScheme.onSurface.withValues(alpha: 0.1),
-        ),
+        border: Border.all(color: colorScheme.onSurface.withValues(alpha: 0.1)),
       ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,

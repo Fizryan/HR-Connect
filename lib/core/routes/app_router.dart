@@ -19,7 +19,7 @@ class AppRouter {
 
         return authState.maybeWhen(
           initial: () => isAtSplash ? null : '/splash',
-          loading: () => isAtSplash ? null : '/splash',
+          loading: () => null,
 
           authenticated: (user) {
             if (isGoingToLogin || isAtSplash) return '/';
@@ -54,9 +54,9 @@ class AppRouter {
 
             if (user == null) {
               return const Scaffold(
-                body: Center(child: Text(
-                  'Something went wrong. Please try again.'
-                )),
+                body: Center(
+                  child: Text('Something went wrong. Please try again.'),
+                ),
               );
             }
 

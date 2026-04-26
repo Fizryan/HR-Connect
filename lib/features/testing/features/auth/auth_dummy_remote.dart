@@ -18,19 +18,22 @@ class AuthDummyRemote implements AuthRemote {
     await _simulatedNetworkDelay();
 
     final Map<String, Map<String, dynamic>> dummyAccounts = {
-      'admin@hrconnect.com': { 'role': UserRole.admin, 'uid': 'USR-001' },
-      'director@hrconnect.com': { 'role': UserRole.director, 'uid': 'USR-002' },
-      'manager@hrconnect.com': { 'role': UserRole.manager, 'uid': 'USR-003' },
-      'supervisor@hrconnect.com': { 'role': UserRole.supervisor, 'uid': 'USR-004' },
-      'staff@hrconnect.com': { 'role': UserRole.staff, 'uid': 'USR-005' },
-      'test@hrconnect.com': { 'role': UserRole.staff, 'uid': 'USR-006' },
+      'admin@hrconnect.com': {'role': UserRole.admin, 'uid': 'USR-001'},
+      'director@hrconnect.com': {'role': UserRole.director, 'uid': 'USR-002'},
+      'manager@hrconnect.com': {'role': UserRole.manager, 'uid': 'USR-003'},
+      'supervisor@hrconnect.com': {
+        'role': UserRole.supervisor,
+        'uid': 'USR-004',
+      },
+      'staff@hrconnect.com': {'role': UserRole.staff, 'uid': 'USR-005'},
+      'test@hrconnect.com': {'role': UserRole.staff, 'uid': 'USR-006'},
     };
 
     if (dummyAccounts.containsKey(email)) {
       final accountInfo = dummyAccounts[email]!;
       final UserRole role = accountInfo['role'];
       final expectedPassword = '${role.name}123';
-      
+
       if (password == expectedPassword) {
         _currentUid = accountInfo['uid'];
         return AuthModel(
@@ -50,7 +53,7 @@ class AuthDummyRemote implements AuthRemote {
     if (dummyUsers.containsKey(_currentUid)) {
       return dummyUsers[_currentUid]!;
     }
-    
+
     throw const ServerFailure('User profile not found.');
   }
 }

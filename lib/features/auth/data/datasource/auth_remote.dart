@@ -1,5 +1,3 @@
-import 'package:dio/dio.dart';
-import 'package:hr_connect/core/error/core_exception.dart';
 import 'package:hr_connect/core/error/failures.dart';
 import 'package:hr_connect/core/network/api_client.dart';
 import 'package:hr_connect/features/auth/data/model/auth_model.dart';
@@ -18,13 +16,11 @@ class AuthRemoteImpl implements AuthRemote {
   @override
   Future<AuthModel> login(String email, String password) async {
     try {
-      final response = await apiClient.dio.post(
+      final response = await apiClient.post(
         '/login',
         data: {'email': email, 'password': password},
       );
-      return AuthModel.fromJson(response.data);
-    } on DioException catch (e) {
-      throw CoreException.serverFailure(e);
+      return AuthModel.fromJson(response);
     } catch (e) {
       throw ServerFailure('Failed to process data: $e');
     }
@@ -33,10 +29,8 @@ class AuthRemoteImpl implements AuthRemote {
   @override
   Future<UserModel> getUserProfile() async {
     try {
-      final response = await apiClient.dio.get('/profile');
-      return UserModel.fromJson(response.data['data']);
-    } on DioException catch (e) {
-      throw CoreException.serverFailure(e);
+      final response = await apiClient.get('/profile');
+      return UserModel.fromJson(response['data']);
     } catch (e) {
       throw ServerFailure('Failed to process data: $e');
     }

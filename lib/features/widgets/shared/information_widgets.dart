@@ -25,11 +25,7 @@ class InformationWidgets extends StatelessWidget {
       ),
       child: Row(
         children: [
-          Icon(
-            icon,
-            color: iconColor,
-            size: 18.sp,
-          ),
+          Icon(icon, color: iconColor, size: 18.sp),
           SizedBox(width: 8.w),
           Expanded(
             child: Text(

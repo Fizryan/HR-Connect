@@ -78,7 +78,9 @@ class _AdminControlState extends State<AdminControl> {
           title: TabBar(
             indicatorColor: colorScheme.onSecondary,
             labelColor: colorScheme.onSecondary,
-            unselectedLabelColor: colorScheme.onSecondary.withValues(alpha: 0.6),
+            unselectedLabelColor: colorScheme.onSecondary.withValues(
+              alpha: 0.6,
+            ),
             indicatorWeight: 3.h,
             labelStyle: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.bold),
             tabs: tabs.map((tab) => Tab(text: tab.title)).toList(),
@@ -89,5 +91,3 @@ class _AdminControlState extends State<AdminControl> {
     );
   }
 }
-
-

@@ -302,9 +302,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                         ),
                         TextButton(
-                          onPressed: isLoading
-                              ? null
-                              : _showContactInfo,
+                          onPressed: isLoading ? null : _showContactInfo,
                           style: TextButton.styleFrom(
                             padding: EdgeInsets.zero,
                             minimumSize: Size.zero,
@@ -396,11 +394,7 @@ class _LoginScreenState extends State<LoginScreen> {
           color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
           fontSize: 14.sp,
         ),
-        prefixIcon: Icon(
-          icon,
-          color: theme.colorScheme.onSurface,
-          size: 20.sp,
-        ),
+        prefixIcon: Icon(icon, color: theme.colorScheme.onSurface, size: 20.sp),
         suffixIcon: isPassword
             ? IconButton(
                 icon: Icon(
@@ -427,15 +421,24 @@ class _LoginScreenState extends State<LoginScreen> {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16.r),
-          borderSide: BorderSide(color: theme.colorScheme.onSurface, width: 1.5),
+          borderSide: BorderSide(
+            color: theme.colorScheme.onSurface,
+            width: 1.5,
+          ),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16.r),
-          borderSide: BorderSide(color: theme.colorScheme.error.withValues(alpha: 0.6), width: 1.5),
+          borderSide: BorderSide(
+            color: theme.colorScheme.error.withValues(alpha: 0.6),
+            width: 1.5,
+          ),
         ),
         focusedErrorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16.r),
-          borderSide: BorderSide(color: theme.colorScheme.error.withValues(alpha: 0.6), width: 1.5),
+          borderSide: BorderSide(
+            color: theme.colorScheme.error.withValues(alpha: 0.6),
+            width: 1.5,
+          ),
         ),
         contentPadding: EdgeInsets.symmetric(vertical: 16.h, horizontal: 16.w),
       ),

@@ -1,6 +1,5 @@
-import 'package:dio/dio.dart';
 import 'package:hr_connect/core/error/failures.dart';
-import 'package:hr_connect/core/error/core_exception.dart';
+
 import 'package:hr_connect/features/user_management/data/models/user_model.dart';
 import 'package:hr_connect/core/network/api_client.dart';
 
@@ -20,11 +19,9 @@ class UserRemoteImpl implements UserRemote {
   @override
   Future<List<UserModel>> getAllUsers() async {
     try {
-      final response = await apiClient.dio.get('/users');
-      final List userData = response.data['data'];
+      final response = await apiClient.get('/users');
+      final List userData = response['data'];
       return userData.map((json) => UserModel.fromJson(json)).toList();
-    } on DioException catch (e) {
-      throw CoreException.serverFailure(e);
     } catch (e) {
       throw ServerFailure('Failed to process data: $e');
     }
@@ -33,10 +30,8 @@ class UserRemoteImpl implements UserRemote {
   @override
   Future<UserModel> getUserByUid(String uid) async {
     try {
-      final response = await apiClient.dio.get('/users/$uid');
-      return UserModel.fromJson(response.data['data']);
-    } on DioException catch (e) {
-      throw CoreException.serverFailure(e);
+      final response = await apiClient.get('/users/$uid');
+      return UserModel.fromJson(response['data']);
     } catch (e) {
       throw ServerFailure('Failed to process data: $e');
     }
@@ -45,10 +40,8 @@ class UserRemoteImpl implements UserRemote {
   @override
   Future<UserModel> createUser(Map<String, dynamic> userData) async {
     try {
-      final response = await apiClient.dio.post('/users', data: userData);
-      return UserModel.fromJson(response.data['data']);
-    } on DioException catch (e) {
-      throw CoreException.serverFailure(e);
+      final response = await apiClient.post('/users', data: userData);
+      return UserModel.fromJson(response['data']);
     } catch (e) {
       throw ServerFailure('Failed to process data: $e');
     }
@@ -60,10 +53,8 @@ class UserRemoteImpl implements UserRemote {
     Map<String, dynamic> userData,
   ) async {
     try {
-      final response = await apiClient.dio.put('/users/$uid', data: userData);
-      return UserModel.fromJson(response.data['data']);
-    } on DioException catch (e) {
-      throw CoreException.serverFailure(e);
+      final response = await apiClient.put('/users/$uid', data: userData);
+      return UserModel.fromJson(response['data']);
     } catch (e) {
       throw ServerFailure('Failed to process data: $e');
     }
@@ -72,9 +63,7 @@ class UserRemoteImpl implements UserRemote {
   @override
   Future<void> deleteUser(String uid) async {
     try {
-      await apiClient.dio.delete('/users/$uid');
-    } on DioException catch (e) {
-      throw CoreException.serverFailure(e);
+      await apiClient.delete('/users/$uid');
     } catch (e) {
       throw ServerFailure('Failed to process data: $e');
     }

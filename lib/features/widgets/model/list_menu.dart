@@ -14,4 +14,4 @@ class ListMenu {
     this.isNew = false,
     this.onTap,
   });
-} 
+}

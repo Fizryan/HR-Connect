@@ -23,17 +23,18 @@ class ProfileMenuTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    
+
     final resolvedIconColor = iconColor ?? colorScheme.onSurface;
     final resolvedTextColor = textColor ?? colorScheme.onSurface;
-    
+
     return Padding(
       padding: EdgeInsets.symmetric(vertical: 6.h),
       child: ListTile(
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12.r),
         ),
-        tileColor: backgroundColor ?? 
+        tileColor:
+            backgroundColor ??
             colorScheme.surfaceContainerHighest.withValues(alpha: 0.8),
         leading: Icon(icon, color: resolvedIconColor),
         title: Text(
@@ -49,7 +50,9 @@ class ProfileMenuTile extends StatelessWidget {
           size: 14.sp,
           color: resolvedIconColor.withValues(alpha: 0.5),
         ),
-        splashColor: (backgroundColor ?? colorScheme.onSurface).withValues(alpha: 0.1),
+        splashColor: (backgroundColor ?? colorScheme.onSurface).withValues(
+          alpha: 0.1,
+        ),
         onTap: onTap,
       ),
     );

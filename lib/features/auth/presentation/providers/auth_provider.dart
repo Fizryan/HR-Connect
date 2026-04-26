@@ -6,8 +6,9 @@ import 'package:hr_connect/features/auth/presentation/providers/auth_state.dart'
 class AuthProvider extends ValueNotifier<AuthState> {
   final AuthRepository repository;
   final FlutterSecureStorage secureStorage;
-  
-  AuthProvider({required this.repository, required this.secureStorage}) : super(const AuthState.initial());
+
+  AuthProvider({required this.repository, required this.secureStorage})
+    : super(const AuthState.initial());
 
   Future<void> checkAuthStatus() async {
     value = const AuthState.loading();

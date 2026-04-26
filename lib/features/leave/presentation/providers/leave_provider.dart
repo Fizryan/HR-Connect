@@ -7,7 +7,7 @@ class LeaveProvider extends ValueNotifier<LeaveState> {
   final LeaveRepository repository;
 
   LeaveProvider({required this.repository}) : super(const LeaveState.initial());
-  
+
   Future<void> fetchAllLeaves() async {
     value = const LeaveState.loading();
     final result = await repository.getAllLeaves();

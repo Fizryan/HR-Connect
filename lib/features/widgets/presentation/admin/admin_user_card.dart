@@ -50,14 +50,11 @@ class AdminUserCard extends StatelessWidget {
               right: 0,
               child: Container(
                 height: 60.h,
-                decoration: BoxDecoration(
+                decoration: const BoxDecoration(
                   gradient: LinearGradient(
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
-                    colors: [
-                      AppColors.transparent,
-                      AppColors.primary,
-                    ],
+                    colors: [AppColors.transparent, AppColors.primary],
                   ),
                 ),
                 padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 8.h),

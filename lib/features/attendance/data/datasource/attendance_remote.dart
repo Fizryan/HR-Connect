@@ -1,6 +1,5 @@
-import 'package:dio/dio.dart';
 import 'package:hr_connect/core/error/failures.dart';
-import 'package:hr_connect/core/error/core_exception.dart';
+
 import 'package:hr_connect/core/network/api_client.dart';
 import 'package:hr_connect/features/attendance/data/models/attendance_model.dart';
 
@@ -19,13 +18,11 @@ class AttendanceRemoteImpl implements AttendanceRemote {
   @override
   Future<List<AttendanceModel>> getAllAttendances() async {
     try {
-      final response = await apiClient.dio.get('/attendances');
-      final List attendanceData = response.data['data'];
+      final response = await apiClient.get('/attendances');
+      final List attendanceData = response['data'];
       return attendanceData
           .map((json) => AttendanceModel.fromJson(json))
           .toList();
-    } on DioException catch (e) {
-      throw CoreException.serverFailure(e);
     } catch (e) {
       throw ServerFailure('Failed to process data: $e');
     }
@@ -34,10 +31,8 @@ class AttendanceRemoteImpl implements AttendanceRemote {
   @override
   Future<AttendanceModel> getAttendanceByUid(String uid) async {
     try {
-      final response = await apiClient.dio.get('/attendances/$uid');
-      return AttendanceModel.fromJson(response.data['data']);
-    } on DioException catch (e) {
-      throw CoreException.serverFailure(e);
+      final response = await apiClient.get('/attendances/$uid');
+      return AttendanceModel.fromJson(response['data']);
     } catch (e) {
       throw ServerFailure('Failed to process data: $e');
     }
@@ -48,13 +43,11 @@ class AttendanceRemoteImpl implements AttendanceRemote {
     Map<String, dynamic> attendanceData,
   ) async {
     try {
-      final response = await apiClient.dio.post(
+      final response = await apiClient.post(
         '/attendances',
         data: attendanceData,
       );
-      return AttendanceModel.fromJson(response.data['data']);
-    } on DioException catch (e) {
-      throw CoreException.serverFailure(e);
+      return AttendanceModel.fromJson(response['data']);
     } catch (e) {
       throw ServerFailure('Failed to process data: $e');
     }
@@ -63,9 +56,7 @@ class AttendanceRemoteImpl implements AttendanceRemote {
   @override
   Future<void> deleteAttendance(String uid) async {
     try {
-      await apiClient.dio.delete('/attendances/$uid');
-    } on DioException catch (e) {
-      throw CoreException.serverFailure(e);
+      await apiClient.delete('/attendances/$uid');
     } catch (e) {
       throw ServerFailure('Failed to process data: $e');
     }

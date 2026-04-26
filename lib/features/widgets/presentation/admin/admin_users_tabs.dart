@@ -104,7 +104,7 @@ class _AdminUsersTabState extends State<AdminUsersTab> {
                 ),
               ),
               items: [
-                DropdownItem<UserRole?>(value: null, child: Text('All Roles')),
+                const DropdownItem<UserRole?>(value: null, child: Text('All Roles')),
                 ...UserRole.values.map(
                   (role) => DropdownItem<UserRole?>(
                     value: role,

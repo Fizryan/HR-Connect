@@ -80,7 +80,10 @@ class DialogWidget {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text('Close', style: TextStyle(color: colorScheme.onSurface)),
+            child: Text(
+              'Close',
+              style: TextStyle(color: colorScheme.onSurface),
+            ),
           ),
         ],
       ),
@@ -140,7 +143,10 @@ class DialogWidget {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text('Close', style: TextStyle(color: colorScheme.onSurface)),
+            child: Text(
+              'Close',
+              style: TextStyle(color: colorScheme.onSurface),
+            ),
           ),
         ],
       ),
@@ -181,7 +187,10 @@ class DialogWidget {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text('Cancel', style: TextStyle(color: colorScheme.onSurface)),
+            child: Text(
+              'Cancel',
+              style: TextStyle(color: colorScheme.onSurface),
+            ),
           ),
           ElevatedButton.icon(
             onPressed: () {
@@ -254,7 +263,10 @@ class DialogWidget {
               actions: [
                 TextButton(
                   onPressed: () => Navigator.pop(context),
-                  child: Text('Close', style: TextStyle(color: colorScheme.onSurface)),
+                  child: Text(
+                    'Close',
+                    style: TextStyle(color: colorScheme.onSurface),
+                  ),
                 ),
               ],
             );
