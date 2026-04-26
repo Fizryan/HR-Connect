@@ -5,8 +5,7 @@ import 'package:hr_connect/core/di/injection.dart';
 import 'package:hr_connect/core/routes/app_router.dart';
 import 'package:hr_connect/core/theme/app_theme.dart';
 import 'package:hr_connect/core/theme/theme_provider.dart';
-import 'package:hr_connect/features/auth/presentation/providers/auth_provider.dart';
-import 'package:hr_connect/features/user_management/presentation/providers/user_provider.dart';
+import 'package:hr_connect/features/providers_export.dart';
 import 'package:provider/provider.dart';
 
 class MainApp extends StatefulWidget {
@@ -38,6 +37,9 @@ class _MainAppState extends State<MainApp> {
         ChangeNotifierProvider.value(value: sl<ThemeProvider>()),
         ChangeNotifierProvider.value(value: sl<UserProvider>()),
         ChangeNotifierProvider.value(value: sl<AuthProvider>()),
+        ChangeNotifierProvider.value(value: sl<AttendanceProvider>()),
+        ChangeNotifierProvider.value(value: sl<LeaveProvider>()),
+        ChangeNotifierProvider.value(value: sl<OvertimeProvider>()),
       ],
       child: ScreenUtilInit(
         designSize: const Size(393, 830),

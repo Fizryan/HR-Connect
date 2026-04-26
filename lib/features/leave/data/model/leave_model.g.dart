@@ -9,13 +9,18 @@ part of 'leave_model.dart';
 _LeaveModel _$LeaveModelFromJson(Map<String, dynamic> json) => _LeaveModel(
   uid: json['uid'] as String,
   requestedById: json['requestedById'] as String,
-  approvedById: json['approvedById'] as String,
+  approvedById: json['approvedById'] as String?,
   type: $enumDecode(_$LeaveTypeEnumMap, json['type']),
   reason: json['reason'] as String,
   startDate: DateTime.parse(json['start_date'] as String),
   endDate: DateTime.parse(json['end_date'] as String),
-  createdAt: DateTime.parse(json['created_at'] as String),
-  updatedAt: DateTime.parse(json['updated_at'] as String),
+  isApproved: json['is_approved'] as bool? ?? false,
+  createdAt: json['created_at'] == null
+      ? null
+      : DateTime.parse(json['created_at'] as String),
+  updatedAt: json['updated_at'] == null
+      ? null
+      : DateTime.parse(json['updated_at'] as String),
 );
 
 Map<String, dynamic> _$LeaveModelToJson(_LeaveModel instance) =>
@@ -27,8 +32,9 @@ Map<String, dynamic> _$LeaveModelToJson(_LeaveModel instance) =>
       'reason': instance.reason,
       'start_date': instance.startDate.toIso8601String(),
       'end_date': instance.endDate.toIso8601String(),
-      'created_at': instance.createdAt.toIso8601String(),
-      'updated_at': instance.updatedAt.toIso8601String(),
+      'is_approved': instance.isApproved,
+      'created_at': instance.createdAt?.toIso8601String(),
+      'updated_at': instance.updatedAt?.toIso8601String(),
     };
 
 const _$LeaveTypeEnumMap = {

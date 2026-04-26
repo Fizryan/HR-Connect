@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:hr_connect/core/error/core_exception.dart';
 import 'package:hr_connect/core/error/failures.dart';
 import 'package:hr_connect/core/network/api_client.dart';
 import 'package:hr_connect/features/auth/data/model/auth_model.dart';
@@ -23,14 +24,7 @@ class AuthRemoteImpl implements AuthRemote {
       );
       return AuthModel.fromJson(response.data);
     } on DioException catch (e) {
-      if (e.type == DioExceptionType.connectionTimeout ||
-          e.type == DioExceptionType.receiveTimeout) {
-        throw const NetworkFailure(
-          'Connection timeout. Please try again later',
-        );
-      }
-      final errorMessage = e.response?.data['message'] ?? 'An error occurred';
-      throw ServerFailure(errorMessage);
+      throw CoreException.serverFailure(e);
     } catch (e) {
       throw ServerFailure('Failed to process data: $e');
     }
@@ -42,14 +36,7 @@ class AuthRemoteImpl implements AuthRemote {
       final response = await apiClient.dio.get('/profile');
       return UserModel.fromJson(response.data['data']);
     } on DioException catch (e) {
-      if (e.type == DioExceptionType.connectionTimeout ||
-          e.type == DioExceptionType.receiveTimeout) {
-        throw const NetworkFailure(
-          'Connection timeout. Please try again later',
-        );
-      }
-      final errorMessage = e.response?.data['message'] ?? 'An error occurred';
-      throw ServerFailure(errorMessage);
+      throw CoreException.serverFailure(e);
     } catch (e) {
       throw ServerFailure('Failed to process data: $e');
     }

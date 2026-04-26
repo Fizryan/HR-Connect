@@ -63,11 +63,11 @@ We're cooking up some more features right now and Here is the plan for the next 
 
 | Feature               |      | Role      | Backend Logic | UI Implementation | Status       |
 | :-------------------- | :--- | :-------- | :------------ | :---------------- | :----------- |
-| Attendance            |      | Admin     | [ ]           | [ ]               | To Do        |
-|                       |      | Director  | [ ]           | [ ]               | To Do        |
-|                       |      | Manager   | [ ]           | [ ]               | To Do        |
-|                       |      | Supervisor| [ ]           | [ ]               | To Do        |
-|                       |      | Staff     | [ ]           | [ ]               | To Do        |
+| Attendance            |      | Admin     | [x]           | [ ]               | In Progress  |
+|                       |      | Director  | [x]           | [ ]               | In Progress  |
+|                       |      | Manager   | [x]           | [ ]               | In Progress  |
+|                       |      | Supervisor| [x]           | [ ]               | In Progress  |
+|                       |      | Staff     | [x]           | [ ]               | In Progress  |
 
 | Feature               |      | Role      | Backend Logic | UI Implementation | Status       |
 | :-------------------- | :--- | :-------- | :------------ | :---------------- | :----------- |
@@ -79,11 +79,11 @@ We're cooking up some more features right now and Here is the plan for the next 
 
 | Feature               |      | Role      | Backend Logic | UI Implementation | Status       |
 | :-------------------- | :--- | :-------- | :------------ | :---------------- | :----------- |
-| Overtime Reimbursment |      | Admin     | [ ]           | [ ]               | To Do        |
-|                       |      | Director  | [ ]           | [ ]               | To Do        |
-|                       |      | Manager   | [ ]           | [ ]               | To Do        |
-|                       |      | Supervisor| [ ]           | [ ]               | To Do        |
-|                       |      | Staff     | [ ]           | [ ]               | To Do        |
+| Overtime Reimbursment |      | Admin     | [x]           | [ ]               | In Progress  |
+|                       |      | Director  | [x]           | [ ]               | In Progress  |
+|                       |      | Manager   | [x]           | [ ]               | In Progress  |
+|                       |      | Supervisor| [x]           | [ ]               | In Progress  |
+|                       |      | Staff     | [x]           | [ ]               | In Progress  |
 
 ### User & Personal
 

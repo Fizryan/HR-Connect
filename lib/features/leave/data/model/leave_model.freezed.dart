@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$LeaveModel {
 
- String get uid; String get requestedById; String get approvedById; LeaveType get type; String get reason;@JsonKey(name: 'start_date') DateTime get startDate;@JsonKey(name: 'end_date') DateTime get endDate;@JsonKey(name: 'created_at') DateTime get createdAt;@JsonKey(name: 'updated_at') DateTime get updatedAt;
+ String get uid; String get requestedById; String? get approvedById; LeaveType get type; String get reason;@JsonKey(name: 'start_date') DateTime get startDate;@JsonKey(name: 'end_date') DateTime get endDate;@JsonKey(name: 'is_approved', defaultValue: false) bool get isApproved;@JsonKey(name: 'created_at') DateTime? get createdAt;@JsonKey(name: 'updated_at') DateTime? get updatedAt;
 /// Create a copy of LeaveModel
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -28,16 +28,16 @@ $LeaveModelCopyWith<LeaveModel> get copyWith => _$LeaveModelCopyWithImpl<LeaveMo
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is LeaveModel&&(identical(other.uid, uid) || other.uid == uid)&&(identical(other.requestedById, requestedById) || other.requestedById == requestedById)&&(identical(other.approvedById, approvedById) || other.approvedById == approvedById)&&(identical(other.type, type) || other.type == type)&&(identical(other.reason, reason) || other.reason == reason)&&(identical(other.startDate, startDate) || other.startDate == startDate)&&(identical(other.endDate, endDate) || other.endDate == endDate)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is LeaveModel&&(identical(other.uid, uid) || other.uid == uid)&&(identical(other.requestedById, requestedById) || other.requestedById == requestedById)&&(identical(other.approvedById, approvedById) || other.approvedById == approvedById)&&(identical(other.type, type) || other.type == type)&&(identical(other.reason, reason) || other.reason == reason)&&(identical(other.startDate, startDate) || other.startDate == startDate)&&(identical(other.endDate, endDate) || other.endDate == endDate)&&(identical(other.isApproved, isApproved) || other.isApproved == isApproved)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,uid,requestedById,approvedById,type,reason,startDate,endDate,createdAt,updatedAt);
+int get hashCode => Object.hash(runtimeType,uid,requestedById,approvedById,type,reason,startDate,endDate,isApproved,createdAt,updatedAt);
 
 @override
 String toString() {
-  return 'LeaveModel(uid: $uid, requestedById: $requestedById, approvedById: $approvedById, type: $type, reason: $reason, startDate: $startDate, endDate: $endDate, createdAt: $createdAt, updatedAt: $updatedAt)';
+  return 'LeaveModel(uid: $uid, requestedById: $requestedById, approvedById: $approvedById, type: $type, reason: $reason, startDate: $startDate, endDate: $endDate, isApproved: $isApproved, createdAt: $createdAt, updatedAt: $updatedAt)';
 }
 
 
@@ -48,7 +48,7 @@ abstract mixin class $LeaveModelCopyWith<$Res>  {
   factory $LeaveModelCopyWith(LeaveModel value, $Res Function(LeaveModel) _then) = _$LeaveModelCopyWithImpl;
 @useResult
 $Res call({
- String uid, String requestedById, String approvedById, LeaveType type, String reason,@JsonKey(name: 'start_date') DateTime startDate,@JsonKey(name: 'end_date') DateTime endDate,@JsonKey(name: 'created_at') DateTime createdAt,@JsonKey(name: 'updated_at') DateTime updatedAt
+ String uid, String requestedById, String? approvedById, LeaveType type, String reason,@JsonKey(name: 'start_date') DateTime startDate,@JsonKey(name: 'end_date') DateTime endDate,@JsonKey(name: 'is_approved', defaultValue: false) bool isApproved,@JsonKey(name: 'created_at') DateTime? createdAt,@JsonKey(name: 'updated_at') DateTime? updatedAt
 });
 
 
@@ -65,18 +65,19 @@ class _$LeaveModelCopyWithImpl<$Res>
 
 /// Create a copy of LeaveModel
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? uid = null,Object? requestedById = null,Object? approvedById = null,Object? type = null,Object? reason = null,Object? startDate = null,Object? endDate = null,Object? createdAt = null,Object? updatedAt = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? uid = null,Object? requestedById = null,Object? approvedById = freezed,Object? type = null,Object? reason = null,Object? startDate = null,Object? endDate = null,Object? isApproved = null,Object? createdAt = freezed,Object? updatedAt = freezed,}) {
   return _then(_self.copyWith(
 uid: null == uid ? _self.uid : uid // ignore: cast_nullable_to_non_nullable
 as String,requestedById: null == requestedById ? _self.requestedById : requestedById // ignore: cast_nullable_to_non_nullable
-as String,approvedById: null == approvedById ? _self.approvedById : approvedById // ignore: cast_nullable_to_non_nullable
-as String,type: null == type ? _self.type : type // ignore: cast_nullable_to_non_nullable
+as String,approvedById: freezed == approvedById ? _self.approvedById : approvedById // ignore: cast_nullable_to_non_nullable
+as String?,type: null == type ? _self.type : type // ignore: cast_nullable_to_non_nullable
 as LeaveType,reason: null == reason ? _self.reason : reason // ignore: cast_nullable_to_non_nullable
 as String,startDate: null == startDate ? _self.startDate : startDate // ignore: cast_nullable_to_non_nullable
 as DateTime,endDate: null == endDate ? _self.endDate : endDate // ignore: cast_nullable_to_non_nullable
-as DateTime,createdAt: null == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
-as DateTime,updatedAt: null == updatedAt ? _self.updatedAt : updatedAt // ignore: cast_nullable_to_non_nullable
-as DateTime,
+as DateTime,isApproved: null == isApproved ? _self.isApproved : isApproved // ignore: cast_nullable_to_non_nullable
+as bool,createdAt: freezed == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
+as DateTime?,updatedAt: freezed == updatedAt ? _self.updatedAt : updatedAt // ignore: cast_nullable_to_non_nullable
+as DateTime?,
   ));
 }
 
@@ -161,10 +162,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String uid,  String requestedById,  String approvedById,  LeaveType type,  String reason, @JsonKey(name: 'start_date')  DateTime startDate, @JsonKey(name: 'end_date')  DateTime endDate, @JsonKey(name: 'created_at')  DateTime createdAt, @JsonKey(name: 'updated_at')  DateTime updatedAt)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String uid,  String requestedById,  String? approvedById,  LeaveType type,  String reason, @JsonKey(name: 'start_date')  DateTime startDate, @JsonKey(name: 'end_date')  DateTime endDate, @JsonKey(name: 'is_approved', defaultValue: false)  bool isApproved, @JsonKey(name: 'created_at')  DateTime? createdAt, @JsonKey(name: 'updated_at')  DateTime? updatedAt)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _LeaveModel() when $default != null:
-return $default(_that.uid,_that.requestedById,_that.approvedById,_that.type,_that.reason,_that.startDate,_that.endDate,_that.createdAt,_that.updatedAt);case _:
+return $default(_that.uid,_that.requestedById,_that.approvedById,_that.type,_that.reason,_that.startDate,_that.endDate,_that.isApproved,_that.createdAt,_that.updatedAt);case _:
   return orElse();
 
 }
@@ -182,10 +183,10 @@ return $default(_that.uid,_that.requestedById,_that.approvedById,_that.type,_tha
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String uid,  String requestedById,  String approvedById,  LeaveType type,  String reason, @JsonKey(name: 'start_date')  DateTime startDate, @JsonKey(name: 'end_date')  DateTime endDate, @JsonKey(name: 'created_at')  DateTime createdAt, @JsonKey(name: 'updated_at')  DateTime updatedAt)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String uid,  String requestedById,  String? approvedById,  LeaveType type,  String reason, @JsonKey(name: 'start_date')  DateTime startDate, @JsonKey(name: 'end_date')  DateTime endDate, @JsonKey(name: 'is_approved', defaultValue: false)  bool isApproved, @JsonKey(name: 'created_at')  DateTime? createdAt, @JsonKey(name: 'updated_at')  DateTime? updatedAt)  $default,) {final _that = this;
 switch (_that) {
 case _LeaveModel():
-return $default(_that.uid,_that.requestedById,_that.approvedById,_that.type,_that.reason,_that.startDate,_that.endDate,_that.createdAt,_that.updatedAt);case _:
+return $default(_that.uid,_that.requestedById,_that.approvedById,_that.type,_that.reason,_that.startDate,_that.endDate,_that.isApproved,_that.createdAt,_that.updatedAt);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -202,10 +203,10 @@ return $default(_that.uid,_that.requestedById,_that.approvedById,_that.type,_tha
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String uid,  String requestedById,  String approvedById,  LeaveType type,  String reason, @JsonKey(name: 'start_date')  DateTime startDate, @JsonKey(name: 'end_date')  DateTime endDate, @JsonKey(name: 'created_at')  DateTime createdAt, @JsonKey(name: 'updated_at')  DateTime updatedAt)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String uid,  String requestedById,  String? approvedById,  LeaveType type,  String reason, @JsonKey(name: 'start_date')  DateTime startDate, @JsonKey(name: 'end_date')  DateTime endDate, @JsonKey(name: 'is_approved', defaultValue: false)  bool isApproved, @JsonKey(name: 'created_at')  DateTime? createdAt, @JsonKey(name: 'updated_at')  DateTime? updatedAt)?  $default,) {final _that = this;
 switch (_that) {
 case _LeaveModel() when $default != null:
-return $default(_that.uid,_that.requestedById,_that.approvedById,_that.type,_that.reason,_that.startDate,_that.endDate,_that.createdAt,_that.updatedAt);case _:
+return $default(_that.uid,_that.requestedById,_that.approvedById,_that.type,_that.reason,_that.startDate,_that.endDate,_that.isApproved,_that.createdAt,_that.updatedAt);case _:
   return null;
 
 }
@@ -217,18 +218,19 @@ return $default(_that.uid,_that.requestedById,_that.approvedById,_that.type,_tha
 @JsonSerializable()
 
 class _LeaveModel implements LeaveModel {
-  const _LeaveModel({required this.uid, required this.requestedById, required this.approvedById, required this.type, required this.reason, @JsonKey(name: 'start_date') required this.startDate, @JsonKey(name: 'end_date') required this.endDate, @JsonKey(name: 'created_at') required this.createdAt, @JsonKey(name: 'updated_at') required this.updatedAt});
+  const _LeaveModel({required this.uid, required this.requestedById, this.approvedById, required this.type, required this.reason, @JsonKey(name: 'start_date') required this.startDate, @JsonKey(name: 'end_date') required this.endDate, @JsonKey(name: 'is_approved', defaultValue: false) required this.isApproved, @JsonKey(name: 'created_at') this.createdAt, @JsonKey(name: 'updated_at') this.updatedAt});
   factory _LeaveModel.fromJson(Map<String, dynamic> json) => _$LeaveModelFromJson(json);
 
 @override final  String uid;
 @override final  String requestedById;
-@override final  String approvedById;
+@override final  String? approvedById;
 @override final  LeaveType type;
 @override final  String reason;
 @override@JsonKey(name: 'start_date') final  DateTime startDate;
 @override@JsonKey(name: 'end_date') final  DateTime endDate;
-@override@JsonKey(name: 'created_at') final  DateTime createdAt;
-@override@JsonKey(name: 'updated_at') final  DateTime updatedAt;
+@override@JsonKey(name: 'is_approved', defaultValue: false) final  bool isApproved;
+@override@JsonKey(name: 'created_at') final  DateTime? createdAt;
+@override@JsonKey(name: 'updated_at') final  DateTime? updatedAt;
 
 /// Create a copy of LeaveModel
 /// with the given fields replaced by the non-null parameter values.
@@ -243,16 +245,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _LeaveModel&&(identical(other.uid, uid) || other.uid == uid)&&(identical(other.requestedById, requestedById) || other.requestedById == requestedById)&&(identical(other.approvedById, approvedById) || other.approvedById == approvedById)&&(identical(other.type, type) || other.type == type)&&(identical(other.reason, reason) || other.reason == reason)&&(identical(other.startDate, startDate) || other.startDate == startDate)&&(identical(other.endDate, endDate) || other.endDate == endDate)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _LeaveModel&&(identical(other.uid, uid) || other.uid == uid)&&(identical(other.requestedById, requestedById) || other.requestedById == requestedById)&&(identical(other.approvedById, approvedById) || other.approvedById == approvedById)&&(identical(other.type, type) || other.type == type)&&(identical(other.reason, reason) || other.reason == reason)&&(identical(other.startDate, startDate) || other.startDate == startDate)&&(identical(other.endDate, endDate) || other.endDate == endDate)&&(identical(other.isApproved, isApproved) || other.isApproved == isApproved)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,uid,requestedById,approvedById,type,reason,startDate,endDate,createdAt,updatedAt);
+int get hashCode => Object.hash(runtimeType,uid,requestedById,approvedById,type,reason,startDate,endDate,isApproved,createdAt,updatedAt);
 
 @override
 String toString() {
-  return 'LeaveModel(uid: $uid, requestedById: $requestedById, approvedById: $approvedById, type: $type, reason: $reason, startDate: $startDate, endDate: $endDate, createdAt: $createdAt, updatedAt: $updatedAt)';
+  return 'LeaveModel(uid: $uid, requestedById: $requestedById, approvedById: $approvedById, type: $type, reason: $reason, startDate: $startDate, endDate: $endDate, isApproved: $isApproved, createdAt: $createdAt, updatedAt: $updatedAt)';
 }
 
 
@@ -263,7 +265,7 @@ abstract mixin class _$LeaveModelCopyWith<$Res> implements $LeaveModelCopyWith<$
   factory _$LeaveModelCopyWith(_LeaveModel value, $Res Function(_LeaveModel) _then) = __$LeaveModelCopyWithImpl;
 @override @useResult
 $Res call({
- String uid, String requestedById, String approvedById, LeaveType type, String reason,@JsonKey(name: 'start_date') DateTime startDate,@JsonKey(name: 'end_date') DateTime endDate,@JsonKey(name: 'created_at') DateTime createdAt,@JsonKey(name: 'updated_at') DateTime updatedAt
+ String uid, String requestedById, String? approvedById, LeaveType type, String reason,@JsonKey(name: 'start_date') DateTime startDate,@JsonKey(name: 'end_date') DateTime endDate,@JsonKey(name: 'is_approved', defaultValue: false) bool isApproved,@JsonKey(name: 'created_at') DateTime? createdAt,@JsonKey(name: 'updated_at') DateTime? updatedAt
 });
 
 
@@ -280,18 +282,19 @@ class __$LeaveModelCopyWithImpl<$Res>
 
 /// Create a copy of LeaveModel
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? uid = null,Object? requestedById = null,Object? approvedById = null,Object? type = null,Object? reason = null,Object? startDate = null,Object? endDate = null,Object? createdAt = null,Object? updatedAt = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? uid = null,Object? requestedById = null,Object? approvedById = freezed,Object? type = null,Object? reason = null,Object? startDate = null,Object? endDate = null,Object? isApproved = null,Object? createdAt = freezed,Object? updatedAt = freezed,}) {
   return _then(_LeaveModel(
 uid: null == uid ? _self.uid : uid // ignore: cast_nullable_to_non_nullable
 as String,requestedById: null == requestedById ? _self.requestedById : requestedById // ignore: cast_nullable_to_non_nullable
-as String,approvedById: null == approvedById ? _self.approvedById : approvedById // ignore: cast_nullable_to_non_nullable
-as String,type: null == type ? _self.type : type // ignore: cast_nullable_to_non_nullable
+as String,approvedById: freezed == approvedById ? _self.approvedById : approvedById // ignore: cast_nullable_to_non_nullable
+as String?,type: null == type ? _self.type : type // ignore: cast_nullable_to_non_nullable
 as LeaveType,reason: null == reason ? _self.reason : reason // ignore: cast_nullable_to_non_nullable
 as String,startDate: null == startDate ? _self.startDate : startDate // ignore: cast_nullable_to_non_nullable
 as DateTime,endDate: null == endDate ? _self.endDate : endDate // ignore: cast_nullable_to_non_nullable
-as DateTime,createdAt: null == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
-as DateTime,updatedAt: null == updatedAt ? _self.updatedAt : updatedAt // ignore: cast_nullable_to_non_nullable
-as DateTime,
+as DateTime,isApproved: null == isApproved ? _self.isApproved : isApproved // ignore: cast_nullable_to_non_nullable
+as bool,createdAt: freezed == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
+as DateTime?,updatedAt: freezed == updatedAt ? _self.updatedAt : updatedAt // ignore: cast_nullable_to_non_nullable
+as DateTime?,
   ));
 }
 

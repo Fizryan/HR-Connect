@@ -1,6 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:hr_connect/core/error/failures.dart';
-import 'package:hr_connect/core/exception/core_exception.dart';
+import 'package:hr_connect/core/error/core_exception.dart';
 import 'package:hr_connect/core/network/api_client.dart';
 import 'package:hr_connect/features/leave/data/model/leave_model.dart';
 

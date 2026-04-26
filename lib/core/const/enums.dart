@@ -34,7 +34,7 @@ enum LeaveType {
   other,
 }
 
-enum LeaveStatus {
+enum RequestStatus {
   @JsonValue('pending')
   pending,
 

@@ -57,9 +57,9 @@ class LeaveRepositoryImpl implements LeaveRepository {
   }
 
   @override
-  Future<Either<Failure, void>> deleteLeave(String id) async {
+  Future<Either<Failure, void>> deleteLeave(String uid) async {
     try {
-      await remoteDataSource.deleteLeave(id);
+      await remoteDataSource.deleteLeave(uid);
       return const Right(null);
     } catch (e) {
       if (e is ServerFailure || e is NetworkFailure) return Left(e as Failure);

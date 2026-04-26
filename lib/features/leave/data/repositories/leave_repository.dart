@@ -7,5 +7,5 @@ abstract class LeaveRepository {
   Future<Either<Failure, LeaveModel>> getLeaveByUid(String uid);
   Future<Either<Failure, LeaveModel>> createLeave(LeaveModel leave);
   Future<Either<Failure, LeaveModel>> updateLeave(LeaveModel leave);
-  Future<Either<Failure, void>> deleteLeave(String id);
+  Future<Either<Failure, void>> deleteLeave(String uid);
 }
