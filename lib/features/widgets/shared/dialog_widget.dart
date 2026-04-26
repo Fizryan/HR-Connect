@@ -14,7 +14,7 @@ class DialogWidget {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: colorScheme.primary,
+        backgroundColor: colorScheme.surfaceContainerHighest,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16.r),
         ),
@@ -22,7 +22,7 @@ class DialogWidget {
           children: [
             Icon(
               Icons.support_agent_outlined,
-              color: colorScheme.onSecondary,
+              color: colorScheme.onSurface,
               size: 24.sp,
             ),
             SizedBox(width: 12.w),
@@ -36,19 +36,19 @@ class DialogWidget {
             Text(
               'Just contacting the HR Administrator or IT Support:',
               style: TextStyle(
-                color: colorScheme.onSecondary.withValues(alpha: 0.8),
+                color: colorScheme.onSurface.withValues(alpha: 0.8),
               ),
             ),
             SizedBox(height: 16.h),
             Row(
               children: [
-                Icon(Icons.email, size: 18.sp, color: colorScheme.onSecondary),
+                Icon(Icons.email, size: 18.sp, color: colorScheme.onSurface),
                 SizedBox(width: 8.w),
                 Expanded(
                   child: Text(
                     _supportEmail,
                     style: TextStyle(
-                      color: colorScheme.onSecondary,
+                      color: colorScheme.onSurface,
                       fontWeight: FontWeight.w500,
                     ),
                   ),
@@ -61,14 +61,14 @@ class DialogWidget {
                 Icon(
                   Icons.phone_in_talk_outlined,
                   size: 18.sp,
-                  color: colorScheme.onSecondary,
+                  color: colorScheme.onSurface,
                 ),
                 SizedBox(width: 8.w),
                 Expanded(
                   child: Text(
                     _supportPhone,
                     style: TextStyle(
-                      color: colorScheme.onSecondary,
+                      color: colorScheme.onSurface,
                       fontWeight: FontWeight.w500,
                     ),
                   ),
@@ -80,7 +80,7 @@ class DialogWidget {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text('Close', style: TextStyle(color: colorScheme.onSecondary)),
+            child: Text('Close', style: TextStyle(color: colorScheme.onSurface)),
           ),
         ],
       ),
@@ -91,7 +91,7 @@ class DialogWidget {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: colorScheme.primary,
+        backgroundColor: colorScheme.surfaceContainerHighest,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16.r),
         ),
@@ -99,7 +99,7 @@ class DialogWidget {
           children: [
             Icon(
               Icons.info_outline_rounded,
-              color: colorScheme.onSecondary,
+              color: colorScheme.onSurface,
               size: 24.sp,
             ),
             SizedBox(width: 12.w),
@@ -112,13 +112,13 @@ class DialogWidget {
           children: [
             Text(
               'HR-Connect is a modern human resources management system designed to streamline corporate operations. Ensuring that every HR workflow from daily operations remains efficient, secure, and centralized.',
-              style: TextStyle(color: colorScheme.onSecondary),
+              style: TextStyle(color: colorScheme.onSurface),
             ),
             SizedBox(height: 14.h),
             Text(
               'Team: HHHM',
               style: TextStyle(
-                color: colorScheme.onSecondary.withValues(alpha: 0.6),
+                color: colorScheme.onSurface.withValues(alpha: 0.6),
               ),
             ),
             FutureBuilder<PackageInfo>(
@@ -130,7 +130,7 @@ class DialogWidget {
                 return Text(
                   'Version: $versionStr',
                   style: TextStyle(
-                    color: colorScheme.onSecondary.withValues(alpha: 0.6),
+                    color: colorScheme.onSurface.withValues(alpha: 0.6),
                   ),
                 );
               },
@@ -140,7 +140,7 @@ class DialogWidget {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text('Close', style: TextStyle(color: colorScheme.onSecondary)),
+            child: Text('Close', style: TextStyle(color: colorScheme.onSurface)),
           ),
         ],
       ),
@@ -151,7 +151,7 @@ class DialogWidget {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: colorScheme.primary,
+        backgroundColor: colorScheme.surfaceContainerHighest,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16.r),
         ),
@@ -159,7 +159,7 @@ class DialogWidget {
           children: [
             Icon(
               Icons.logout_outlined,
-              color: colorScheme.onSecondary,
+              color: colorScheme.onSurface,
               size: 24.sp,
             ),
             SizedBox(width: 12.w),
@@ -173,7 +173,7 @@ class DialogWidget {
             Text(
               'Are you sure you want to logout?',
               style: TextStyle(
-                color: colorScheme.onSecondary.withValues(alpha: 0.8),
+                color: colorScheme.onSurface.withValues(alpha: 0.8),
               ),
             ),
           ],
@@ -181,7 +181,7 @@ class DialogWidget {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text('Cancel', style: TextStyle(color: colorScheme.onSecondary)),
+            child: Text('Cancel', style: TextStyle(color: colorScheme.onSurface)),
           ),
           ElevatedButton.icon(
             onPressed: () {
@@ -207,7 +207,7 @@ class DialogWidget {
         return Consumer<ThemeProvider>(
           builder: (context, themeProvider, _) {
             return AlertDialog(
-              backgroundColor: colorScheme.primary,
+              backgroundColor: colorScheme.surfaceContainerHighest,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(16.r),
               ),
@@ -215,7 +215,7 @@ class DialogWidget {
                 children: [
                   Icon(
                     Icons.color_lens_outlined,
-                    color: colorScheme.onSecondary,
+                    color: colorScheme.onSurface,
                     size: 24.sp,
                   ),
                   SizedBox(width: 12.w),
@@ -236,17 +236,17 @@ class DialogWidget {
                     RadioListTile<ThemeMode>(
                       title: const Text('System Default'),
                       value: ThemeMode.system,
-                      activeColor: colorScheme.onSecondary,
+                      activeColor: colorScheme.onSurface,
                     ),
                     RadioListTile<ThemeMode>(
                       title: const Text('Light'),
                       value: ThemeMode.light,
-                      activeColor: colorScheme.onSecondary,
+                      activeColor: colorScheme.onSurface,
                     ),
                     RadioListTile<ThemeMode>(
                       title: const Text('Dark'),
                       value: ThemeMode.dark,
-                      activeColor: colorScheme.onSecondary,
+                      activeColor: colorScheme.onSurface,
                     ),
                   ],
                 ),
@@ -254,7 +254,7 @@ class DialogWidget {
               actions: [
                 TextButton(
                   onPressed: () => Navigator.pop(context),
-                  child: Text('Close', style: TextStyle(color: colorScheme.onSecondary)),
+                  child: Text('Close', style: TextStyle(color: colorScheme.onSurface)),
                 ),
               ],
             );

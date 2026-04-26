@@ -19,22 +19,30 @@ class AppColors {
   static const Color lightPallet3 = Color.fromRGBO(221,226,242, 1);
   static const Color lightPallet4 = Color.fromRGBO(236,240,255, 1);
 
+  static const Color primary = Color.fromRGBO(136,192,208, 1);
+  static const Color secondary = Color.fromRGBO(129,161,193, 1);
+  static const Color tertiary = Color.fromRGBO(163,190,140, 1);
+  static const Color neutral = Color.fromRGBO(46,52,64, 1);
+
+  static const Color backgroundPrimary= Color.fromRGBO(22,28,39, 1);
+  static const Color backgroundSecondary = Color.fromRGBO(236,240,255, 1);
+
   static const Color information = Color.fromRGBO(129,161,193, 1);
-  static const Color error = Color.fromRGBO(129,12,12, 1);
+  static const Color error = Color.fromRGBO(161, 25, 25, 1);
 
   static const Color transparent = Colors.transparent;
 
   static const FlexSchemeColor lightDefault = FlexSchemeColor(
-    primary: lightPallet4,
-    secondary: lightPallet3,
-    appBarColor: lightPallet2,
+    primary: primary,
+    secondary: secondary,
+    tertiary: tertiary,
     error: error,
   );
 
   static const FlexSchemeColor darkDefault = FlexSchemeColor(
-    primary: darkPallet1,
-    secondary: darkPallet2,
-    appBarColor: darkPallet3,
+    primary: primary,
+    secondary: secondary,
+    tertiary: tertiary,
     error: error,
   );
 }

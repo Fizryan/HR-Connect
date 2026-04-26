@@ -56,7 +56,7 @@ class AdminUserCard extends StatelessWidget {
                     end: Alignment.bottomCenter,
                     colors: [
                       AppColors.transparent,
-                      AppColors.darkPallet2,
+                      AppColors.primary,
                     ],
                   ),
                 ),

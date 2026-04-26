@@ -16,3 +16,31 @@ enum UserRole {
   @JsonValue('staff')
   staff,
 }
+
+enum LeaveType {
+  @JsonValue('sick')
+  sick,
+
+  @JsonValue('casual')
+  casual,
+
+  @JsonValue('maternity')
+  maternity,
+
+  @JsonValue('paternity')
+  paternity,
+
+  @JsonValue('other')
+  other,
+}
+
+enum LeaveStatus {
+  @JsonValue('pending')
+  pending,
+
+  @JsonValue('approved')
+  approved,
+
+  @JsonValue('rejected')
+  rejected,
+}

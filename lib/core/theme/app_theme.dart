@@ -6,49 +6,32 @@ import 'package:google_fonts/google_fonts.dart';
 class AppTheme {
   AppTheme._();
 
+  static const FlexSubThemesData _subThemesData = FlexSubThemesData(
+    blendOnLevel: 10,
+    defaultRadius: 12.0,
+    cardRadius: 16.0,
+    cardElevation: 2.0,
+    blendOnColors: false,
+    useMaterial3Typography: true,
+    useM2StyleDividerInM3: true,
+    inputDecoratorUnfocusedHasBorder: true,
+  );
+
   static final ThemeData lightTheme = FlexThemeData.light(
     colors: AppColors.lightDefault,
     surfaceMode: FlexSurfaceMode.highSurfaceLowScaffold,
     blendLevel: 10,
-    scaffoldBackground: AppColors.lightPallet4,
     useMaterial3: true,
-    subThemesData: const FlexSubThemesData(
-      blendOnLevel: 10,
-      blendOnColors: false,
-      useMaterial3Typography: true,
-      useM2StyleDividerInM3: true,
-      defaultRadius: 12.0,
-      inputDecoratorBorderType: FlexInputBorderType.outline,
-      inputDecoratorUnfocusedHasBorder: true,
-      cardElevation: 2.0,
-      cardRadius: 16.0,
-    ),
-    textTheme: GoogleFonts.interTextTheme().apply(
-      bodyColor: AppColors.darkPallet1,
-      displayColor: AppColors.darkPallet1,
-    ),
+    subThemesData: _subThemesData,
+    textTheme: GoogleFonts.interTextTheme(ThemeData.light().textTheme)
   );
 
   static final ThemeData darkTheme = FlexThemeData.dark(
     colors: AppColors.darkDefault,
     surfaceMode: FlexSurfaceMode.highSurfaceLowScaffold,
     blendLevel: 10,
-    scaffoldBackground: AppColors.darkPallet1,
     useMaterial3: true,
-    subThemesData: const FlexSubThemesData(
-      blendOnLevel: 10,
-      blendOnColors: false,
-      useMaterial3Typography: true,
-      useM2StyleDividerInM3: true,
-      defaultRadius: 12.0,
-      inputDecoratorBorderType: FlexInputBorderType.outline,
-      inputDecoratorUnfocusedHasBorder: true,
-      cardElevation: 2.0,
-      cardRadius: 16.0,
-    ),
-    textTheme: GoogleFonts.interTextTheme().apply(
-      bodyColor: AppColors.lightPallet4,
-      displayColor: AppColors.lightPallet4,
-    ),
+    subThemesData: _subThemesData,
+    textTheme: GoogleFonts.interTextTheme(ThemeData.dark().textTheme)
   );
 }

@@ -33,25 +33,9 @@ class _SplashScreenState extends State<SplashScreen> {
     final colorScheme = theme.colorScheme;
 
     return Scaffold(
-      backgroundColor: theme.scaffoldBackgroundColor,
+      backgroundColor: theme.colorScheme.surface,
       body: Stack(
         children: [
-          Center(
-            child: Container(
-              width: 300.w,
-              height: 300.w,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                boxShadow: [
-                  BoxShadow(
-                    color: colorScheme.primary.withValues(alpha: 0.2),
-                    blurRadius: 120,
-                    spreadRadius: 20,
-                  ),
-                ],
-              ),
-            ),
-          ),
           Center(
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -70,29 +54,18 @@ class _SplashScreenState extends State<SplashScreen> {
                       ),
                     );
                   },
-                  child: Container(
-                    decoration: BoxDecoration(
-                      boxShadow: [
-                        BoxShadow(
-                          color: colorScheme.primary.withValues(alpha: 0.15),
-                          blurRadius: 30,
-                          offset: const Offset(0, 10),
-                        ),
-                      ],
-                    ),
-                    child: Image.asset(
-                      'assets/logo_icon.png',
-                      width: 110.w,
-                      height: 110.h,
-                      fit: BoxFit.contain,
-                      errorBuilder: (context, error, stackTrace) {
-                        return Icon(
-                          Icons.business_center_rounded,
-                          size: 110.sp,
-                          color: colorScheme.primary,
-                        );
-                      },
-                    ),
+                  child: Image.asset(
+                    'assets/logo_icon.png',
+                    width: 110.w,
+                    height: 110.h,
+                    fit: BoxFit.contain,
+                    errorBuilder: (context, error, stackTrace) {
+                      return Icon(
+                        Icons.business_center_rounded,
+                        size: 110.sp,
+                        color: colorScheme.onSurface,
+                      );
+                    },
                   ),
                 ),
                 SizedBox(height: 24.h),
@@ -143,11 +116,11 @@ class _SplashScreenState extends State<SplashScreen> {
               child: Column(
                 children: [
                   SizedBox(
-                    width: 24.w,
-                    height: 24.w,
-                    child: CircularProgressIndicator(
+                    width: 300.w,
+                    height: 4.w,
+                    child: LinearProgressIndicator(
                       color: colorScheme.primary.withValues(alpha: 0.6),
-                      strokeWidth: 2.5.w,
+                      backgroundColor: colorScheme.onSurface.withValues(alpha: 0.1),
                     ),
                   ),
                   SizedBox(height: 16.h),

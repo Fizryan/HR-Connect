@@ -34,7 +34,7 @@ class ProfileMenuTile extends StatelessWidget {
           borderRadius: BorderRadius.circular(12.r),
         ),
         tileColor: backgroundColor ?? 
-            colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
+            colorScheme.surfaceContainerHighest.withValues(alpha: 0.8),
         leading: Icon(icon, color: resolvedIconColor),
         title: Text(
           title,
@@ -49,7 +49,7 @@ class ProfileMenuTile extends StatelessWidget {
           size: 14.sp,
           color: resolvedIconColor.withValues(alpha: 0.5),
         ),
-        splashColor: (backgroundColor ?? colorScheme.primary).withValues(alpha: 0.1),
+        splashColor: (backgroundColor ?? colorScheme.onSurface).withValues(alpha: 0.1),
         onTap: onTap,
       ),
     );
