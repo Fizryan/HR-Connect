@@ -109,7 +109,7 @@ We're cooking up some more features right now and Here is the plan for the next 
 
 ### Entity Relationship Diagram (ERD)
 
-![ERD](assets/HR-Connect-ERD.jpeg.png)
+![ERD](assets/HR-Connect-ERD.jpeg)
 
 ---
 
