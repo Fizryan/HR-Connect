@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get_it/get_it.dart';
-import 'package:hr_connect/features/datasource_export.dart';
-import 'package:hr_connect/features/providers_export.dart';
-import 'package:hr_connect/features/repositories_export.dart';
+import 'package:hr_connect/features/export/datasource_export.dart';
+import 'package:hr_connect/features/export/providers_export.dart';
+import 'package:hr_connect/features/export/repositories_export.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:hr_connect/core/const/shared_preferences.dart';
 import 'package:hr_connect/core/network/api_client.dart';
@@ -29,15 +29,18 @@ Future<void> initDI() async {
   sl.registerLazySingleton<ApiClient>(() => ApiClient(secureStorage: sl()));
 
   // Repositories
-  sl.registerLazySingleton<UserRepository>(
-    () => UserRepositoryImpl(remoteDataSource: sl()),
-  );
   sl.registerLazySingleton<AuthRepository>(
     () => AuthRepositoryImpl(
       remoteDataSource: sl(),
       secureStorage: sl(),
       apiClient: sl(),
     ),
+  );
+  sl.registerLazySingleton<AccountRepository>(
+    () => AccountRepositoryImpl(remoteDataSource: sl()),
+  );
+  sl.registerLazySingleton<UserRepository>(
+    () => UserRepositoryImpl(remoteDataSource: sl()),
   );
   sl.registerLazySingleton<AttendanceRepository>(
     () => AttendanceRepositoryImpl(remoteDataSource: sl()),
@@ -56,7 +59,11 @@ Future<void> initDI() async {
   } else {
     sl.registerLazySingleton<AuthRemote>(() => AuthRemoteImpl(apiClient: sl()));
     sl.registerLazySingleton<UserRemote>(() => UserRemoteImpl(apiClient: sl()));
-    sl.registerLazySingleton<AttendanceRemote>(
+  }
+  sl.registerLazySingleton<AccountRemote>(
+    () => AccountRemoteImpl(apiClient: sl()),
+  );
+  sl.registerLazySingleton<AttendanceRemote>(
       () => AttendanceRemoteImpl(apiClient: sl()),
     );
     sl.registerLazySingleton<LeaveRemote>(
@@ -65,7 +72,6 @@ Future<void> initDI() async {
     sl.registerLazySingleton<OvertimeRemote>(
       () => OvertimeRemoteImpl(apiClient: sl()),
     );
-  }
 
   // Providers
   sl.registerLazySingleton<ThemeProvider>(() {
@@ -79,6 +85,9 @@ Future<void> initDI() async {
 
   sl.registerLazySingleton<AuthProvider>(
     () => AuthProvider(repository: sl(), secureStorage: sl()),
+  );
+  sl.registerLazySingleton<AccountProvider>(
+    () => AccountProvider(repository: sl()),
   );
   sl.registerLazySingleton<UserProvider>(() => UserProvider(repository: sl()));
   sl.registerLazySingleton<AttendanceProvider>(

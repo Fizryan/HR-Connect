@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:hr_connect/features/widgets/main_screen.dart';
-import 'package:hr_connect/features/auth/presentation/providers/auth_provider.dart';
-import 'package:hr_connect/features/auth/presentation/providers/auth_state.dart';
-import 'package:hr_connect/features/auth/presentation/screens/login_screen.dart';
-import 'package:hr_connect/features/widgets/splash_screen.dart';
+import 'package:hr_connect/features/widgets/presentation/main_screen.dart';
+import 'package:hr_connect/features/logic/auth/providers/auth_provider.dart';
+import 'package:hr_connect/features/logic/auth/providers/auth_state.dart';
+import 'package:hr_connect/features/widgets/presentation/etc/auth/login_screen.dart';
+import 'package:hr_connect/features/widgets/presentation/splash_screen.dart';
 
 class AppRouter {
   static GoRouter createRouter(AuthProvider authProvider) {

@@ -107,6 +107,13 @@ We're cooking up some more features right now and Here is the plan for the next 
 
 ---
 
+### Entity Relationship Diagram (ERD)
+
+![ERD](assets/HR-Connect-ERD.jpeg.png)
+
+---
+
+
 ## Testing
 
 - [x] **Mock Data Implementation:** We've got testing dummy data ready (`UserDummyRemote` and `AuthDummyRemote`) so the dashboard UI can run smoothly without the backend API live.

@@ -19,6 +19,8 @@ class AppTheme {
 
   static final ThemeData lightTheme = FlexThemeData.light(
     colors: AppColors.lightDefault,
+    scaffoldBackground: AppColors.backgroundSecondary,
+    surface: AppColors.backgroundSecondary,
     surfaceMode: FlexSurfaceMode.highSurfaceLowScaffold,
     blendLevel: 10,
     useMaterial3: true,
@@ -28,6 +30,8 @@ class AppTheme {
 
   static final ThemeData darkTheme = FlexThemeData.dark(
     colors: AppColors.darkDefault,
+    scaffoldBackground: AppColors.backgroundPrimary,
+    surface: AppColors.backgroundPrimary,
     surfaceMode: FlexSurfaceMode.highSurfaceLowScaffold,
     blendLevel: 10,
     useMaterial3: true,

@@ -1,7 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:hr_connect/core/di/injection.dart';
 import 'package:hr_connect/core/error/core_exception.dart';
-import 'package:hr_connect/features/auth/presentation/providers/auth_provider.dart';
+import 'package:hr_connect/features/logic/auth/providers/auth_provider.dart';
 import 'package:logger/logger.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';

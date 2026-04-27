@@ -1,11 +1,19 @@
 import 'package:hr_connect/core/const/enums.dart';
-import 'package:hr_connect/features/user_management/data/models/user_model.dart';
+import 'package:hr_connect/features/logic/user_management/data/models/user_model.dart';
 
 class UserData {
+  static final Map<String, Map<String, dynamic>> dummyAccounts = {
+    'admin@hrconnect.com': {'role': UserRole.admin, 'uid': 'USR-001'},
+    'director@hrconnect.com': {'role': UserRole.director, 'uid': 'USR-002'},
+    'manager@hrconnect.com': {'role': UserRole.manager, 'uid': 'USR-003'},
+    'supervisor@hrconnect.com': {'role': UserRole.supervisor, 'uid': 'USR-004'},
+    'staff@hrconnect.com': {'role': UserRole.staff, 'uid': 'USR-005'},
+    'test@hrconnect.com': {'role': UserRole.staff, 'uid': 'USR-006'},
+  };
+
   static final Map<String, UserModel> dummyUsers = {
     'USR-001': UserModel(
       uid: 'USR-001',
-      email: 'admin@hrconnect.com',
       firstName: 'Hafizryandin',
       lastName: 'Haykal Matondang',
       role: UserRole.admin,
@@ -16,7 +24,6 @@ class UserData {
     ),
     'USR-002': UserModel(
       uid: 'USR-002',
-      email: 'director@hrconnect.com',
       firstName: 'Muhammad Fathir',
       lastName: 'Rizky Salam',
       role: UserRole.director,
@@ -27,7 +34,6 @@ class UserData {
     ),
     'USR-003': UserModel(
       uid: 'USR-003',
-      email: 'manager@hrconnect.com',
       firstName: 'Hafidz Naufal',
       lastName: 'Pradana',
       role: UserRole.manager,
@@ -38,7 +44,6 @@ class UserData {
     ),
     'USR-004': UserModel(
       uid: 'USR-004',
-      email: 'supervisor@hrconnect.com',
       firstName: 'Haidar Zahran',
       lastName: 'Haryono',
       role: UserRole.supervisor,
@@ -49,7 +54,6 @@ class UserData {
     ),
     'USR-005': UserModel(
       uid: 'USR-005',
-      email: 'staff@hrconnect.com',
       firstName: 'Cecep Wijaya',
       lastName: 'Antonio Lopez',
       role: UserRole.staff,
@@ -60,7 +64,6 @@ class UserData {
     ),
     'USR-006': UserModel(
       uid: 'USR-006',
-      email: 'test@hrconnect.com',
       firstName: 'Test 1',
       lastName: 'System',
       role: UserRole.admin,
@@ -71,7 +74,6 @@ class UserData {
     ),
     'USR-007': UserModel(
       uid: 'USR-006',
-      email: 'test@hrconnect.com',
       firstName: 'Test 2',
       lastName: 'System',
       role: UserRole.admin,
@@ -82,7 +84,6 @@ class UserData {
     ),
     'USR-008': UserModel(
       uid: 'USR-006',
-      email: 'test@hrconnect.com',
       firstName: 'Test 3',
       lastName: 'System',
       role: UserRole.admin,
@@ -93,7 +94,6 @@ class UserData {
     ),
     'USR-009': UserModel(
       uid: 'USR-006',
-      email: 'test@hrconnect.com',
       firstName: 'Test 4',
       lastName: 'System',
       role: UserRole.admin,
@@ -104,7 +104,6 @@ class UserData {
     ),
     'USR-010': UserModel(
       uid: 'USR-006',
-      email: 'test@hrconnect.com',
       firstName: 'Test 5',
       lastName: 'System',
       role: UserRole.admin,
@@ -115,7 +114,6 @@ class UserData {
     ),
     'USR-011': UserModel(
       uid: 'USR-0006',
-      email: 'test@hrconnect.com',
       firstName: 'Test 6',
       lastName: 'System',
       role: UserRole.admin,
@@ -126,11 +124,9 @@ class UserData {
     ),
     'USR-012': UserModel(
       uid: 'USR-0006',
-      email: 'test@hrconnect.com',
       firstName: 'Test 7',
       lastName: 'System',
       role: UserRole.admin,
-      avatarUrl: 'https://i.pravatar.cc/150?img=12',
       isActive: true,
       createdAt: DateTime.now().subtract(const Duration(days: 8)),
       updatedAt: DateTime.now().subtract(const Duration(days: 5)),

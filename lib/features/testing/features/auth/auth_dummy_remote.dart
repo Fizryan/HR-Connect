@@ -1,33 +1,23 @@
 import 'package:hr_connect/core/const/enums.dart';
 import 'package:hr_connect/core/error/failures.dart';
-import 'package:hr_connect/features/auth/data/datasource/auth_remote.dart';
-import 'package:hr_connect/features/auth/data/model/auth_model.dart';
+import 'package:hr_connect/features/logic/auth/data/datasource/auth_remote.dart';
+import 'package:hr_connect/features/logic/auth/data/model/auth_model.dart';
 import 'package:hr_connect/features/testing/shared/user_data.dart';
-import 'package:hr_connect/features/user_management/data/models/user_model.dart';
+import 'package:hr_connect/features/logic/user_management/data/models/user_model.dart';
 
 class AuthDummyRemote implements AuthRemote {
   final Map<String, UserModel> dummyUsers = UserData.dummyUsers;
-  String _currentUid = 'USR-005';
+  String _currentUid = '';
 
   Future<void> _simulatedNetworkDelay() async {
-    await Future.delayed(const Duration(seconds: 2));
+    await Future.delayed(const Duration(seconds: 1));
   }
 
   @override
   Future<AuthModel> login(String email, String password) async {
     await _simulatedNetworkDelay();
-
-    final Map<String, Map<String, dynamic>> dummyAccounts = {
-      'admin@hrconnect.com': {'role': UserRole.admin, 'uid': 'USR-001'},
-      'director@hrconnect.com': {'role': UserRole.director, 'uid': 'USR-002'},
-      'manager@hrconnect.com': {'role': UserRole.manager, 'uid': 'USR-003'},
-      'supervisor@hrconnect.com': {
-        'role': UserRole.supervisor,
-        'uid': 'USR-004',
-      },
-      'staff@hrconnect.com': {'role': UserRole.staff, 'uid': 'USR-005'},
-      'test@hrconnect.com': {'role': UserRole.staff, 'uid': 'USR-006'},
-    };
+    
+    final Map<String, Map<String, dynamic>> dummyAccounts = UserData.dummyAccounts;
 
     if (dummyAccounts.containsKey(email)) {
       final accountInfo = dummyAccounts[email]!;

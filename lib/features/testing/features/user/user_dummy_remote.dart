@@ -1,7 +1,7 @@
 import 'package:hr_connect/core/error/failures.dart';
 import 'package:hr_connect/features/testing/shared/user_data.dart';
-import 'package:hr_connect/features/user_management/data/datasources/user_remote.dart';
-import 'package:hr_connect/features/user_management/data/models/user_model.dart';
+import 'package:hr_connect/features/logic/user_management/data/datasources/user_remote.dart';
+import 'package:hr_connect/features/logic/user_management/data/models/user_model.dart';
 
 class UserDummyRemote implements UserRemote {
   final List<UserModel> _dummyUsers = UserData.dummyUsers.values.toList();
