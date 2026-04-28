@@ -1,14 +1,21 @@
 import 'package:hr_connect/core/const/enums.dart';
 import 'package:hr_connect/features/logic/user_management/data/models/user_model.dart';
+import 'package:hr_connect/features/logic/account/data/model/account_model.dart';
 
 class UserData {
-  static final Map<String, Map<String, dynamic>> dummyAccounts = {
-    'admin@hrconnect.com': {'role': UserRole.admin, 'uid': 'USR-001'},
-    'director@hrconnect.com': {'role': UserRole.director, 'uid': 'USR-002'},
-    'manager@hrconnect.com': {'role': UserRole.manager, 'uid': 'USR-003'},
-    'supervisor@hrconnect.com': {'role': UserRole.supervisor, 'uid': 'USR-004'},
-    'staff@hrconnect.com': {'role': UserRole.staff, 'uid': 'USR-005'},
-    'test@hrconnect.com': {'role': UserRole.staff, 'uid': 'USR-006'},
+  static final Map<String, AccountModel> dummyAccounts = {
+    'admin@hrconnect.com': const AccountModel(uid: 'USR-001', email: 'admin@hrconnect.com', password: 'password123'),
+    'director@hrconnect.com': const AccountModel(uid: 'USR-002', email: 'director@hrconnect.com', password: 'password123'),
+    'manager@hrconnect.com': const AccountModel(uid: 'USR-003', email: 'manager@hrconnect.com', password: 'password123'),
+    'supervisor@hrconnect.com': const AccountModel(uid: 'USR-004', email: 'supervisor@hrconnect.com', password: 'password123'),
+    'staff@hrconnect.com': const AccountModel(uid: 'USR-005', email: 'staff@hrconnect.com', password: 'password123'),
+    'test@hrconnect.com': const AccountModel(uid: 'USR-006', email: 'test@hrconnect.com', password: 'password123'),
+    'test2@hrconnect.com': const AccountModel(uid: 'USR-007', email: 'test2@hrconnect.com', password: 'password123'),
+    'test3@hrconnect.com': const AccountModel(uid: 'USR-008', email: 'test3@hrconnect.com', password: 'password123'),
+    'test4@hrconnect.com': const AccountModel(uid: 'USR-009', email: 'test4@hrconnect.com', password: 'password123'),
+    'test5@hrconnect.com': const AccountModel(uid: 'USR-010', email: 'test5@hrconnect.com', password: 'password123'),
+    'test6@hrconnect.com': const AccountModel(uid: 'USR-011', email: 'test6@hrconnect.com', password: 'password123'),
+    'test7@hrconnect.com': const AccountModel(uid: 'USR-012', email: 'test7@hrconnect.com', password: 'password123'),
   };
 
   static final Map<String, UserModel> dummyUsers = {
@@ -73,7 +80,7 @@ class UserData {
       updatedAt: DateTime.now().subtract(const Duration(days: 5)),
     ),
     'USR-007': UserModel(
-      uid: 'USR-006',
+      uid: 'USR-007',
       firstName: 'Test 2',
       lastName: 'System',
       role: UserRole.admin,
@@ -83,7 +90,7 @@ class UserData {
       updatedAt: DateTime.now().subtract(const Duration(days: 5)),
     ),
     'USR-008': UserModel(
-      uid: 'USR-006',
+      uid: 'USR-008',
       firstName: 'Test 3',
       lastName: 'System',
       role: UserRole.admin,
@@ -93,7 +100,7 @@ class UserData {
       updatedAt: DateTime.now().subtract(const Duration(days: 5)),
     ),
     'USR-009': UserModel(
-      uid: 'USR-006',
+      uid: 'USR-009',
       firstName: 'Test 4',
       lastName: 'System',
       role: UserRole.admin,
@@ -103,7 +110,7 @@ class UserData {
       updatedAt: DateTime.now().subtract(const Duration(days: 5)),
     ),
     'USR-010': UserModel(
-      uid: 'USR-006',
+      uid: 'USR-010',
       firstName: 'Test 5',
       lastName: 'System',
       role: UserRole.admin,
@@ -113,7 +120,7 @@ class UserData {
       updatedAt: DateTime.now().subtract(const Duration(days: 5)),
     ),
     'USR-011': UserModel(
-      uid: 'USR-0006',
+      uid: 'USR-011',
       firstName: 'Test 6',
       lastName: 'System',
       role: UserRole.admin,
@@ -123,7 +130,7 @@ class UserData {
       updatedAt: DateTime.now().subtract(const Duration(days: 5)),
     ),
     'USR-012': UserModel(
-      uid: 'USR-0006',
+      uid: 'USR-012',
       firstName: 'Test 7',
       lastName: 'System',
       role: UserRole.admin,

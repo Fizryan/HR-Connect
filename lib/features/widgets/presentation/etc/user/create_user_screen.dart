@@ -5,38 +5,28 @@ import 'package:hr_connect/features/logic/user_management/data/models/user_model
 import 'package:hr_connect/features/logic/user_management/providers/user_provider.dart';
 import 'package:hr_connect/features/logic/user_management/providers/user_state.dart';
 
-class AdminEditUserScreen extends StatefulWidget {
+class AdminCreateUserScreen extends StatefulWidget {
   final ColorScheme colorScheme;
-  final UserModel user;
   final UserProvider userProvider;
 
-  const AdminEditUserScreen({
+  const AdminCreateUserScreen({
     super.key,
     required this.colorScheme,
-    required this.user,
     required this.userProvider,
   });
 
   @override
-  State<AdminEditUserScreen> createState() => _AdminEditUserScreenState();
+  State<AdminCreateUserScreen> createState() => _AdminCreateUserScreenState();
 }
 
-class _AdminEditUserScreenState extends State<AdminEditUserScreen> {
+class _AdminCreateUserScreenState extends State<AdminCreateUserScreen> {
   final _formKey = GlobalKey<FormState>();
-  late final TextEditingController _firstNameCtrl;
-  late final TextEditingController _lastNameCtrl;
-  late UserRole _selectedRole;
-  late bool _isActive;
-  bool _isLoading = false;
+  final TextEditingController _firstNameCtrl = TextEditingController();
+  final TextEditingController _lastNameCtrl = TextEditingController();
 
-  @override
-  void initState() {
-    super.initState();
-    _firstNameCtrl = TextEditingController(text: widget.user.firstName);
-    _lastNameCtrl = TextEditingController(text: widget.user.lastName);
-    _selectedRole = widget.user.role;
-    _isActive = widget.user.isActive;
-  }
+  late UserRole _selectedRole = UserRole.values.first;
+  bool _isActive = true;
+  bool _isLoading = false;
 
   @override
   void dispose() {
@@ -50,15 +40,21 @@ class _AdminEditUserScreenState extends State<AdminEditUserScreen> {
 
     setState(() => _isLoading = true);
 
-    final updatedUser = widget.user.copyWith(
+    final newUser = UserModel(
+      uid: '',
       firstName: _firstNameCtrl.text.trim(),
       lastName: _lastNameCtrl.text.trim(),
       role: _selectedRole,
       isActive: _isActive,
+      createdAt: DateTime.now(),
       updatedAt: DateTime.now(),
     );
 
-    await widget.userProvider.updateUser(updatedUser);
+    try {
+      await widget.userProvider.createUser(newUser);
+    } catch (e) {
+      debugPrint('Error creating user: $e');
+    }
 
     if (!mounted) return;
 
@@ -75,7 +71,10 @@ class _AdminEditUserScreenState extends State<AdminEditUserScreen> {
       error: (msg) => ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text(msg))),
-      orElse: () {},
+      orElse: () {
+        widget.userProvider.fetchAllUsers();
+        Navigator.pop(context);
+      },
     );
   }
 
@@ -83,13 +82,14 @@ class _AdminEditUserScreenState extends State<AdminEditUserScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Edit User',
-          style: TextStyle(color: colorScheme.onSecondary),
+          'Create User',
+          style: TextStyle(color: colorScheme.onSurface),
         ),
-        backgroundColor: colorScheme.secondary,
+        backgroundColor: colorScheme.surfaceContainer,
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
@@ -102,15 +102,15 @@ class _AdminEditUserScreenState extends State<AdminEditUserScreen> {
                   children: [
                     _buildInput(
                       controller: _firstNameCtrl,
-                      hint: _firstNameCtrl.text,
-                      icon: Icons.short_text_outlined,
+                      hint: 'First Name',
+                      icon: Icons.person_outline,
                       theme: theme,
                     ),
                     SizedBox(height: 16.h),
                     _buildInput(
                       controller: _lastNameCtrl,
-                      hint: _lastNameCtrl.text,
-                      icon: Icons.short_text_outlined,
+                      hint: 'Last Name',
+                      icon: Icons.person_outline,
                       theme: theme,
                     ),
                     SizedBox(height: 16.h),
@@ -142,7 +142,19 @@ class _AdminEditUserScreenState extends State<AdminEditUserScreen> {
                       height: 48.h,
                       child: ElevatedButton(
                         onPressed: _submit,
-                        child: const Text('Save Changes'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: colorScheme.primary,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16.r),
+                          ),
+                        ),
+                        child: Text(
+                          'Create User',
+                          style: TextStyle(
+                            fontSize: 16.sp,
+                            color: colorScheme.onPrimary,
+                          ),
+                        ),
                       ),
                     ),
                   ],
@@ -161,25 +173,19 @@ class _AdminEditUserScreenState extends State<AdminEditUserScreen> {
     return TextFormField(
       controller: controller,
       style: TextStyle(
-        color: theme.colorScheme.onPrimary,
+        color: theme.colorScheme.onSurface,
         fontSize: 14.sp,
         fontWeight: FontWeight.w500,
       ),
       decoration: InputDecoration(
         filled: true,
-        fillColor: theme.colorScheme.surfaceContainerHigh.withValues(
-          alpha: 0.3,
-        ),
+        fillColor: theme.colorScheme.surfaceContainerLowest,
         hintText: hint,
         hintStyle: TextStyle(
-          color: theme.colorScheme.onSecondary.withValues(alpha: 0.4),
+          color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
           fontSize: 14.sp,
         ),
-        prefixIcon: Icon(
-          icon,
-          color: theme.colorScheme.onSecondary.withValues(alpha: 0.5),
-          size: 20.sp,
-        ),
+        prefixIcon: Icon(icon, color: theme.colorScheme.onSurface, size: 20.sp),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16.r),
           borderSide: BorderSide.none,
@@ -190,7 +196,10 @@ class _AdminEditUserScreenState extends State<AdminEditUserScreen> {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16.r),
-          borderSide: BorderSide(color: theme.colorScheme.primary, width: 1.5),
+          borderSide: BorderSide(
+            color: theme.colorScheme.onSurface,
+            width: 1.5,
+          ),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16.r),

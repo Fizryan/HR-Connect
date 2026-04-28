@@ -32,7 +32,9 @@ class AccountRepositoryImpl implements AccountRepository {
   }
 
   @override
-  Future<Either<Failure, AccountModel>> createAccount(AccountModel account) async {
+  Future<Either<Failure, AccountModel>> createAccount(
+    AccountModel account,
+  ) async {
     try {
       final result = await remoteDataSource.createAccount(account);
       return Right(result);
@@ -43,9 +45,14 @@ class AccountRepositoryImpl implements AccountRepository {
   }
 
   @override
-  Future<Either<Failure, AccountModel>> updateAccount(AccountModel account) async {
+  Future<Either<Failure, AccountModel>> updateAccount(
+    AccountModel account,
+  ) async {
     try {
-      final result = await remoteDataSource.updateAccount(account.uid, account.toJson());
+      final result = await remoteDataSource.updateAccount(
+        account.uid,
+        account.toJson(),
+      );
       return Right(result);
     } catch (e) {
       if (e is ServerFailure || e is NetworkFailure) return Left(e as Failure);

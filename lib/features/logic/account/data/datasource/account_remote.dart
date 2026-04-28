@@ -55,10 +55,7 @@ class AccountRemoteImpl implements AccountRemote {
     Map<String, dynamic> account,
   ) async {
     try {
-      final response = await apiClient.put(
-        '/accounts/$uid',
-        data: account,
-      );
+      final response = await apiClient.put('/accounts/$uid', data: account);
       return AccountModel.fromJson(response['data']);
     } catch (e) {
       throw ServerFailure('Failed to process data: $e');

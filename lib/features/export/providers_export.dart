@@ -6,6 +6,4 @@ export 'package:hr_connect/features/logic/attendance/providers/attendance_provid
 
 export 'package:hr_connect/features/logic/leave/providers/leave_provider.dart';
 
-export 'package:hr_connect/features/logic/overtime/providers/overtime_provider.dart';
-
 export 'package:hr_connect/features/logic/account/providers/account_provider.dart';

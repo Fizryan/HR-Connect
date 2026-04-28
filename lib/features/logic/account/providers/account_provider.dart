@@ -6,7 +6,8 @@ import 'package:hr_connect/features/logic/account/providers/account_state.dart';
 class AccountProvider extends ValueNotifier<AccountState> {
   final AccountRepository repository;
 
-  AccountProvider({required this.repository}) : super(const AccountState.initial());
+  AccountProvider({required this.repository})
+    : super(const AccountState.initial());
 
   Future<void> fetchAllAccounts() async {
     value = const AccountState.loading();
@@ -31,7 +32,8 @@ class AccountProvider extends ValueNotifier<AccountState> {
     final result = await repository.createAccount(account);
     result.fold(
       (failure) => value = AccountState.error(failure.message),
-      (account) => value = const AccountState.success('Account created successfully'),
+      (account) =>
+          value = const AccountState.success('Account created successfully'),
     );
   }
 
@@ -40,7 +42,8 @@ class AccountProvider extends ValueNotifier<AccountState> {
     final result = await repository.updateAccount(account);
     result.fold(
       (failure) => value = AccountState.error(failure.message),
-      (account) => value = const AccountState.success('Account updated successfully'),
+      (account) =>
+          value = const AccountState.success('Account updated successfully'),
     );
   }
 

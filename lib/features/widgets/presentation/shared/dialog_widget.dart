@@ -275,4 +275,45 @@ class DialogWidget {
       },
     );
   }
+
+  static void showInformationDialog(
+    BuildContext context,
+    ColorScheme colorScheme,
+    String title,
+    String content,
+  ) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: colorScheme.surfaceContainer,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16.r),
+        ),
+        title: Row(
+          children: [
+            Icon(
+              Icons.info_outline_rounded,
+              color: colorScheme.onSurface,
+              size: 24.sp,
+            ),
+            SizedBox(width: 12.w),
+            Text(title),
+          ],
+        ),
+        content: Text(
+          content,
+          style: TextStyle(color: colorScheme.onSurface.withValues(alpha: 0.8)),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(
+              'Close',
+              style: TextStyle(color: colorScheme.onSurface),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 }

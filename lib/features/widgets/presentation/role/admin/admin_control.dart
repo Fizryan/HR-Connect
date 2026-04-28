@@ -3,6 +3,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get_it/get_it.dart';
 import 'package:hr_connect/features/logic/user_management/providers/user_provider.dart';
 import 'package:hr_connect/features/widgets/presentation/role/admin/admin_users_tabs.dart';
+import 'package:hr_connect/features/logic/account/providers/account_provider.dart';
+import 'package:hr_connect/features/widgets/presentation/role/admin/admin_accounts_tabs.dart';
 
 class AdminControl extends StatefulWidget {
   final ColorScheme colorScheme;
@@ -22,12 +24,15 @@ class _AdminTabItem {
 
 class _AdminControlState extends State<AdminControl> {
   late final UserProvider _userProvider;
+  late final AccountProvider _accountProvider;
 
   @override
   void initState() {
     super.initState();
     _userProvider = GetIt.I<UserProvider>();
+    _accountProvider = GetIt.I<AccountProvider>();
     _userProvider.fetchAllUsers();
+    _accountProvider.fetchAllAccounts();
   }
 
   @override
@@ -50,10 +55,12 @@ class _AdminControlState extends State<AdminControl> {
       ),
       _AdminTabItem(
         title: 'Account',
-        content: const Center(child: Text('Account Management (Coming Soon)')),
+        content: AdminAccountsTab(
+          colorScheme: colorScheme,
+          accountProvider: _accountProvider,
+        ),
       ),
     ];
-
     if (tabs.isEmpty) {
       return Scaffold(
         appBar: AppBar(

@@ -40,7 +40,6 @@ class _MainAppState extends State<MainApp> {
         ChangeNotifierProvider.value(value: sl<AuthProvider>()),
         ChangeNotifierProvider.value(value: sl<AttendanceProvider>()),
         ChangeNotifierProvider.value(value: sl<LeaveProvider>()),
-        ChangeNotifierProvider.value(value: sl<OvertimeProvider>()),
       ],
       child: ScreenUtilInit(
         designSize: const Size(393, 830),

@@ -5,9 +5,10 @@ import 'package:hr_connect/core/const/enums.dart';
 import 'package:hr_connect/features/logic/user_management/data/models/user_model.dart';
 import 'package:hr_connect/features/logic/user_management/providers/user_provider.dart';
 import 'package:hr_connect/features/logic/user_management/providers/user_state.dart';
-import 'package:hr_connect/features/widgets/presentation/role/admin/admin_edit_user_screen.dart';
+import 'package:hr_connect/features/widgets/presentation/etc/user/edit_user_screen.dart';
+import 'package:hr_connect/features/widgets/presentation/etc/user/create_user_screen.dart';
 import 'package:hr_connect/features/widgets/presentation/role/admin/admin_user_card.dart';
-import 'package:hr_connect/features/widgets/presentation/shared/information_widgets.dart';
+import 'package:hr_connect/features/widgets/presentation/shared/dialog_widget.dart';
 
 class AdminUsersTab extends StatefulWidget {
   final ColorScheme colorScheme;
@@ -31,33 +32,43 @@ class _AdminUsersTabState extends State<AdminUsersTab> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Padding(
-          padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 4.h),
-          child: InformationWidgets(
-            colorScheme: widget.colorScheme,
-            desciption:
-                'Quickly find what you need by typing a name in the search bar, or use Filter Role to quickly filter results by role.',
-            icon: Icons.info_outline_rounded,
-            iconColor: widget.colorScheme.onSurface,
+    return Scaffold(
+      backgroundColor: Colors.transparent,
+      body: Column(
+        children: [
+          _buildFilterSection(widget.colorScheme),
+          Expanded(
+            child: ValueListenableBuilder<UserState>(
+              valueListenable: widget.userProvider,
+              builder: (context, state, child) {
+                return state.maybeWhen(
+                  loading: () =>
+                      const Center(child: CircularProgressIndicator()),
+                  error: (message) => Center(child: Text('Error: $message')),
+                  dataList: (users) => _buildGrid(users, widget.colorScheme),
+                  orElse: () => const Center(child: Text('No Data Available')),
+                );
+              },
+            ),
           ),
-        ),
-        _buildFilterSection(widget.colorScheme),
-        Expanded(
-          child: ValueListenableBuilder<UserState>(
-            valueListenable: widget.userProvider,
-            builder: (context, state, child) {
-              return state.maybeWhen(
-                loading: () => const Center(child: CircularProgressIndicator()),
-                error: (message) => Center(child: Text('Error: $message')),
-                dataList: (users) => _buildGrid(users, widget.colorScheme),
-                orElse: () => const Center(child: Text('No Data Available')),
-              );
-            },
-          ),
-        ),
-      ],
+        ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: widget.colorScheme.primary,
+        foregroundColor: widget.colorScheme.onPrimary,
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => AdminCreateUserScreen(
+                colorScheme: widget.colorScheme,
+                userProvider: widget.userProvider,
+              ),
+            ),
+          );
+        },
+        child: const Icon(Icons.add),
+      ),
     );
   }
 
@@ -66,6 +77,16 @@ class _AdminUsersTabState extends State<AdminUsersTab> {
       padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
       child: Row(
         children: [
+          IconButton(
+            icon: const Icon(Icons.info_outline_rounded),
+            onPressed: () => DialogWidget.showInformationDialog(
+              context,
+              colorScheme,
+              'Information',
+              'Quickly find what you need by typing a name in the search bar, or use Filter Role to quickly filter results by role.',
+            ),
+            color: colorScheme.onSurface,
+          ),
           Expanded(
             child: TextField(
               decoration: InputDecoration(

@@ -1,5 +1,5 @@
-import 'package:hr_connect/core/const/enums.dart';
 import 'package:hr_connect/core/error/failures.dart';
+import 'package:hr_connect/features/logic/account/data/model/account_model.dart';
 import 'package:hr_connect/features/logic/auth/data/datasource/auth_remote.dart';
 import 'package:hr_connect/features/logic/auth/data/model/auth_model.dart';
 import 'package:hr_connect/features/testing/shared/user_data.dart';
@@ -17,17 +17,20 @@ class AuthDummyRemote implements AuthRemote {
   Future<AuthModel> login(String email, String password) async {
     await _simulatedNetworkDelay();
     
-    final Map<String, Map<String, dynamic>> dummyAccounts = UserData.dummyAccounts;
+    final Map<String, AccountModel> dummyAccounts = UserData.dummyAccounts;
 
     if (dummyAccounts.containsKey(email)) {
       final accountInfo = dummyAccounts[email]!;
-      final UserRole role = accountInfo['role'];
-      final expectedPassword = '${role.name}123';
+      final expectedPassword = accountInfo.password;
 
       if (password == expectedPassword) {
-        _currentUid = accountInfo['uid'];
+        _currentUid = accountInfo.uid;
+        
+        final user = dummyUsers[_currentUid];
+        final roleName = user?.role.name ?? 'unknown';
+        
         return AuthModel(
-          token: 'dummy_${role.name}_token_abcdef1234567890',
+          token: 'dummy_${roleName}_token_abcdef1234567890',
           message: 'Login successful',
         );
       }

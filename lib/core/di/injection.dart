@@ -48,30 +48,23 @@ Future<void> initDI() async {
   sl.registerLazySingleton<LeaveRepository>(
     () => LeaveRepositoryImpl(remoteDataSource: sl()),
   );
-  sl.registerLazySingleton<OvertimeRepository>(
-    () => OvertimeRepositoryImpl(remoteDataSource: sl()),
-  );
 
   // Data Sources
   if (dotenv.env['USE_MOCK_DATA'] == 'true') {
     sl.registerLazySingleton<AuthRemote>(AuthDummyRemote.new);
     sl.registerLazySingleton<UserRemote>(UserDummyRemote.new);
+    sl.registerLazySingleton<AccountRemote>(AccountDummyRemote.new);
   } else {
     sl.registerLazySingleton<AuthRemote>(() => AuthRemoteImpl(apiClient: sl()));
     sl.registerLazySingleton<UserRemote>(() => UserRemoteImpl(apiClient: sl()));
+    sl.registerLazySingleton<AccountRemote>(
+      () => AccountRemoteImpl(apiClient: sl()),
+    );
   }
-  sl.registerLazySingleton<AccountRemote>(
-    () => AccountRemoteImpl(apiClient: sl()),
-  );
   sl.registerLazySingleton<AttendanceRemote>(
-      () => AttendanceRemoteImpl(apiClient: sl()),
-    );
-    sl.registerLazySingleton<LeaveRemote>(
-      () => LeaveRemoteImpl(apiClient: sl()),
-    );
-    sl.registerLazySingleton<OvertimeRemote>(
-      () => OvertimeRemoteImpl(apiClient: sl()),
-    );
+    () => AttendanceRemoteImpl(apiClient: sl()),
+  );
+  sl.registerLazySingleton<LeaveRemote>(() => LeaveRemoteImpl(apiClient: sl()));
 
   // Providers
   sl.registerLazySingleton<ThemeProvider>(() {
@@ -95,8 +88,5 @@ Future<void> initDI() async {
   );
   sl.registerLazySingleton<LeaveProvider>(
     () => LeaveProvider(repository: sl()),
-  );
-  sl.registerLazySingleton<OvertimeProvider>(
-    () => OvertimeProvider(repository: sl()),
   );
 }

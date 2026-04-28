@@ -10,8 +10,5 @@ export 'package:hr_connect/features/logic/attendance/data/repositories/attendanc
 export 'package:hr_connect/features/logic/leave/data/repositories/leave_repository.dart';
 export 'package:hr_connect/features/logic/leave/data/repositories/leave_repository_impl.dart';
 
-export 'package:hr_connect/features/logic/overtime/data/repositories/overtime_repository.dart';
-export 'package:hr_connect/features/logic/overtime/data/repositories/overtime_repository_impl.dart';
-
 export 'package:hr_connect/features/logic/account/data/repositories/account_repository.dart';
 export 'package:hr_connect/features/logic/account/data/repositories/account_repository_impl.dart';
