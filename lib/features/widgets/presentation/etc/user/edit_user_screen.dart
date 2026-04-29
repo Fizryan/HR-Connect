@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:hr_connect/core/const/enums.dart';
+import 'package:hr_connect/core/di/injection.dart';
+import 'package:hr_connect/features/logic/auth/providers/auth_provider.dart';
+import 'package:hr_connect/features/logic/auth/providers/auth_state.dart';
 import 'package:hr_connect/features/logic/user_management/data/models/user_model.dart';
 import 'package:hr_connect/features/logic/user_management/providers/user_provider.dart';
 import 'package:hr_connect/features/logic/user_management/providers/user_state.dart';
+import 'package:hr_connect/features/widgets/presentation/shared/custom_text_field.dart';
 
 class AdminEditUserScreen extends StatefulWidget {
   final ColorScheme colorScheme;
@@ -39,6 +43,15 @@ class _AdminEditUserScreenState extends State<AdminEditUserScreen> {
     _lastNameCtrl = TextEditingController(text: widget.user.lastName);
     _selectedRole = widget.user.role;
     _isActive = widget.user.isActive;
+  }
+
+  bool _isCurrentUser() {
+    final authProvider = sl<AuthProvider>();
+    final currentUser = authProvider.value.maybeWhen(
+      authenticated: (user) => user,
+      orElse: () => null,
+    );
+    return currentUser?.uid == widget.user.uid;
   }
 
   @override
@@ -83,8 +96,10 @@ class _AdminEditUserScreenState extends State<AdminEditUserScreen> {
   }
 
   Future<void> _deleteUser() async {
+    if (_isCurrentUser()) return;
+
     final deleteFormKey = GlobalKey<FormState>();
-    const expectedText = 'Rox Sudah Silver';
+    final expectedText = '${widget.user.firstName} ${widget.user.lastName}';
 
     final confirm = await showDialog<bool>(
       context: context,
@@ -246,27 +261,30 @@ class _AdminEditUserScreenState extends State<AdminEditUserScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _buildInputReadyOnly(
-                      'UID',
-                      uid.toString(),
-                      Icons.person_outline,
-                      theme,
+                    CustomTextField(
+                      title: 'UID',
+                      hint: uid.toString(),
+                      icon: Icons.person_outline,
+                      theme: theme,
+                      readOnly: true,
                     ),
                     SizedBox(height: 16.h),
-                    _buildInput(
+                    CustomTextField(
                       controller: _firstNameCtrl,
                       title: 'First Name',
                       hint: _firstNameCtrl.text,
                       icon: Icons.short_text_outlined,
                       theme: theme,
+                      validator: (v) => v == null || v.isEmpty ? 'Required' : null,
                     ),
                     SizedBox(height: 16.h),
-                    _buildInput(
+                    CustomTextField(
                       controller: _lastNameCtrl,
                       title: 'Last Name',
                       hint: _lastNameCtrl.text,
                       icon: Icons.short_text_outlined,
                       theme: theme,
+                      validator: (v) => v == null || v.isEmpty ? 'Required' : null,
                     ),
                     SizedBox(height: 16.h),
                     DropdownButtonFormField<UserRole>(
@@ -276,34 +294,48 @@ class _AdminEditUserScreenState extends State<AdminEditUserScreen> {
                           .map(
                             (role) => DropdownMenuItem(
                               value: role,
+                              enabled:
+                                  !_isCurrentUser() || role == _selectedRole,
                               child: Text(role.name.toUpperCase()),
                             ),
                           )
                           .toList(),
-                      onChanged: (v) {
-                        if (v != null) setState(() => _selectedRole = v);
-                      },
+                      onChanged: _isCurrentUser()
+                          ? null
+                          : (v) {
+                              if (v != null) setState(() => _selectedRole = v);
+                            },
                     ),
                     SizedBox(height: 16.h),
                     SwitchListTile(
                       title: const Text('Active Status'),
+                      subtitle: _isCurrentUser()
+                          ? const Text(
+                              'You cannot change your own status',
+                              style: TextStyle(fontSize: 12),
+                            )
+                          : null,
                       contentPadding: EdgeInsets.zero,
                       value: _isActive,
-                      onChanged: (v) => setState(() => _isActive = v),
+                      onChanged: _isCurrentUser()
+                          ? null
+                          : (v) => setState(() => _isActive = v),
                     ),
                     SizedBox(height: 16.h),
-                    _buildInputReadyOnly(
-                      'Created At',
-                      createdAt.toString(),
-                      Icons.date_range_outlined,
-                      theme,
+                    CustomTextField(
+                      title: 'Created At',
+                      hint: createdAt.toString(),
+                      icon: Icons.date_range_outlined,
+                      theme: theme,
+                      readOnly: true,
                     ),
                     SizedBox(height: 16.h),
-                    _buildInputReadyOnly(
-                      'Updated At',
-                      updatedAt.toString(),
-                      Icons.date_range_outlined,
-                      theme,
+                    CustomTextField(
+                      title: 'Updated At',
+                      hint: updatedAt.toString(),
+                      icon: Icons.date_range_outlined,
+                      theme: theme,
+                      readOnly: true,
                     ),
                     SizedBox(height: 32.h),
                     SizedBox(
@@ -326,148 +358,33 @@ class _AdminEditUserScreenState extends State<AdminEditUserScreen> {
                         ),
                       ),
                     ),
-                    SizedBox(height: 22.h),
-                    SizedBox(
-                      width: double.infinity,
-                      height: 48.h,
-                      child: ElevatedButton(
-                        onPressed: _deleteUser,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: colorScheme.error,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(16.r),
+                    if (!_isCurrentUser()) ...[
+                      SizedBox(height: 22.h),
+                      SizedBox(
+                        width: double.infinity,
+                        height: 48.h,
+                        child: ElevatedButton(
+                          onPressed: _deleteUser,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: colorScheme.error,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16.r),
+                            ),
                           ),
-                        ),
-                        child: Text(
-                          'Delete User',
-                          style: TextStyle(
-                            fontSize: 16.sp,
-                            color: colorScheme.onError,
+                          child: Text(
+                            'Delete User',
+                            style: TextStyle(
+                              fontSize: 16.sp,
+                              color: colorScheme.onError,
+                            ),
                           ),
                         ),
                       ),
-                    ),
+                    ],
                   ],
                 ),
               ),
             ),
-    );
-  }
-
-  Widget _buildInput({
-    required TextEditingController controller,
-    required String title,
-    required String hint,
-    required IconData icon,
-    required ThemeData theme,
-  }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(title),
-        SizedBox(height: 8.h),
-        TextFormField(
-          controller: controller,
-          style: TextStyle(
-            color: theme.colorScheme.onSurface,
-            fontSize: 14.sp,
-            fontWeight: FontWeight.w500,
-          ),
-          decoration: InputDecoration(
-            filled: true,
-            fillColor: theme.colorScheme.surfaceContainerLowest,
-            hintText: hint,
-            hintStyle: TextStyle(
-              color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
-              fontSize: 14.sp,
-            ),
-            prefixIcon: Icon(
-              icon,
-              color: theme.colorScheme.onSurface,
-              size: 20.sp,
-            ),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(16.r),
-              borderSide: BorderSide.none,
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(16.r),
-              borderSide: BorderSide.none,
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(16.r),
-              borderSide: BorderSide(
-                color: theme.colorScheme.onSurface,
-                width: 1.5,
-              ),
-            ),
-            errorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(16.r),
-              borderSide: BorderSide(
-                color: theme.colorScheme.error,
-                width: 1.5,
-              ),
-            ),
-            focusedErrorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(16.r),
-              borderSide: BorderSide(
-                color: theme.colorScheme.error,
-                width: 1.5,
-              ),
-            ),
-            contentPadding: EdgeInsets.symmetric(
-              vertical: 16.h,
-              horizontal: 16.w,
-            ),
-          ),
-          validator: (v) => v == null || v.isEmpty ? 'Required' : null,
-        ),
-      ],
-    );
-  }
-
-  Widget _buildInputReadyOnly(
-    String title,
-    String hint,
-    IconData icon,
-    ThemeData theme,
-  ) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(title),
-        SizedBox(height: 8.h),
-        TextFormField(
-          readOnly: true,
-          style: TextStyle(
-            color: theme.colorScheme.onSurface,
-            fontSize: 14.sp,
-            fontWeight: FontWeight.w500,
-          ),
-          decoration: InputDecoration(
-            filled: true,
-            fillColor: theme.colorScheme.surfaceContainerLowest,
-            hintText: hint,
-            hintStyle: TextStyle(
-              color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
-              fontSize: 14.sp,
-            ),
-            prefixIcon: Icon(
-              icon,
-              color: theme.colorScheme.onSurface,
-              size: 20.sp,
-            ),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(16.r),
-              borderSide: BorderSide.none,
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(16.r),
-              borderSide: BorderSide.none,
-            ),
-          ),
-        ),
-      ],
     );
   }
 }

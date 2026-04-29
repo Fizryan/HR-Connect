@@ -1,11 +1,9 @@
 import 'package:hr_connect/core/error/failures.dart';
 import 'package:hr_connect/features/export/datasource_export.dart';
 import 'package:hr_connect/features/logic/account/data/model/account_model.dart';
-import 'package:hr_connect/features/testing/shared/user_data.dart';
+import 'package:hr_connect/features/testing/shared/dummy_database.dart';
 
 class AccountDummyRemote implements AccountRemote {
-  final List<AccountModel> _dummyAccounts = UserData.dummyAccounts.values
-      .toList();
 
   Future<void> _simulatedNetworkDelay() async {
     await Future.delayed(const Duration(seconds: 1));
@@ -14,14 +12,14 @@ class AccountDummyRemote implements AccountRemote {
   @override
   Future<List<AccountModel>> getAllAccounts() async {
     await _simulatedNetworkDelay();
-    return List.unmodifiable(_dummyAccounts);
+    return List.unmodifiable(DummyDatabase.accounts);
   }
 
   @override
   Future<AccountModel> getAccountById(String uid) async {
     await _simulatedNetworkDelay();
     try {
-      return _dummyAccounts.firstWhere((account) => account.uid == uid);
+      return DummyDatabase.accounts.firstWhere((account) => account.uid == uid);
     } catch (e) {
       throw const ServerFailure('Account not found');
     }
@@ -35,7 +33,7 @@ class AccountDummyRemote implements AccountRemote {
           'USR-${DateTime.now().millisecondsSinceEpoch.toString().substring(7)}';
 
       final newAccount = account.copyWith(uid: newUid);
-      _dummyAccounts.add(newAccount);
+      DummyDatabase.accounts.add(newAccount);
 
       return newAccount;
     } catch (e) {
@@ -50,14 +48,14 @@ class AccountDummyRemote implements AccountRemote {
   ) async {
     await _simulatedNetworkDelay();
     
-    final accountIndex = _dummyAccounts.indexWhere((account) => account.uid == uid);
+    final accountIndex = DummyDatabase.accounts.indexWhere((account) => account.uid == uid);
 
     if (accountIndex == -1) {
       throw const ServerFailure('Account not found');
     }
 
     try {
-      final oldAccount = _dummyAccounts[accountIndex];
+      final oldAccount = DummyDatabase.accounts[accountIndex];
       final Map<String, dynamic> updatedJson = {
         ...oldAccount.toJson(),
         ...account,
@@ -65,7 +63,7 @@ class AccountDummyRemote implements AccountRemote {
       };
 
       final updateAccount = AccountModel.fromJson(updatedJson);
-      _dummyAccounts[accountIndex] = updateAccount;
+      DummyDatabase.accounts[accountIndex] = updateAccount;
 
       return updateAccount;
     } catch (e) {
@@ -77,10 +75,10 @@ class AccountDummyRemote implements AccountRemote {
   Future<void> deleteAccount(String uid) async {
     await _simulatedNetworkDelay();
 
-    final initialLength = _dummyAccounts.length;
-    _dummyAccounts.removeWhere((account) => account.uid == uid);
+    final initialLength = DummyDatabase.accounts.length;
+    DummyDatabase.accounts.removeWhere((account) => account.uid == uid);
     
-    if (_dummyAccounts.length == initialLength) {
+    if (DummyDatabase.accounts.length == initialLength) {
       throw const ServerFailure('Account not found');
     }
   }

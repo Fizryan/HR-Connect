@@ -1,10 +1,9 @@
 import 'package:hr_connect/core/error/failures.dart';
-import 'package:hr_connect/features/testing/shared/user_data.dart';
+import 'package:hr_connect/features/testing/shared/dummy_database.dart';
 import 'package:hr_connect/features/logic/user_management/data/datasources/user_remote.dart';
 import 'package:hr_connect/features/logic/user_management/data/models/user_model.dart';
 
 class UserDummyRemote implements UserRemote {
-  final List<UserModel> _dummyUsers = UserData.dummyUsers.values.toList();
 
   Future<void> _simulatedNetworkDelay() async {
     await Future.delayed(const Duration(seconds: 2));
@@ -13,14 +12,14 @@ class UserDummyRemote implements UserRemote {
   @override
   Future<List<UserModel>> getAllUsers() async {
     await _simulatedNetworkDelay();
-    return List.unmodifiable(_dummyUsers);
+    return List.unmodifiable(DummyDatabase.users);
   }
 
   @override
   Future<UserModel> getUserByUid(String uid) async {
     await _simulatedNetworkDelay();
     try {
-      return _dummyUsers.firstWhere((user) => user.uid == uid);
+      return DummyDatabase.users.firstWhere((user) => user.uid == uid);
     } catch (e) {
       throw const ServerFailure('User not found');
     }
@@ -31,15 +30,20 @@ class UserDummyRemote implements UserRemote {
     await _simulatedNetworkDelay();
 
     try {
-      final newUid =
-          'USR-${DateTime.now().millisecondsSinceEpoch.toString().substring(7)}';
-
       final newData = Map<String, dynamic>.from(userData);
-      newData['uid'] = newUid;
-      newData['createdAt'] = DateTime.now().toIso8601String();
+      
+      // Gunakan uid yang dikirimkan UI (dari dropdown unassigned account),
+      // jika kosong, baru generate uid baru.
+      if (newData['uid'] == null || newData['uid'].toString().isEmpty) {
+        newData['uid'] = 'USR-${DateTime.now().millisecondsSinceEpoch.toString().substring(7)}';
+      }
+      
+      if (newData['createdAt'] == null) {
+        newData['createdAt'] = DateTime.now().toIso8601String();
+      }
 
       final newUser = UserModel.fromJson(newData);
-      _dummyUsers.add(newUser);
+      DummyDatabase.users.add(newUser);
 
       return newUser;
     } catch (e) {
@@ -54,14 +58,14 @@ class UserDummyRemote implements UserRemote {
   ) async {
     await _simulatedNetworkDelay();
 
-    final userIndex = _dummyUsers.indexWhere((user) => user.uid == uid);
+    final userIndex = DummyDatabase.users.indexWhere((user) => user.uid == uid);
 
     if (userIndex == -1) {
       throw const ServerFailure('User not found');
     }
 
     try {
-      final oldUser = _dummyUsers[userIndex];
+      final oldUser = DummyDatabase.users[userIndex];
       final Map<String, dynamic> updatedJson = {
         ...oldUser.toJson(),
         ...userData,
@@ -69,7 +73,7 @@ class UserDummyRemote implements UserRemote {
       };
 
       final updateUser = UserModel.fromJson(updatedJson);
-      _dummyUsers[userIndex] = updateUser;
+      DummyDatabase.users[userIndex] = updateUser;
 
       return updateUser;
     } catch (e) {
@@ -81,10 +85,10 @@ class UserDummyRemote implements UserRemote {
   Future<void> deleteUser(String uid) async {
     await _simulatedNetworkDelay();
 
-    final initialLength = _dummyUsers.length;
-    _dummyUsers.removeWhere((user) => user.uid == uid);
+    final initialLength = DummyDatabase.users.length;
+    DummyDatabase.users.removeWhere((user) => user.uid == uid);
 
-    if (_dummyUsers.length == initialLength) {
+    if (DummyDatabase.users.length == initialLength) {
       throw const ServerFailure('User not found');
     }
   }

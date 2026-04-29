@@ -3,8 +3,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get_it/get_it.dart';
 import 'package:hr_connect/features/logic/user_management/providers/user_provider.dart';
 import 'package:hr_connect/features/widgets/model/list_menu.dart';
-import 'package:hr_connect/features/widgets/model/list_overview.dart';
-import 'package:hr_connect/features/export/shared_widgets.dart';
 
 class AdminDashboard extends StatefulWidget {
   final ColorScheme colorScheme;
@@ -43,14 +41,6 @@ class _AdminDashboardState extends State<AdminDashboard> {
       },
     ),
     ListMenu(
-      title: 'Overtime',
-      icon: Icons.more_time_outlined,
-      iconColor: widget.colorScheme.primary,
-      onTap: () {
-        // TODO: Navigate to the overtime screen
-      },
-    ),
-    ListMenu(
       title: 'Users',
       icon: Icons.people_outline_outlined,
       iconColor: widget.colorScheme.primary,
@@ -65,39 +55,6 @@ class _AdminDashboardState extends State<AdminDashboard> {
       onTap: () {
         // TODO: Navigate to the account screen
       },
-    ),
-  ];
-
-  late List<ListOverview> listOverview = [
-    ListOverview(
-      title: 'Total Users',
-      subtitle: '0', // TODO: Replace with actual value
-      icon: Icons.people_outline_outlined,
-      iconColor: widget.colorScheme.primary,
-    ),
-    ListOverview(
-      title: 'Total Account',
-      subtitle: '0', // TODO: Replace with actual value
-      icon: Icons.account_circle_outlined,
-      iconColor: widget.colorScheme.primary,
-    ),
-    ListOverview(
-      title: 'Total Leave Requst',
-      subtitle: '0', // TODO: Replace with actual value
-      icon: Icons.home_work_outlined,
-      iconColor: widget.colorScheme.primary,
-    ),
-    ListOverview(
-      title: 'Total Business Trip',
-      subtitle: '0', // TODO: Replace with actual value
-      icon: Icons.travel_explore_outlined,
-      iconColor: widget.colorScheme.primary,
-    ),
-    ListOverview(
-      title: 'Total Overtime',
-      subtitle: '0', // TODO: Replace with actual value
-      icon: Icons.more_time_outlined,
-      iconColor: widget.colorScheme.primary,
     ),
   ];
 
@@ -117,26 +74,10 @@ class _AdminDashboardState extends State<AdminDashboard> {
   Widget build(BuildContext context) {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 18.w),
-      child: Column(
+      child: const Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'Welcome Admin ✌️😉', // TODO: Replace with user's name
-            style: Theme.of(context).textTheme.titleMedium,
-          ),
-          SizedBox(height: 16.h),
-          MenuWidgets(
-            colorScheme: widget.colorScheme,
-            title: 'Menus',
-            menus: menu,
-            icon: Icons.view_module_rounded,
-          ),
-          SizedBox(height: 16.h),
-          OverviewWidgets(
-            colorScheme: widget.colorScheme,
-            title: 'Activity',
-            listOverview: listOverview,
-          ),
+          Text('Under Development'),
         ],
       ),
     );

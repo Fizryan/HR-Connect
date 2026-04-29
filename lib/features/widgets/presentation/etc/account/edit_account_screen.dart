@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:hr_connect/core/di/injection.dart';
+import 'package:hr_connect/features/logic/auth/providers/auth_provider.dart';
+import 'package:hr_connect/features/logic/auth/providers/auth_state.dart';
 import 'package:hr_connect/features/logic/account/data/model/account_model.dart';
 import 'package:hr_connect/features/logic/account/providers/account_provider.dart';
 import 'package:hr_connect/features/logic/account/providers/account_state.dart';
+import 'package:hr_connect/features/widgets/presentation/shared/custom_text_field.dart';
 
 class AdminEditAccountScreen extends StatefulWidget {
   final ColorScheme colorScheme;
@@ -25,8 +29,17 @@ class _AdminEditAccountScreenState extends State<AdminEditAccountScreen> {
   late final TextEditingController _emailCtrl;
   late final TextEditingController _passwordCtrl;
   late final uid = widget.account.uid;
-  
+
   bool _isLoading = false;
+
+  bool _isCurrentUser() {
+    final authProvider = sl<AuthProvider>();
+    final currentUser = authProvider.value.maybeWhen(
+      authenticated: (user) => user,
+      orElse: () => null,
+    );
+    return currentUser?.uid == widget.account.uid;
+  }
 
   @override
   void initState() {
@@ -60,16 +73,22 @@ class _AdminEditAccountScreenState extends State<AdminEditAccountScreen> {
 
     widget.accountProvider.value.maybeWhen(
       success: (msg) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(msg)));
         widget.accountProvider.fetchAllAccounts();
         Navigator.pop(context);
       },
-      error: (msg) => ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg))),
+      error: (msg) => ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(msg))),
       orElse: () {},
     );
   }
 
   Future<void> _deleteAccount() async {
+    if (_isCurrentUser()) return;
+
     final deleteFormKey = GlobalKey<FormState>();
     final expectedText = widget.account.email;
 
@@ -113,10 +132,14 @@ class _AdminEditAccountScreenState extends State<AdminEditAccountScreen> {
                 ),
                 decoration: InputDecoration(
                   filled: true,
-                  fillColor: Theme.of(context).colorScheme.surfaceContainerLowest,
+                  fillColor: Theme.of(
+                    context,
+                  ).colorScheme.surfaceContainerLowest,
                   hintText: 'Fill the text to confirm',
                   hintStyle: TextStyle(
-                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.onSurface.withValues(alpha: 0.6),
                     fontSize: 14.sp,
                   ),
                   border: OutlineInputBorder(
@@ -153,7 +176,8 @@ class _AdminEditAccountScreenState extends State<AdminEditAccountScreen> {
                     horizontal: 16.w,
                   ),
                 ),
-                validator: (v) => v != expectedText ? 'Email does not match' : null,
+                validator: (v) =>
+                    v != expectedText ? 'Email does not match' : null,
               ),
             ],
           ),
@@ -194,11 +218,15 @@ class _AdminEditAccountScreenState extends State<AdminEditAccountScreen> {
 
     widget.accountProvider.value.maybeWhen(
       success: (msg) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(msg)));
         widget.accountProvider.fetchAllAccounts();
         Navigator.pop(context);
       },
-      error: (msg) => ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg))),
+      error: (msg) => ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(msg))),
       orElse: () {},
     );
   }
@@ -207,7 +235,7 @@ class _AdminEditAccountScreenState extends State<AdminEditAccountScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    
+
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -225,28 +253,31 @@ class _AdminEditAccountScreenState extends State<AdminEditAccountScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _buildInputReadyOnly(
-                      'UID',
-                      uid.toString(),
-                      Icons.vpn_key_outlined,
-                      theme,
+                    CustomTextField(
+                      title: 'UID',
+                      hint: uid.toString(),
+                      icon: Icons.vpn_key_outlined,
+                      theme: theme,
+                      readOnly: true,
                     ),
                     SizedBox(height: 16.h),
-                    _buildInput(
+                    CustomTextField(
                       controller: _emailCtrl,
                       title: 'Email Address',
                       hint: _emailCtrl.text,
                       icon: Icons.email_outlined,
                       theme: theme,
+                      validator: (v) => v == null || v.isEmpty ? 'Required' : null,
                     ),
                     SizedBox(height: 16.h),
-                    _buildInput(
+                    CustomTextField(
                       controller: _passwordCtrl,
                       title: 'Password',
                       hint: 'Enter a new password',
                       icon: Icons.lock_outline,
                       theme: theme,
                       isPassword: true,
+                      validator: (v) => v == null || v.isEmpty ? 'Required' : null,
                     ),
                     SizedBox(height: 32.h),
                     SizedBox(
@@ -269,90 +300,33 @@ class _AdminEditAccountScreenState extends State<AdminEditAccountScreen> {
                         ),
                       ),
                     ),
-                    SizedBox(height: 22.h),
-                    SizedBox(
-                      width: double.infinity,
-                      height: 48.h,
-                      child: ElevatedButton(
-                        onPressed: _deleteAccount,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: colorScheme.error,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(16.r),
+                    if (!_isCurrentUser()) ...[
+                      SizedBox(height: 22.h),
+                      SizedBox(
+                        width: double.infinity,
+                        height: 48.h,
+                        child: ElevatedButton(
+                          onPressed: _deleteAccount,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: colorScheme.error,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16.r),
+                            ),
                           ),
-                        ),
-                        child: Text(
-                          'Delete Account',
-                          style: TextStyle(
-                            fontSize: 16.sp,
-                            color: colorScheme.onError,
+                          child: Text(
+                            'Delete Account',
+                            style: TextStyle(
+                              fontSize: 16.sp,
+                              color: colorScheme.onError,
+                            ),
                           ),
                         ),
                       ),
-                    ),
+                    ],
                   ],
                 ),
               ),
             ),
-    );
-  }
-
-  Widget _buildInput({
-    required TextEditingController controller,
-    required String title,
-    required String hint,
-    required IconData icon,
-    required ThemeData theme,
-    bool isPassword = false,
-  }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(title),
-        SizedBox(height: 8.h),
-        TextFormField(
-          controller: controller,
-          obscureText: isPassword,
-          style: TextStyle(color: theme.colorScheme.onSurface, fontSize: 14.sp, fontWeight: FontWeight.w500),
-          decoration: InputDecoration(
-            filled: true,
-            fillColor: theme.colorScheme.surfaceContainerLowest,
-            hintText: hint,
-            hintStyle: TextStyle(color: theme.colorScheme.onSurface.withValues(alpha: 0.6), fontSize: 14.sp),
-            prefixIcon: Icon(icon, color: theme.colorScheme.onSurface, size: 20.sp),
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(16.r), borderSide: BorderSide.none),
-            enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(16.r), borderSide: BorderSide.none),
-            focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(16.r), borderSide: BorderSide(color: theme.colorScheme.onSurface, width: 1.5)),
-            errorBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(16.r), borderSide: BorderSide(color: theme.colorScheme.error, width: 1.5)),
-            focusedErrorBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(16.r), borderSide: BorderSide(color: theme.colorScheme.error, width: 1.5)),
-            contentPadding: EdgeInsets.symmetric(vertical: 16.h, horizontal: 16.w),
-          ),
-          validator: (v) => v == null || v.isEmpty ? 'Required' : null,
-        ),
-      ],
-    );
-  }
-
-  Widget _buildInputReadyOnly(String title, String hint, IconData icon, ThemeData theme) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(title),
-        SizedBox(height: 8.h),
-        TextFormField(
-          readOnly: true,
-          style: TextStyle(color: theme.colorScheme.onSurface, fontSize: 14.sp, fontWeight: FontWeight.w500),
-          decoration: InputDecoration(
-            filled: true,
-            fillColor: theme.colorScheme.surfaceContainerLowest,
-            hintText: hint,
-            hintStyle: TextStyle(color: theme.colorScheme.onSurface.withValues(alpha: 0.6), fontSize: 14.sp),
-            prefixIcon: Icon(icon, color: theme.colorScheme.onSurface, size: 20.sp),
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(16.r), borderSide: BorderSide.none),
-            enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(16.r), borderSide: BorderSide.none),
-          ),
-        ),
-      ],
     );
   }
 }

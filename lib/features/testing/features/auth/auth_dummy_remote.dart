@@ -2,11 +2,10 @@ import 'package:hr_connect/core/error/failures.dart';
 import 'package:hr_connect/features/logic/account/data/model/account_model.dart';
 import 'package:hr_connect/features/logic/auth/data/datasource/auth_remote.dart';
 import 'package:hr_connect/features/logic/auth/data/model/auth_model.dart';
-import 'package:hr_connect/features/testing/shared/user_data.dart';
+import 'package:hr_connect/features/testing/shared/dummy_database.dart';
 import 'package:hr_connect/features/logic/user_management/data/models/user_model.dart';
 
 class AuthDummyRemote implements AuthRemote {
-  final Map<String, UserModel> dummyUsers = UserData.dummyUsers;
   String _currentUid = '';
 
   Future<void> _simulatedNetworkDelay() async {
@@ -17,22 +16,33 @@ class AuthDummyRemote implements AuthRemote {
   Future<AuthModel> login(String email, String password) async {
     await _simulatedNetworkDelay();
     
-    final Map<String, AccountModel> dummyAccounts = UserData.dummyAccounts;
+    AccountModel? accountInfo;
+    try {
+      accountInfo = DummyDatabase.accounts.firstWhere(
+        (acc) => acc.email == email,
+      );
+    } catch (_) {
+      throw const ServerFailure('Invalid email or password. Please try again.');
+    }
 
-    if (dummyAccounts.containsKey(email)) {
-      final accountInfo = dummyAccounts[email]!;
-      final expectedPassword = accountInfo.password;
-
-      if (password == expectedPassword) {
-        _currentUid = accountInfo.uid;
+    if (password == accountInfo.password) {
+      _currentUid = accountInfo.uid;
+      
+      try {
+        final user = DummyDatabase.users.firstWhere((u) => u.uid == _currentUid);
         
-        final user = dummyUsers[_currentUid];
-        final roleName = user?.role.name ?? 'unknown';
+        if (!user.isActive) {
+          throw const ServerFailure('This account is deactivated.');
+        }
         
         return AuthModel(
-          token: 'dummy_${roleName}_token_abcdef1234567890',
+          token: 'dummy_${user.role.name}_token_abcdef1234567890',
           message: 'Login successful',
         );
+      } on ServerFailure {
+        rethrow;
+      } catch (_) {
+        throw const ServerFailure('User profile not found. Please ask admin to assign a user to this account.');
       }
     }
 
@@ -43,10 +53,10 @@ class AuthDummyRemote implements AuthRemote {
   Future<UserModel> getUserProfile() async {
     await _simulatedNetworkDelay();
 
-    if (dummyUsers.containsKey(_currentUid)) {
-      return dummyUsers[_currentUid]!;
+    try {
+      return DummyDatabase.users.firstWhere((u) => u.uid == _currentUid);
+    } catch (_) {
+      throw const ServerFailure('User profile not found.');
     }
-
-    throw const ServerFailure('User profile not found.');
   }
 }

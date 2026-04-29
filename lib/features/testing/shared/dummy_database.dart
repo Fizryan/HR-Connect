@@ -1,25 +1,25 @@
 import 'package:hr_connect/core/const/enums.dart';
-import 'package:hr_connect/features/logic/user_management/data/models/user_model.dart';
 import 'package:hr_connect/features/logic/account/data/model/account_model.dart';
+import 'package:hr_connect/features/logic/user_management/data/models/user_model.dart';
 
-class UserData {
-  static final Map<String, AccountModel> dummyAccounts = {
-    'admin@hrconnect.com': const AccountModel(uid: 'USR-001', email: 'admin@hrconnect.com', password: 'password123'),
-    'director@hrconnect.com': const AccountModel(uid: 'USR-002', email: 'director@hrconnect.com', password: 'password123'),
-    'manager@hrconnect.com': const AccountModel(uid: 'USR-003', email: 'manager@hrconnect.com', password: 'password123'),
-    'supervisor@hrconnect.com': const AccountModel(uid: 'USR-004', email: 'supervisor@hrconnect.com', password: 'password123'),
-    'staff@hrconnect.com': const AccountModel(uid: 'USR-005', email: 'staff@hrconnect.com', password: 'password123'),
-    'test@hrconnect.com': const AccountModel(uid: 'USR-006', email: 'test@hrconnect.com', password: 'password123'),
-    'test2@hrconnect.com': const AccountModel(uid: 'USR-007', email: 'test2@hrconnect.com', password: 'password123'),
-    'test3@hrconnect.com': const AccountModel(uid: 'USR-008', email: 'test3@hrconnect.com', password: 'password123'),
-    'test4@hrconnect.com': const AccountModel(uid: 'USR-009', email: 'test4@hrconnect.com', password: 'password123'),
-    'test5@hrconnect.com': const AccountModel(uid: 'USR-010', email: 'test5@hrconnect.com', password: 'password123'),
-    'test6@hrconnect.com': const AccountModel(uid: 'USR-011', email: 'test6@hrconnect.com', password: 'password123'),
-    'test7@hrconnect.com': const AccountModel(uid: 'USR-012', email: 'test7@hrconnect.com', password: 'password123'),
-  };
+class DummyDatabase {
+  static List<AccountModel> accounts = [
+    const AccountModel(uid: 'USR-001', email: 'admin@hrconnect.com', password: 'password123'),
+    const AccountModel(uid: 'USR-002', email: 'director@hrconnect.com', password: 'password123'),
+    const AccountModel(uid: 'USR-003', email: 'manager@hrconnect.com', password: 'password123'),
+    const AccountModel(uid: 'USR-004', email: 'supervisor@hrconnect.com', password: 'password123'),
+    const AccountModel(uid: 'USR-005', email: 'staff@hrconnect.com', password: 'password123'),
+    const AccountModel(uid: 'USR-006', email: 'test@hrconnect.com', password: 'password123'),
+    const AccountModel(uid: 'USR-007', email: 'test2@hrconnect.com', password: 'password123'),
+    const AccountModel(uid: 'USR-008', email: 'test3@hrconnect.com', password: 'password123'),
+    const AccountModel(uid: 'USR-009', email: 'test4@hrconnect.com', password: 'password123'),
+    const AccountModel(uid: 'USR-010', email: 'test5@hrconnect.com', password: 'password123'),
+    const AccountModel(uid: 'USR-011', email: 'test6@hrconnect.com', password: 'password123'),
+    const AccountModel(uid: 'USR-012', email: 'test7@hrconnect.com', password: 'password123'),
+  ];
 
-  static final Map<String, UserModel> dummyUsers = {
-    'USR-001': UserModel(
+  static List<UserModel> users = [
+    UserModel(
       uid: 'USR-001',
       firstName: 'Hafizryandin',
       lastName: 'Haykal Matondang',
@@ -29,7 +29,7 @@ class UserData {
       createdAt: DateTime.now().subtract(const Duration(days: 30)),
       updatedAt: DateTime.now().subtract(const Duration(days: 15)),
     ),
-    'USR-002': UserModel(
+    UserModel(
       uid: 'USR-002',
       firstName: 'Muhammad Fathir',
       lastName: 'Rizky Salam',
@@ -39,7 +39,7 @@ class UserData {
       createdAt: DateTime.now().subtract(const Duration(days: 22)),
       updatedAt: DateTime.now().subtract(const Duration(days: 15)),
     ),
-    'USR-003': UserModel(
+    UserModel(
       uid: 'USR-003',
       firstName: 'Hafidz Naufal',
       lastName: 'Pradana',
@@ -49,7 +49,7 @@ class UserData {
       createdAt: DateTime.now().subtract(const Duration(days: 25)),
       updatedAt: DateTime.now().subtract(const Duration(days: 12)),
     ),
-    'USR-004': UserModel(
+    UserModel(
       uid: 'USR-004',
       firstName: 'Haidar Zahran',
       lastName: 'Haryono',
@@ -59,7 +59,7 @@ class UserData {
       createdAt: DateTime.now().subtract(const Duration(days: 18)),
       updatedAt: DateTime.now().subtract(const Duration(days: 11)),
     ),
-    'USR-005': UserModel(
+    UserModel(
       uid: 'USR-005',
       firstName: 'Cecep Wijaya',
       lastName: 'Antonio Lopez',
@@ -69,7 +69,7 @@ class UserData {
       createdAt: DateTime.now().subtract(const Duration(days: 8)),
       updatedAt: DateTime.now().subtract(const Duration(days: 5)),
     ),
-    'USR-006': UserModel(
+    UserModel(
       uid: 'USR-006',
       firstName: 'Test 1',
       lastName: 'System',
@@ -79,7 +79,7 @@ class UserData {
       createdAt: DateTime.now().subtract(const Duration(days: 8)),
       updatedAt: DateTime.now().subtract(const Duration(days: 5)),
     ),
-    'USR-007': UserModel(
+    UserModel(
       uid: 'USR-007',
       firstName: 'Test 2',
       lastName: 'System',
@@ -89,7 +89,7 @@ class UserData {
       createdAt: DateTime.now().subtract(const Duration(days: 8)),
       updatedAt: DateTime.now().subtract(const Duration(days: 5)),
     ),
-    'USR-008': UserModel(
+    UserModel(
       uid: 'USR-008',
       firstName: 'Test 3',
       lastName: 'System',
@@ -99,7 +99,7 @@ class UserData {
       createdAt: DateTime.now().subtract(const Duration(days: 8)),
       updatedAt: DateTime.now().subtract(const Duration(days: 5)),
     ),
-    'USR-009': UserModel(
+    UserModel(
       uid: 'USR-009',
       firstName: 'Test 4',
       lastName: 'System',
@@ -109,7 +109,7 @@ class UserData {
       createdAt: DateTime.now().subtract(const Duration(days: 8)),
       updatedAt: DateTime.now().subtract(const Duration(days: 5)),
     ),
-    'USR-010': UserModel(
+    UserModel(
       uid: 'USR-010',
       firstName: 'Test 5',
       lastName: 'System',
@@ -119,7 +119,7 @@ class UserData {
       createdAt: DateTime.now().subtract(const Duration(days: 8)),
       updatedAt: DateTime.now().subtract(const Duration(days: 5)),
     ),
-    'USR-011': UserModel(
+    UserModel(
       uid: 'USR-011',
       firstName: 'Test 6',
       lastName: 'System',
@@ -129,7 +129,7 @@ class UserData {
       createdAt: DateTime.now().subtract(const Duration(days: 8)),
       updatedAt: DateTime.now().subtract(const Duration(days: 5)),
     ),
-    'USR-012': UserModel(
+    UserModel(
       uid: 'USR-012',
       firstName: 'Test 7',
       lastName: 'System',
@@ -138,5 +138,5 @@ class UserData {
       createdAt: DateTime.now().subtract(const Duration(days: 8)),
       updatedAt: DateTime.now().subtract(const Duration(days: 5)),
     ),
-  };
+  ];
 }
