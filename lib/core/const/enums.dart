@@ -15,6 +15,9 @@ enum UserRole {
 
   @JsonValue('staff')
   staff,
+
+  @JsonValue('unknown')
+  unknown,
 }
 
 enum LeaveType {

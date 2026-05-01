@@ -2,8 +2,10 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hr_connect/app.dart';
-import 'package:hr_connect/core/di/injection.dart';
+import 'package:hr_connect/core/di/providers.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
   runZonedGuarded(
@@ -11,7 +13,8 @@ void main() {
       WidgetsFlutterBinding.ensureInitialized();
 
       await dotenv.load(fileName: '.env');
-      await initDI();
+
+      final sharedPreferences = await SharedPreferences.getInstance();
 
       FlutterError.onError = (FlutterErrorDetails details) {
         FlutterError.presentError(details);
@@ -24,7 +27,14 @@ void main() {
         return true;
       };
 
-      runApp(const MainApp());
+      runApp(
+        ProviderScope(
+          overrides: [
+            sharedPreferencesProvider.overrideWithValue(sharedPreferences),
+          ],
+          child: const MainApp(),
+        )
+      );
     },
     (error, stack) {
       debugPrint('[RunZonedGuardedError]: $error');

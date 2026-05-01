@@ -17,3 +17,12 @@ linter:
     - sort_child_properties_last
     - curly_braces_in_flow_control_structures
     - prefer_conditional_assignment
+
+analyzer:
+  exclude:
+    - build/**
+    - .dart_tool/**
+    - ios/**
+    - android/**
+    - "**/*.g.dart"
+    - "**/*.freezed.dart"

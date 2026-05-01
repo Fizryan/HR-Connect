@@ -1,7 +1,6 @@
 import 'package:dio/dio.dart';
-import 'package:hr_connect/core/di/injection.dart';
-import 'package:hr_connect/core/error/core_exception.dart';
-import 'package:hr_connect/features/logic/auth/providers/auth_provider.dart';
+import 'package:hr_connect/core/const/secure_storage.dart';
+import 'package:hr_connect/core/error/exception.dart';
 import 'package:logger/logger.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -12,6 +11,7 @@ class ApiClient {
   final FlutterSecureStorage secureStorage;
 
   String? _cachedToken;
+  bool _isRefreshing = false;
 
   ApiClient({required this.secureStorage}) {
     _dio = Dio(
@@ -27,9 +27,12 @@ class ApiClient {
     );
 
     _dio.interceptors.add(
-      InterceptorsWrapper(
+      QueuedInterceptorsWrapper(
         onRequest: (options, handler) async {
-          _cachedToken ??= await secureStorage.read(key: 'auth_token');
+          _cachedToken ??= await secureStorage.read(
+            key: SecureStorage.accessToken,
+          );
+
           if (_cachedToken != null && _cachedToken!.isNotEmpty) {
             options.headers['Authorization'] = 'Bearer $_cachedToken';
           }
@@ -47,38 +50,64 @@ class ApiClient {
 
         onError: (DioException e, handler) async {
           if (e.response?.statusCode == 401) {
-            _cachedToken = null;
+            _logger.w('Token expired, attempting refresh...');
 
-            final refreshToken = await secureStorage.read(key: 'refresh_token');
-            if (refreshToken != null && refreshToken.isNotEmpty) {
-              try {
-                final dio = Dio(BaseOptions(baseUrl: _dio.options.baseUrl));
-                final response = await dio.post(
-                  '/auth/refresh',
-                  data: {'refreshToken': refreshToken},
-                );
+            if (!_isRefreshing) {
+              _isRefreshing = true;
 
-                final newToken = response.data['token'];
-                if (newToken != null) {
-                  updateToken(newToken);
-                  await secureStorage.write(key: 'auth_token', value: newToken);
+              final refreshToken = await secureStorage.read(
+                key: SecureStorage.refreshToken,
+              );
 
-                  final options = e.requestOptions;
-                  options.headers['Authorization'] = 'Bearer $newToken';
+              if (refreshToken != null && refreshToken.isNotEmpty) {
+                try {
+                  final refreshDio = Dio(
+                    BaseOptions(baseUrl: _dio.options.baseUrl),
+                  );
 
-                  final retryResponse = await _dio.fetch(options);
-                  return handler.resolve(retryResponse);
+                  final response = await refreshDio.post(
+                    'v1/auth/refresh',
+                    data: {'refreshToken': refreshToken},
+                  );
+
+                  final newAccessToken = response.data['accessToken'];
+                  final newRefreshToken = response.data['refreshToken'];
+
+                  if (newAccessToken != null) {
+                    updateToken(newAccessToken);
+                    await secureStorage.write(
+                      key: SecureStorage.accessToken,
+                      value: newAccessToken,
+                    );
+
+                    if (newRefreshToken != null) {
+                      await secureStorage.write(
+                        key: SecureStorage.refreshToken,
+                        value: newRefreshToken,
+                      );
+                    }
+
+                    final options = e.requestOptions;
+                    options.headers['Authorization'] = 'Bearer $newAccessToken';
+
+                    _isRefreshing = false;
+
+                    final retryResponse = await _dio.fetch(options);
+                    return handler.resolve(retryResponse);
+                  }
+                } catch (refreshError) {
+                  _logger.e('Failed to refresh token: $refreshError');
+                  _isRefreshing = false;
+                  clearToken();
+                  await secureStorage.deleteAll();
+                  return handler.reject(e);
                 }
-              } catch (refreshError) {
-                _cachedToken = null;
-                await secureStorage.delete(key: 'auth_token');
-                await secureStorage.delete(
-                  key: 'refresh_token',
-                );
-                sl<AuthProvider>().logout();
+              } else {
+                _isRefreshing = false;
               }
             }
           }
+
           _logger.e(
             'ERROR [${e.response?.statusCode}] => PATH: ${e.requestOptions.path}',
           );
@@ -111,7 +140,7 @@ class ApiClient {
       );
       return response.data;
     } on DioException catch (e) {
-      CoreException.handleDioException(e);
+      throw CoreException.handleDioException(e);
     }
   }
 
@@ -130,7 +159,7 @@ class ApiClient {
       );
       return response.data;
     } on DioException catch (e) {
-      CoreException.handleDioException(e);
+      throw CoreException.handleDioException(e);
     }
   }
 
@@ -149,7 +178,7 @@ class ApiClient {
       );
       return response.data;
     } on DioException catch (e) {
-      CoreException.handleDioException(e);
+      throw CoreException.handleDioException(e);
     }
   }
 
@@ -166,9 +195,9 @@ class ApiClient {
         queryParameters: queryParameters,
         options: Options(headers: headers),
       );
-      return response.data['data'] ?? response.data;
+      return response.data;
     } on DioException catch (e) {
-      CoreException.handleDioException(e);
+      throw CoreException.handleDioException(e);
     }
   }
 }
