@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:hr_connect/core/di/providers.dart';
 import 'package:hr_connect/core/routes/app_router.dart';
 import 'package:hr_connect/core/theme/app_theme.dart';
+import 'package:hr_connect/core/theme/text_theme.dart';
 
 class MainApp extends ConsumerWidget {
   const MainApp({super.key});
@@ -19,12 +20,15 @@ class MainApp extends ConsumerWidget {
       minTextAdapt: true,
       splitScreenMode: true,
       builder: (context, child) {
+        final textTheme = createTextTheme(context, 'Roboto', 'Roboto');
+        final materialTheme = MaterialTheme(textTheme);
+
         return MaterialApp.router(
           title: 'HR Connect',
           debugShowCheckedModeBanner: false,
           themeMode: themeMode,
-          theme: AppTheme.lightTheme,
-          darkTheme: AppTheme.darkTheme,
+          theme: materialTheme.light(),
+          darkTheme: materialTheme.dark(),
           routerConfig: router,
         );
       },

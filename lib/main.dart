@@ -11,9 +11,8 @@ void main() {
   runZonedGuarded(
     () async {
       WidgetsFlutterBinding.ensureInitialized();
-
+      
       await dotenv.load(fileName: '.env');
-
       final sharedPreferences = await SharedPreferences.getInstance();
 
       FlutterError.onError = (FlutterErrorDetails details) {

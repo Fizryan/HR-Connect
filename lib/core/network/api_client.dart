@@ -1,8 +1,8 @@
 import 'package:dio/dio.dart';
+import 'package:hr_connect/core/config/env_config.dart';
 import 'package:hr_connect/core/const/secure_storage.dart';
 import 'package:hr_connect/core/error/exception.dart';
 import 'package:logger/logger.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class ApiClient {
@@ -16,7 +16,7 @@ class ApiClient {
   ApiClient({required this.secureStorage}) {
     _dio = Dio(
       BaseOptions(
-        baseUrl: dotenv.env['BASE_URL'] ?? 'https://example.com/api',
+        baseUrl: EnvConfig.baseUrl,
         connectTimeout: const Duration(seconds: 10),
         receiveTimeout: const Duration(seconds: 10),
         headers: {
@@ -51,6 +51,18 @@ class ApiClient {
         onError: (DioException e, handler) async {
           if (e.response?.statusCode == 401) {
             _logger.w('Token expired, attempting refresh...');
+
+            // Fetch current token that was sent with the request
+            final requestToken = e.requestOptions.headers['Authorization']?.toString().replaceAll('Bearer ', '');
+
+            // If the token in request is different from cached, it might have been refreshed already
+            if (requestToken != null && requestToken != _cachedToken) {
+               _logger.i('Token already refreshed, retrying request...');
+               final retryOptions = e.requestOptions;
+               retryOptions.headers['Authorization'] = 'Bearer $_cachedToken';
+               final retryResponse = await _dio.fetch(retryOptions);
+               return handler.resolve(retryResponse);
+            }
 
             if (!_isRefreshing) {
               _isRefreshing = true;
@@ -87,12 +99,11 @@ class ApiClient {
                       );
                     }
 
-                    final options = e.requestOptions;
-                    options.headers['Authorization'] = 'Bearer $newAccessToken';
-
                     _isRefreshing = false;
 
-                    final retryResponse = await _dio.fetch(options);
+                    final retryOptions = e.requestOptions;
+                    retryOptions.headers['Authorization'] = 'Bearer $newAccessToken';
+                    final retryResponse = await _dio.fetch(retryOptions);
                     return handler.resolve(retryResponse);
                   }
                 } catch (refreshError) {
@@ -102,9 +113,11 @@ class ApiClient {
                   await secureStorage.deleteAll();
                   return handler.reject(e);
                 }
-              } else {
-                _isRefreshing = false;
               }
+            } else {
+               // Wait for the token refresh to complete then retry
+               // In QueuedInterceptorsWrapper, next interceptors sit in queue. But we can just reject if not handled.
+               return handler.next(e);
             }
           }
 
