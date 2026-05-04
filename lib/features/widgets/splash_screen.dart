@@ -25,7 +25,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
   }
 
   Future<void> _initializeSplash() async {
-    await Future.delayed(const Duration(milliseconds: 2500));
+    await Future.delayed(const Duration(milliseconds: 2000));
     if (mounted) {
       ref.read(authNotifierProvider.notifier).checkAuth();
     }
@@ -46,7 +46,6 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
     );
 
     return Scaffold(
-      backgroundColor: theme.colorScheme.surface,
       body: Stack(
         children: [
           Center(
@@ -72,10 +71,17 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
                     height: 110.h,
                     fit: BoxFit.contain,
                     errorBuilder: (context, error, stackTrace) {
-                      return Icon(
-                        Icons.business_center_rounded,
-                        size: 110.sp,
-                        color: colorScheme.onSurface,
+                      return Container(
+                        padding: EdgeInsets.all(24.w),
+                        decoration: BoxDecoration(
+                          color: colorScheme.onSurface,
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(
+                          Icons.business_center_rounded,
+                          size: 60.sp,
+                          color: colorScheme.surface,
+                        ),
                       );
                     },
                   ),
@@ -97,7 +103,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
                   child: Text(
                     'HR Connect',
                     style: TextStyle(
-                      fontSize: 28.sp,
+                      fontSize: 32.sp,
                       fontWeight: FontWeight.w800,
                       letterSpacing: -0.5,
                       color: colorScheme.onSurface,
@@ -134,21 +140,20 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
                       key: ValueKey<String>(statusText),
                       style: TextStyle(
                         fontSize: 13.sp,
-                        fontWeight: FontWeight.w500,
-                        letterSpacing: 0.8,
-                        color: colorScheme.onSurface.withValues(alpha: 0.7),
+                        fontWeight: FontWeight.w600,
+                        letterSpacing: 0.5,
+                        color: colorScheme.onSurfaceVariant,
                       ),
                     ),
                   ),
-                  SizedBox(height: 12.h),
+                  SizedBox(height: 16.h),
                   SizedBox(
-                    width: 300.w,
-                    height: 4.w,
+                    width: 200.w,
+                    height: 4.h,
                     child: LinearProgressIndicator(
-                      color: colorScheme.primary.withValues(alpha: 0.6),
-                      backgroundColor: colorScheme.onSurface.withValues(
-                        alpha: 0.1,
-                      ),
+                      color: colorScheme.primary,
+                      backgroundColor: colorScheme.surfaceContainerHighest,
+                      borderRadius: BorderRadius.circular(4.r),
                     ),
                   ),
                   SizedBox(height: 16.h),
@@ -157,14 +162,14 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
                     builder: (context, snapshot) {
                       final versionStr = snapshot.hasData
                           ? snapshot.data!.version
-                          : 'Loading...';
+                          : '...';
                       return Text(
                         'v$versionStr',
                         style: TextStyle(
-                          fontSize: 11.sp,
+                          fontSize: 12.sp,
                           fontWeight: FontWeight.w600,
-                          letterSpacing: 1.2,
-                          color: colorScheme.onSurface.withValues(alpha: 0.4),
+                          letterSpacing: 1.0,
+                          color: colorScheme.outline,
                         ),
                       );
                     },

@@ -24,6 +24,8 @@ class UserRemoteImp implements UserRemote {
 
       final List<dynamic> rawList = response['data'] ?? [];
       return rawList.map((e) => UserModel.fromJson(e)).toList();
+    } on ServerException {
+      rethrow;
     } catch (e) {
       throw ServerException(message: e.toString());
     }
@@ -34,6 +36,8 @@ class UserRemoteImp implements UserRemote {
     try {
       final response = await apiClient.get('v1/users/$id');
       return UserModel.fromJson(response.data);
+    } on ServerException {
+      rethrow;
     } catch (e) {
       throw ServerException(message: e.toString());
     }
@@ -47,6 +51,8 @@ class UserRemoteImp implements UserRemote {
         data: updateData,
       );
       return UserModel.fromJson(response.data);
+    } on ServerException {
+      rethrow;
     } catch (e) {
       throw ServerException(message: e.toString());
     }
@@ -56,6 +62,8 @@ class UserRemoteImp implements UserRemote {
   Future<void> deactivateUser(String id) async {
     try {
       await apiClient.delete('/v1/users/$id');
+    } on ServerException {
+      rethrow;
     } catch (e) {
       throw ServerException(message: e.toString());
     }

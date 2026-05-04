@@ -35,6 +35,8 @@ class AuthRemoteImpl implements AuthRemote {
         expTime: response.data['expTime'],
         refreshToken: response.data['refreshToken'],
       );
+    } on ServerException {
+      rethrow;
     } catch (e) {
       throw ServerException(message: e.toString());
     }
@@ -59,6 +61,8 @@ class AuthRemoteImpl implements AuthRemote {
           'role': role.name,
         },
       );
+    } on ServerException {
+      rethrow;
     } catch (e) {
       throw ServerException(message: e.toString());
     }
@@ -71,6 +75,8 @@ class AuthRemoteImpl implements AuthRemote {
         '/v1/auth/logout',
         data: {'refresh': refreshToken},
       );
+    } on ServerException {
+      rethrow;
     } catch (e) {
       throw ServerException(message: e.toString());
     }
@@ -88,6 +94,8 @@ class AuthRemoteImpl implements AuthRemote {
         expTime: response.data['expTime'],
         refreshToken: response.data['refreshToken'],
       );
+    } on ServerException {
+      rethrow;
     } catch (e) {
       throw ServerException(message: e.toString());
     }
@@ -98,6 +106,8 @@ class AuthRemoteImpl implements AuthRemote {
     try {
       final response = await apiClient.get('/v1/auth/me');
       return UserModel.fromJson(response.data);
+    } on ServerException {
+      rethrow;
     } catch (e) {
       throw ServerException(message: e.toString());
     }

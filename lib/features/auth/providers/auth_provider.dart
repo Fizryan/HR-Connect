@@ -9,8 +9,6 @@ class AuthNotifier extends Notifier<AuthState> {
   
   @override
   AuthState build() {
-    Future.microtask(checkAuth);
-    
     return const AuthState.initial();
   }
 

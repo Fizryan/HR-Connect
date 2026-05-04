@@ -1,5 +1,4 @@
 import 'package:dio/dio.dart';
-import 'package:hr_connect/core/error/failures.dart';
 
 class CoreException {
   static Never handleDioException(DioException e) {
@@ -7,7 +6,7 @@ class CoreException {
         e.type == DioExceptionType.receiveTimeout ||
         e.type == DioExceptionType.sendTimeout ||
         e.type == DioExceptionType.connectionError) {
-      throw const NetworkFailure('Connection timeout. Please try again later');
+      throw ServerException(message: 'Connection timeout. Please check your internet and try again.');
     }
 
     if (e.type == DioExceptionType.cancel) {
@@ -27,4 +26,7 @@ class CoreException {
 class ServerException implements Exception {
   final String message;
   ServerException({required this.message});
+
+  @override
+  String toString() => message;
 }
