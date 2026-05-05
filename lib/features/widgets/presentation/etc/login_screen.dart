@@ -229,9 +229,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               height: 300.w,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: theme.colorScheme.tertiaryContainer.withValues(
-                  alpha: 0.4,
-                ),
+                color: theme.colorScheme.primary.withValues(alpha: 0.2),
               ),
             ),
           ),
@@ -243,9 +241,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               height: 200.w,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: theme.colorScheme.tertiaryContainer.withValues(
-                  alpha: 0.3,
-                ),
+                color: theme.colorScheme.primary.withValues(alpha: 0.1),
               ),
             ),
           ),
@@ -265,7 +261,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         borderRadius: BorderRadius.circular(20.r),
                         boxShadow: [
                           BoxShadow(
-                            color: theme.colorScheme.tertiary.withValues(
+                            color: theme.colorScheme.primary.withValues(
                               alpha: 0.4,
                             ),
                             blurRadius: 5,
@@ -373,13 +369,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         Container(
           padding: EdgeInsets.all(14.w),
           decoration: BoxDecoration(
-            color: theme.colorScheme.onSurface,
+            color: theme.colorScheme.primary,
             shape: BoxShape.circle,
           ),
           child: Icon(
             Icons.people_alt_rounded,
             size: 32.sp,
-            color: theme.colorScheme.surface,
+            color: theme.colorScheme.onPrimary,
           ),
         ),
         SizedBox(height: 20.h),
@@ -508,10 +504,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       child: FilledButton(
         onPressed: isLoading ? null : _handleLogin,
         style: FilledButton.styleFrom(
-          backgroundColor: theme.colorScheme.tertiary,
-          foregroundColor: theme.colorScheme.onTertiary,
-          disabledBackgroundColor: theme.colorScheme.surfaceContainerHighest,
-          disabledForegroundColor: theme.colorScheme.onSurface,
+          backgroundColor: theme.colorScheme.primary,
+          foregroundColor: theme.colorScheme.onPrimary,
+          disabledBackgroundColor: theme.colorScheme.primaryContainer,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(14.r),
           ),
