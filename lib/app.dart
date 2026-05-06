@@ -12,7 +12,6 @@ class MainApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final themeMode = ref.watch(themeNotifierProvider);
-    
     final router = ref.watch(goRouterProvider);
 
     return ScreenUtilInit(

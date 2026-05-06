@@ -4,7 +4,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:hr_connect/core/const/enums.dart';
 import 'package:hr_connect/features/user_management/data/model/user_model.dart';
+import 'package:hr_connect/features/widgets/presentation/etc/about_screen.dart';
 import 'package:hr_connect/features/widgets/presentation/etc/edit_profile_screen.dart';
+import 'package:hr_connect/features/widgets/presentation/etc/support_screen.dart';
+import 'package:hr_connect/features/widgets/presentation/etc/theme_screen.dart';
 import 'package:hr_connect/features/widgets/shared/profile_menu_tile.dart';
 
 class NavIndexNotifier extends Notifier<int> {
@@ -251,7 +254,12 @@ class MainScreen extends ConsumerWidget {
                   ProfileMenuTile(
                     icon: Icons.info_outline_rounded,
                     title: 'About',
-                    onTap: () {},
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => const AboutScreen()),
+                      );
+                    },
                   ),
                   Divider(
                     height: 1,
@@ -262,7 +270,12 @@ class MainScreen extends ConsumerWidget {
                   ProfileMenuTile(
                     icon: Icons.style_outlined,
                     title: 'Theme Mode',
-                    onTap: () {},
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => const ThemeScreen()),
+                      );
+                    },
                   ),
                   Divider(
                     height: 1,
@@ -273,7 +286,12 @@ class MainScreen extends ConsumerWidget {
                   ProfileMenuTile(
                     icon: Icons.support_agent_outlined,
                     title: 'Support',
-                    onTap: () {},
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => const SupportScreen()),
+                      );
+                    },
                   ),
                 ],
               ),

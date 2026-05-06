@@ -241,7 +241,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                     'Read Only',
                     style: TextStyle(color: colorScheme.onSurfaceVariant),
                   ),
-                  Divider(height: 30.h, indent: 10.w, endIndent: 10.w),
+                  SizedBox(height: 18.h),
                   CustomTextField(
                     title: 'Email',
                     hint: email,
@@ -265,6 +265,30 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                     icon: Icons.calendar_today,
                     theme: theme,
                     readOnly: true,
+                  ),
+                  SizedBox(height: 16.h),
+                  SizedBox(
+                    width: double.infinity,
+                    height: 54.h,
+                    child: FilledButton(
+                      onPressed: _saveProfile,
+                      style: FilledButton.styleFrom(
+                        backgroundColor: colorScheme.primary,
+                        foregroundColor: colorScheme.onPrimary,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16.r),
+                        ),
+                        elevation: 0,
+                      ),
+                      child: Text(
+                        'Save Changes',
+                        style: TextStyle(
+                          fontSize: 16.sp,
+                          fontWeight: FontWeight.w600,
+                          letterSpacing: 0.5,
+                        ),
+                      ),
+                    ),
                   ),
                   SizedBox(height: 40.h),
                 ],
