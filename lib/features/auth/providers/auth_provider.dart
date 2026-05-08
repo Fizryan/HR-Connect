@@ -1,44 +1,36 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart'; 
+import 'dart:async';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hr_connect/core/const/enums.dart';
 import 'package:hr_connect/core/di/providers.dart';
-import 'package:hr_connect/features/auth/providers/auth_state.dart';
+import 'package:hr_connect/features/user_management/data/model/user_model.dart';
 
-final authNotifierProvider = NotifierProvider<AuthNotifier, AuthState>(AuthNotifier.new);
+final authNotifierProvider = AsyncNotifierProvider<AuthNotifier, UserModel?>(
+  AuthNotifier.new,
+);
 
-class AuthNotifier extends Notifier<AuthState> {
-  
+class AuthNotifier extends AsyncNotifier<UserModel?> {
   @override
-  AuthState build() {
-    return const AuthState.initial();
-  }
-
-  Future<void> checkAuth() async {
-    state.maybeMap(
-      initial: (_) => state = const AuthState.loading(),
-      orElse: () {}, 
-    );
-
+  FutureOr<UserModel?> build() async {
     final repository = ref.read(authRepositoryProvider);
     final result = await repository.checkAuthStatus();
 
-    state = result.fold(
-      (failure) => AuthState.unauthenticated(message: failure.message),
-      AuthState.authenticated, 
-    );
+    return result.fold((failure) => null, (user) => user);
   }
 
   Future<void> login(String email, String password) async {
-    state = const AuthState.loading();
-    
+    state = const AsyncValue.loading();
+
     final repository = ref.read(authRepositoryProvider);
     final result = await repository.login(email, password);
 
-    await result.fold(
-      (failure) async {
-        state = AuthState.unauthenticated(message: failure.message);
-      },
+    state = await result.fold(
+      (failure) async => AsyncValue.error(failure.message, StackTrace.current),
       (_) async {
-        await checkAuth();
+        final authResult = await repository.checkAuthStatus();
+        return authResult.fold(
+          (failure) => AsyncValue.error(failure.message, StackTrace.current),
+          AsyncValue.data,
+        );
       },
     );
   }
@@ -50,7 +42,7 @@ class AuthNotifier extends Notifier<AuthState> {
     required String lastName,
     required UserRole role,
   }) async {
-    state = const AuthState.loading();
+    state = const AsyncValue.loading();
 
     final repository = ref.read(authRepositoryProvider);
     final result = await repository.register(
@@ -63,24 +55,20 @@ class AuthNotifier extends Notifier<AuthState> {
 
     return result.fold(
       (failure) {
-        state = AuthState.unauthenticated(message: failure.message);
+        state = AsyncValue.error(failure.message, StackTrace.current);
         return false;
       },
       (_) {
-        state = const AuthState.unauthenticated(
-          message: 'Registration successful',
-        );
+        state = const AsyncValue.data(null);
         return true;
       },
     );
   }
 
   Future<void> logout() async {
-    state = const AuthState.loading();
-
+    state = const AsyncValue.loading();
     final repository = ref.read(authRepositoryProvider);
     await repository.logout();
-
-    state = const AuthState.unauthenticated(message: 'Logged out successfully');
+    state = const AsyncValue.data(null);
   }
 }

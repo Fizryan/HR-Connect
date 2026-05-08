@@ -12,15 +12,18 @@ import 'package:hr_connect/features/auth/data/datasource/auth_remote.dart';
 import 'package:hr_connect/features/auth/data/model/auth_model.dart';
 import 'package:hr_connect/features/auth/data/repositories/auth_repository.dart';
 import 'package:hr_connect/features/user_management/data/model/user_model.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthRepositoryImp implements AuthRepository {
   final AuthRemote remoteDataSource;
   final FlutterSecureStorage secureStorage;
+  final SharedPreferences sharedPreferences;
   final ApiClient apiClient;
 
   AuthRepositoryImp({
     required this.remoteDataSource,
     required this.secureStorage,
+    required this.sharedPreferences,
     required this.apiClient,
   });
 
@@ -30,9 +33,7 @@ class AuthRepositoryImp implements AuthRepository {
       final token = await secureStorage.read(key: SecureStorage.accessToken);
       if (token != null && token.isNotEmpty) {
         apiClient.updateToken(token);
-        final cachedUser = await secureStorage.read(
-          key: SecureStorage.cachedUser,
-        );
+        final cachedUser = sharedPreferences.getString('cachedUser');
         if (cachedUser != null) {
           final userMap = jsonDecode(cachedUser);
           return Right(UserModel.fromJson(userMap));
@@ -109,6 +110,7 @@ class AuthRepositoryImp implements AuthRepository {
       }
 
       await secureStorage.deleteAll();
+      await sharedPreferences.remove('cachedUser');
       apiClient.clearToken();
 
       return const Right(null);
@@ -205,9 +207,9 @@ class AuthRepositoryImp implements AuthRepository {
 
       userMap.remove('password');
 
-      await secureStorage.write(
-        key: SecureStorage.cachedUser,
-        value: jsonEncode(userMap),
+      await sharedPreferences.setString(
+        'cachedUser',
+        jsonEncode(userMap),
       );
 
       return Right(user);

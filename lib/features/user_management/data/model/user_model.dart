@@ -6,7 +6,7 @@ part 'user_model.g.dart';
 
 @freezed
 abstract class UserModel with _$UserModel {
-  const UserModel._(); 
+  const UserModel._();
 
   const factory UserModel({
     required String id,
@@ -16,17 +16,17 @@ abstract class UserModel with _$UserModel {
     required String lastName,
     required UserRole role,
     String? avatarUrl,
-    @Default(true) bool isActive, 
+    @Default(true) bool isActive,
     DateTime? createdAt,
     DateTime? updatedAt,
   }) = _UserModel;
 
-  factory UserModel.fromJson(Map<String, dynamic> json) => _$UserModelFromJson(json);
+  factory UserModel.fromJson(Map<String, dynamic> json) =>
+      _$UserModelFromJson(json);
 
   factory UserModel.fromApi(Map<String, dynamic> json) {
     final userNode = json['user'] as Map<String, dynamic>? ?? json;
     final dataNode = userNode['data'] as Map<String, dynamic>? ?? {};
-
     final rawRole = dataNode['role'] as String? ?? '';
     String mappedRole = 'unknown';
 
@@ -43,7 +43,7 @@ abstract class UserModel with _$UserModel {
       case 'ROLE_SUPERVISOR':
         mappedRole = 'supervisor';
         break;
-      case 'ROLE_STAFF':
+      case 'ROLE_STAFF_UNSPECIFIED':
         mappedRole = 'staff';
         break;
       default:
@@ -54,22 +54,24 @@ abstract class UserModel with _$UserModel {
       if (timestamp == null) return null;
       final intSeconds = int.tryParse(timestamp.toString());
       if (intSeconds == null) return null;
-      return DateTime.fromMillisecondsSinceEpoch(intSeconds * 1000).toIso8601String();
+      return DateTime.fromMillisecondsSinceEpoch(
+        intSeconds * 1000,
+      ).toIso8601String();
     }
 
     return UserModel.fromJson({
       'id': userNode['id'],
       'email': dataNode['email'],
-      'password': null, 
+      'password': null,
       'firstName': dataNode['firstName'],
       'lastName': dataNode['lastName'],
       'role': mappedRole,
-      'avatarUrl': dataNode['avatarUrl'], 
+      'avatarUrl': dataNode['avatarUrl'],
       'isActive': userNode['isActive'] ?? true,
       'createdAt': parseUnixToIso(userNode['createdAt']),
       'updatedAt': parseUnixToIso(userNode['updatedAt']),
     });
   }
-      
+
   String get fullName => '$firstName $lastName';
 }

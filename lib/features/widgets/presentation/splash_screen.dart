@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:hr_connect/core/const/assets.dart';
 import 'package:hr_connect/features/auth/providers/auth_provider.dart';
-import 'package:hr_connect/features/auth/providers/auth_state.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
 class SplashScreen extends ConsumerStatefulWidget {
@@ -20,16 +19,6 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
   void initState() {
     super.initState();
     _packageInfoFuture = PackageInfo.fromPlatform();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _initializeSplash();
-    });
-  }
-
-  Future<void> _initializeSplash() async {
-    await Future.delayed(const Duration(milliseconds: 2000));
-    if (mounted) {
-      ref.read(authNotifierProvider.notifier).checkAuth();
-    }
   }
 
   @override
@@ -38,12 +27,10 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
     final colorScheme = theme.colorScheme;
     final authState = ref.watch(authNotifierProvider);
 
-    final statusText = authState.maybeWhen(
-      initial: () => 'Initializing Engine...',
+    final statusText = authState.when(
+      data: (user) => user == null ? 'Preparing Workspace...' : 'Welcome Back!',
       loading: () => 'Authenticating Credentials...',
-      authenticated: (_) => 'Welcome Back!',
-      unauthenticated: (_) => 'Preparing Workspace...',
-      orElse: () => 'Loading...',
+      error: (_, _) => 'Error during setup',
     );
 
     return Scaffold(
@@ -67,7 +54,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
                     );
                   },
                   child: Image.asset(
-                    Assets.logo,
+                    Assets.logoRounded,
                     width: 200.w,
                     height: 200.h,
                     fit: BoxFit.contain,

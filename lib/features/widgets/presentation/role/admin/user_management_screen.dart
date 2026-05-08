@@ -2,10 +2,10 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:hr_connect/core/const/capitalize.dart';
 import 'package:hr_connect/core/const/enums.dart';
 import 'package:hr_connect/features/user_management/data/model/user_model.dart';
 import 'package:hr_connect/features/user_management/providers/user_provider.dart';
-import 'package:hr_connect/features/user_management/providers/user_state.dart';
 import 'package:hr_connect/features/widgets/presentation/etc/edit_profile_screen.dart';
 
 class UserManagementScreen extends ConsumerStatefulWidget {
@@ -35,9 +35,6 @@ class _UserManagementScreenState extends ConsumerState<UserManagementScreen> {
     _searchController.dispose();
     super.dispose();
   }
-
-  String _capitalize(String s) =>
-      s.isNotEmpty ? '${s[0].toUpperCase()}${s.substring(1)}' : '';
 
   List<UserModel> _getFilteredUsers(List<UserModel> users) {
     return users.where((user) {
@@ -92,11 +89,10 @@ class _UserManagementScreenState extends ConsumerState<UserManagementScreen> {
           SizedBox(width: 8.w),
         ],
       ),
-      body: userState.maybeMap(
-        loading: (_) => const Center(child: CircularProgressIndicator()),
-        error: (state) => _buildErrorState(state.message, colorScheme),
-        loaded: (state) => _buildUserContent(state.users, colorScheme),
-        orElse: () => const SizedBox.shrink(),
+      body: userState.when(
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (error, _) => _buildErrorState(error.toString(), colorScheme),
+        data: (users) => _buildUserContent(users, colorScheme),
       ),
     );
   }
@@ -206,7 +202,7 @@ class _UserManagementScreenState extends ConsumerState<UserManagementScreen> {
                       return Padding(
                         padding: EdgeInsets.only(right: 8.w),
                         child: ChoiceChip(
-                          label: Text(_capitalize(role.name)),
+                          label: Text(Capitalize.firstLetterUppercase(role.name)),
                           selected: _selectedRole == role,
                           showCheckmark: false,
                           selectedColor: colorScheme.primaryContainer,
@@ -353,7 +349,7 @@ class _UserManagementScreenState extends ConsumerState<UserManagementScreen> {
                             borderRadius: BorderRadius.circular(6.r),
                           ),
                           child: Text(
-                            _capitalize(user.role.name),
+                            Capitalize.firstLetterUppercase(user.role.name),
                             style: TextStyle(
                               fontSize: 10.sp,
                               fontWeight: FontWeight.bold,

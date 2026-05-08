@@ -197,9 +197,9 @@ class _AboutScreenState extends State<AboutScreen> {
                     applicationIcon: Padding(
                       padding: EdgeInsets.all(12.w),
                       child: Image.asset(
-                        Assets.logo,
-                        width: 100.w,
-                        height: 100.h,
+                        Assets.logoRounded,
+                        width: 160.w,
+                        height: 160.h,
                         fit: BoxFit.contain,
                         errorBuilder: (context, error, stackTrace) {
                           return Container(

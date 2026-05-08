@@ -2,10 +2,12 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:hr_connect/core/const/capitalize.dart';
 import 'package:hr_connect/core/const/enums.dart';
 import 'package:hr_connect/features/auth/providers/auth_provider.dart';
 import 'package:hr_connect/features/user_management/data/model/user_model.dart';
-import 'package:hr_connect/features/widgets/presentation/dashboard/admin/user_management_screen.dart';
+import 'package:hr_connect/features/widgets/presentation/etc/request_screen.dart';
+import 'package:hr_connect/features/widgets/presentation/role/admin/user_management_screen.dart';
 import 'package:hr_connect/features/widgets/presentation/etc/about_screen.dart';
 import 'package:hr_connect/features/widgets/presentation/etc/edit_profile_screen.dart';
 import 'package:hr_connect/features/widgets/presentation/etc/support_screen.dart';
@@ -42,9 +44,6 @@ class MainScreen extends ConsumerWidget {
 
   const MainScreen({super.key, required this.user});
 
-  String _capitalize(String s) =>
-      s.isNotEmpty ? '${s[0].toUpperCase()}${s.substring(1)}' : '';
-
   List<_NavigationItem> _getNavigationItems(
     BuildContext context,
     WidgetRef ref,
@@ -62,7 +61,7 @@ class MainScreen extends ConsumerWidget {
         label: 'Request',
         icon: Icons.file_open_outlined,
         selectedIcon: Icons.file_open,
-        page: const Scaffold(),
+        page: const RequestScreen(),
       ),
     ];
 
@@ -214,7 +213,7 @@ class MainScreen extends ConsumerWidget {
                           ),
                           SizedBox(width: 4.w),
                           Text(
-                            'HRConnect | ${_capitalize(role.name)}',
+                            'HRConnect | ${Capitalize.firstLetterUppercase(role.name)}',
                             style: TextStyle(
                               color: colorScheme.onSurfaceVariant,
                               fontSize: 13.sp,

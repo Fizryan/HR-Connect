@@ -4,7 +4,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:hr_connect/core/const/assets.dart';
 import 'package:hr_connect/core/const/support_information.dart';
 import 'package:hr_connect/features/auth/providers/auth_provider.dart';
-import 'package:hr_connect/features/auth/providers/auth_state.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
@@ -170,52 +169,45 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final authState = ref.watch(authNotifierProvider);
-    final isLoading = authState.maybeWhen(
-      loading: () => true,
-      orElse: () => false,
-    );
+    final isLoading = authState.isLoading;
 
-    ref.listen<AuthState>(authNotifierProvider, (previous, next) {
-      final wasLoading =
-          previous?.maybeWhen(loading: () => true, orElse: () => false) ??
-          false;
+    ref.listen(authNotifierProvider, (previous, next) {
+      final wasLoading = previous?.isLoading ?? false;
 
-      if (wasLoading) {
-        next.maybeWhen(
-          unauthenticated: (message) {
-            if (message != null && message.isNotEmpty) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Row(
-                    children: [
-                      Icon(
-                        Icons.error_outline,
-                        color: theme.colorScheme.onErrorContainer,
-                      ),
-                      SizedBox(width: 12.w),
-                      Expanded(
-                        child: Text(
-                          message,
-                          style: TextStyle(
-                            color: theme.colorScheme.onErrorContainer,
-                          ),
+      if (wasLoading && !next.isLoading) {
+        if (next.hasError) {
+          final message = next.error.toString();
+          if (message.isNotEmpty) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Row(
+                  children: [
+                    Icon(
+                      Icons.error_outline,
+                      color: theme.colorScheme.onErrorContainer,
+                    ),
+                    SizedBox(width: 12.w),
+                    Expanded(
+                      child: Text(
+                        message,
+                        style: TextStyle(
+                          color: theme.colorScheme.onErrorContainer,
                         ),
                       ),
-                    ],
-                  ),
-                  backgroundColor: theme.colorScheme.errorContainer,
-                  behavior: SnackBarBehavior.floating,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12.r),
-                  ),
-                  margin: EdgeInsets.all(20.w),
-                  elevation: 0,
+                    ),
+                  ],
                 ),
-              );
-            }
-          },
-          orElse: () {},
-        );
+                backgroundColor: theme.colorScheme.errorContainer,
+                behavior: SnackBarBehavior.floating,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12.r),
+                ),
+                margin: EdgeInsets.all(20.w),
+                elevation: 0,
+              ),
+            );
+          }
+        }
       }
     });
 

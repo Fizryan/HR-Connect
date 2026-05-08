@@ -1,38 +1,68 @@
+import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hr_connect/core/di/providers.dart';
-import 'package:hr_connect/features/user_management/providers/user_state.dart';
+import 'package:hr_connect/features/user_management/data/model/user_model.dart';
 
-final userNotifierProvider = NotifierProvider<UserNotifier, UserState>(
-  UserNotifier.new,
-);
+final userNotifierProvider =
+    AsyncNotifierProvider<UserNotifier, List<UserModel>>(UserNotifier.new);
 
-class UserNotifier extends Notifier<UserState> {
+class UserNotifier extends AsyncNotifier<List<UserModel>> {
+  int _currentPage = 1;
+  bool _hasMore = true;
+
   @override
-  UserState build() {
-    return const UserState.initial();
+  FutureOr<List<UserModel>> build() async {
+    _currentPage = 1;
+    _hasMore = true;
+    return _fetchUsersLogic(page: _currentPage, limit: 20);
   }
 
-  Future<void> fetchUsers({int page = 1, int limit = 20}) async {
-    state = const UserState.loading();
-
+  Future<List<UserModel>> _fetchUsersLogic({
+    int page = 1,
+    int limit = 20,
+  }) async {
     final repository = ref.read(userRepositoryProvider);
     final result = await repository.getUsers(page: page, limit: limit);
 
-    state = result.fold(
-      (failure) => UserState.error(failure.message),
-      UserState.loaded,
+    return result.fold((failure) => throw failure.message, (users) {
+      if (users.length < limit) _hasMore = false;
+      return users;
+    });
+  }
+
+  Future<void> fetchUsers({int page = 1, int limit = 20}) async {
+    state = const AsyncValue.loading();
+    _currentPage = page;
+    _hasMore = true;
+    state = await AsyncValue.guard(
+      () => _fetchUsersLogic(page: page, limit: limit),
     );
   }
 
+  Future<void> loadMore({int limit = 20}) async {
+    if (!_hasMore || state.isLoading) return;
+
+    final currentUsers = state.value ?? [];
+    state = const AsyncValue.loading();
+
+    try {
+      _currentPage++;
+      final newUsers = await _fetchUsersLogic(page: _currentPage, limit: limit);
+      state = AsyncValue.data([...currentUsers, ...newUsers]);
+    } catch (e, st) {
+      state = AsyncValue.error(e, st);
+    }
+  }
+
   Future<void> fetchUserById(String id) async {
-    state = const UserState.loading();
+    state = const AsyncValue.loading();
 
     final repository = ref.read(userRepositoryProvider);
     final result = await repository.getUserById(id);
 
     state = result.fold(
-      (failure) => UserState.error(failure.message),
-      (user) => UserState.loaded([user]),
+      (failure) => AsyncValue.error(failure.message, StackTrace.current),
+      (user) => AsyncValue.data([user]),
     );
   }
 
@@ -44,22 +74,21 @@ class UserNotifier extends Notifier<UserState> {
 
     result.fold(
       (failure) {
-        state = UserState.error(failure.message);
+        state = AsyncValue<List<UserModel>>.error(
+          failure.message,
+          StackTrace.current,
+        );
         Future.delayed(const Duration(seconds: 2), () {
           state = previousState;
         });
       },
       (updatedUser) {
-        previousState.maybeMap(
-          loaded: (currentState) {
-            final updatedList = currentState.users.map((user) {
-              return user.id == id ? updatedUser : user;
-            }).toList();
-
-            state = UserState.loaded(updatedList);
-          },
-          orElse: () {},
-        );
+        if (previousState.hasValue) {
+          final updatedList = previousState.value!.map((user) {
+            return user.id == id ? updatedUser : user;
+          }).toList();
+          state = AsyncValue.data(updatedList);
+        }
       },
     );
   }
@@ -75,22 +104,21 @@ class UserNotifier extends Notifier<UserState> {
 
     result.fold(
       (failure) {
-        state = UserState.error(failure.message);
+        state = AsyncValue<List<UserModel>>.error(
+          failure.message,
+          StackTrace.current,
+        );
         Future.delayed(const Duration(seconds: 2), () {
           state = previousState;
         });
       },
       (updatedUser) {
-        previousState.maybeMap(
-          loaded: (currentState) {
-            final updatedList = currentState.users.map((user) {
-              return user.id == id ? updatedUser : user;
-            }).toList();
-
-            state = UserState.loaded(updatedList);
-          },
-          orElse: () {},
-        );
+        if (previousState.hasValue) {
+          final updatedList = previousState.value!.map((user) {
+            return user.id == id ? updatedUser : user;
+          }).toList();
+          state = AsyncValue.data(updatedList);
+        }
       },
     );
   }
@@ -98,26 +126,24 @@ class UserNotifier extends Notifier<UserState> {
   Future<void> deleteUser(String id) async {
     final previousState = state;
 
-    previousState.maybeMap(
-      loaded: (currentState) {
-        final optimisticList = currentState.users
-            .where((user) => user.id != id)
-            .toList();
-
-        state = UserState.loaded(optimisticList);
-      },
-      orElse: () {},
-    );
+    if (previousState.hasValue) {
+      final optimisticList = previousState.value!
+          .where((user) => user.id != id)
+          .toList();
+      state = AsyncValue.data(optimisticList);
+    }
 
     final repository = ref.read(userRepositoryProvider);
     final result = await repository.deleteUser(id);
 
     result.fold((failure) {
-      state = UserState.error(failure.message);
-
+      state = AsyncValue<List<UserModel>>.error(
+        failure.message,
+        StackTrace.current,
+      );
       Future.delayed(const Duration(seconds: 2), () {
-        state = previousState;
-      });
+          state = previousState;
+        });
     }, (_) {});
   }
 }

@@ -2,19 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hr_connect/features/auth/providers/auth_provider.dart';
-import 'package:hr_connect/features/auth/providers/auth_state.dart';
+import 'package:hr_connect/features/user_management/data/model/user_model.dart';
 import 'package:hr_connect/features/widgets/presentation/etc/login_screen.dart';
 import 'package:hr_connect/features/widgets/presentation/main_screen.dart';
 import 'package:hr_connect/features/widgets/presentation/splash_screen.dart';
 
 final goRouterProvider = Provider<GoRouter>((ref) {
-  final authStateNotifier = ValueNotifier<AuthState>(
+  final authStateNotifier = ValueNotifier<AsyncValue<UserModel?>>(
     ref.read(authNotifierProvider),
   );
 
   ref.onDispose(authStateNotifier.dispose);
 
-  ref.listen<AuthState>(authNotifierProvider, (_, next) {
+  ref.listen<AsyncValue<UserModel?>>(authNotifierProvider, (_, next) {
     authStateNotifier.value = next;
   });
 
@@ -27,22 +27,17 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       final isAtSplash = state.uri.path == '/splash';
       final isGoingToLogin = state.uri.path == '/login';
 
-      return authState.maybeWhen(
-        initial: () => isAtSplash ? null : '/splash',
-        loading: () => null,
+      if (authState.isLoading) return null;
 
-        authenticated: (user) {
-          if (isGoingToLogin || isAtSplash) return '/';
-          return null;
-        },
+      final isAuthenticated = authState.hasValue && authState.value != null;
 
-        unauthenticated: (message) {
-          if (!isGoingToLogin) return '/login';
-          return null;
-        },
-
-        orElse: () => null,
-      );
+      if (isAuthenticated) {
+        if (isGoingToLogin || isAtSplash) return '/';
+        return null;
+      } else {
+        if (!isGoingToLogin) return '/login';
+        return null;
+      }
     },
     routes: [
       GoRoute(
@@ -55,20 +50,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         name: 'home',
         builder: (context, state) {
           final authState = authStateNotifier.value;
-
-          final user = authState.maybeWhen(
-            authenticated: (user) => user,
-            orElse: () => null,
-          );
-
-          // const user = UserModel(
-          //   email: 'fizryan@mail.com',
-          //   password: 'password123',
-          //   firstName: 'Hafizryandin',
-          //   lastName: 'Haykal Matondang',
-          //   role: UserRole.admin,
-          //   avatarUrl: 'https://i.pravatar.cc/150?img=1',
-          // );
+          final user = authState.value;
 
           if (user == null) {
             return const Scaffold(
