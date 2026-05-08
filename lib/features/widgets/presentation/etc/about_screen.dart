@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:hr_connect/core/const/assets.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
 class AboutScreen extends StatefulWidget {
@@ -41,7 +42,7 @@ class _AboutScreenState extends State<AboutScreen> {
         ),
       ),
       body: SingleChildScrollView(
-        physics: const BouncingScrollPhysics(),
+        physics: const ClampingScrollPhysics(),
         child: Padding(
           padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 20.h),
           child: Column(
@@ -59,7 +60,7 @@ class _AboutScreenState extends State<AboutScreen> {
                       shape: BoxShape.circle,
                     ),
                     child: Image.asset(
-                      'assets/logo_icon.png',
+                      Assets.logoRounded,
                       width: 100.w,
                       height: 100.h,
                       fit: BoxFit.contain,
@@ -97,7 +98,7 @@ class _AboutScreenState extends State<AboutScreen> {
                           'Human Resource Management App',
                           style: TextStyle(
                             fontSize: 12.sp,
-                            fontWeight: FontWeight.w100,
+                            fontWeight: FontWeight.w300,
                             color: colorScheme.onSurfaceVariant,
                             letterSpacing: 0.5,
                           ),
@@ -196,7 +197,7 @@ class _AboutScreenState extends State<AboutScreen> {
                     applicationIcon: Padding(
                       padding: EdgeInsets.all(12.w),
                       child: Image.asset(
-                        'assets/logo_icon.png',
+                        Assets.logo,
                         width: 100.w,
                         height: 100.h,
                         fit: BoxFit.contain,

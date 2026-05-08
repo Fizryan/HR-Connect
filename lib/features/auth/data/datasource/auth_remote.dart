@@ -1,3 +1,4 @@
+import 'package:hr_connect/core/const/api_endpoints.dart';
 import 'package:hr_connect/core/const/enums.dart';
 import 'package:hr_connect/core/error/exception.dart';
 import 'package:hr_connect/core/network/api_client.dart';
@@ -27,13 +28,13 @@ class AuthRemoteImpl implements AuthRemote {
   Future<AuthModel> login(String email, String password) async {
     try {
       final response = await apiClient.post(
-        '/v1/auth/login',
+        ApiEndpoints.authLogin,
         data: {'email': email, 'password': password},
       );
       return AuthModel.success(
-        accessToken: response.data['accessToken'],
-        expTime: response.data['expTime'],
-        refreshToken: response.data['refreshToken'],
+        accessToken: response['accessToken'],
+        expTime: response['expTime'],
+        refreshToken: response['refreshToken'],
       );
     } on ServerException {
       rethrow;
@@ -52,7 +53,7 @@ class AuthRemoteImpl implements AuthRemote {
   ) async {
     try {
       await apiClient.post(
-        '/v1/auth/register',
+        ApiEndpoints.usersRegister,
         data: {
           'email': email,
           'password': password,
@@ -72,7 +73,7 @@ class AuthRemoteImpl implements AuthRemote {
   Future<void> logout(String refreshToken) async {
     try {
       await apiClient.post(
-        '/v1/auth/logout',
+        ApiEndpoints.authLogout,
         data: {'refresh': refreshToken},
       );
     } on ServerException {
@@ -86,13 +87,13 @@ class AuthRemoteImpl implements AuthRemote {
   Future<AuthModel> refreshToken(String token) async {
     try {
       final response = await apiClient.post(
-        '/v1/auth/refresh',
+        ApiEndpoints.authRefresh,
         data: {'refresh': token},
       );
       return AuthModel.success(
-        accessToken: response.data['accessToken'],
-        expTime: response.data['expTime'],
-        refreshToken: response.data['refreshToken'],
+        accessToken: response['accessToken'],
+        expTime: response['expTime'],
+        refreshToken: response['refreshToken'],
       );
     } on ServerException {
       rethrow;
@@ -104,8 +105,8 @@ class AuthRemoteImpl implements AuthRemote {
   @override
   Future<UserModel> getUserInfo() async {
     try {
-      final response = await apiClient.get('/v1/auth/me');
-      return UserModel.fromJson(response.data);
+      final response = await apiClient.get(ApiEndpoints.profile);
+      return UserModel.fromApi(response as Map<String, dynamic>);
     } on ServerException {
       rethrow;
     } catch (e) {

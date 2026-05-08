@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:hr_connect/core/const/assets.dart';
 import 'package:hr_connect/features/auth/providers/auth_provider.dart';
 import 'package:hr_connect/features/auth/providers/auth_state.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -66,9 +67,9 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
                     );
                   },
                   child: Image.asset(
-                    'assets/logo_icon.png',
-                    width: 110.w,
-                    height: 110.h,
+                    Assets.logo,
+                    width: 200.w,
+                    height: 200.h,
                     fit: BoxFit.contain,
                     errorBuilder: (context, error, stackTrace) {
                       return Container(

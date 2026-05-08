@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:hr_connect/core/config/env_config.dart';
+import 'package:hr_connect/core/const/api_endpoints.dart';
 import 'package:hr_connect/core/const/secure_storage.dart';
 import 'package:hr_connect/core/error/exception.dart';
 import 'package:logger/logger.dart';
@@ -37,7 +38,7 @@ class ApiClient {
             options.headers['Authorization'] = 'Bearer $_cachedToken';
           }
 
-          _logger.i('REQUEST [${options.method}] => PATH: ${options.path}');
+          _logger.i('REQUEST [${options.method}] => PATH: ${options.uri}');
           return handler.next(options);
         },
 
@@ -52,16 +53,16 @@ class ApiClient {
           if (e.response?.statusCode == 401) {
             _logger.w('Token expired, attempting refresh...');
 
-            // Fetch current token that was sent with the request
-            final requestToken = e.requestOptions.headers['Authorization']?.toString().replaceAll('Bearer ', '');
+            final requestToken = e.requestOptions.headers['Authorization']
+                ?.toString()
+                .replaceAll('Bearer ', '');
 
-            // If the token in request is different from cached, it might have been refreshed already
             if (requestToken != null && requestToken != _cachedToken) {
-               _logger.i('Token already refreshed, retrying request...');
-               final retryOptions = e.requestOptions;
-               retryOptions.headers['Authorization'] = 'Bearer $_cachedToken';
-               final retryResponse = await _dio.fetch(retryOptions);
-               return handler.resolve(retryResponse);
+              _logger.i('Token already refreshed, retrying request...');
+              final retryOptions = e.requestOptions;
+              retryOptions.headers['Authorization'] = 'Bearer $_cachedToken';
+              final retryResponse = await _dio.fetch(retryOptions);
+              return handler.resolve(retryResponse);
             }
 
             if (!_isRefreshing) {
@@ -74,11 +75,17 @@ class ApiClient {
               if (refreshToken != null && refreshToken.isNotEmpty) {
                 try {
                   final refreshDio = Dio(
-                    BaseOptions(baseUrl: _dio.options.baseUrl),
+                    BaseOptions(
+                      baseUrl: _dio.options.baseUrl,
+                      headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                      },
+                    ),
                   );
 
                   final response = await refreshDio.post(
-                    'v1/auth/refresh',
+                    ApiEndpoints.authRefresh,
                     data: {'refreshToken': refreshToken},
                   );
 
@@ -102,7 +109,8 @@ class ApiClient {
                     _isRefreshing = false;
 
                     final retryOptions = e.requestOptions;
-                    retryOptions.headers['Authorization'] = 'Bearer $newAccessToken';
+                    retryOptions.headers['Authorization'] =
+                        'Bearer $newAccessToken';
                     final retryResponse = await _dio.fetch(retryOptions);
                     return handler.resolve(retryResponse);
                   }
@@ -115,9 +123,7 @@ class ApiClient {
                 }
               }
             } else {
-               // Wait for the token refresh to complete then retry
-               // In QueuedInterceptorsWrapper, next interceptors sit in queue. But we can just reject if not handled.
-               return handler.next(e);
+              return handler.next(e);
             }
           }
 

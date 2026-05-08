@@ -79,10 +79,13 @@ class UserRepositoryImp implements UserRepository {
   }
 
   @override
-  Future<Either<Failure, void>> deactivateUser(String id) async {
+  Future<Either<Failure, UserModel>> deactivateUser(
+    String id,
+    Map<String, dynamic> updateData,
+  ) async {
     try {
-      await remoteDataSource.deactivateUser(id);
-      return const Right(null);
+      final deactivateUser = await remoteDataSource.deactivateUser(id, updateData);
+      return Right(deactivateUser);
     } on ServerException catch (e) {
       return Left(ServerFailure(e.message));
     } catch (e) {
@@ -92,6 +95,26 @@ class UserRepositoryImp implements UserRepository {
           Intl.message(
             'Failed to deactivate user. Please try again.',
             name: 'deactivateUserFailed',
+          ),
+        ),
+      );
+    }
+  }
+
+  @override
+  Future<Either<Failure, void>> deleteUser(String id) async {
+    try {
+      await remoteDataSource.deleteUser(id);
+      return const Right(null);
+    } on ServerException catch (e) {
+      return Left(ServerFailure(e.message));
+    } catch (e) {
+      debugPrint('[UserRepository] Delete User Error: $e');
+      return Left(
+        ServerFailure(
+          Intl.message(
+            'Failed to delete user. Please try again.',
+            name: 'deleteUserFailed',
           ),
         ),
       );

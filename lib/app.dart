@@ -21,7 +21,6 @@ class MainApp extends ConsumerWidget {
       builder: (context, child) {
         final textTheme = createTextTheme(context, 'Roboto', 'Roboto');
         final materialTheme = MaterialTheme(textTheme);
-
         return MaterialApp.router(
           title: 'HR Connect',
           debugShowCheckedModeBanner: false,

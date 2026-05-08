@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:hr_connect/core/const/assets.dart';
 import 'package:hr_connect/core/const/support_information.dart';
 import 'package:hr_connect/features/auth/providers/auth_provider.dart';
 import 'package:hr_connect/features/auth/providers/auth_state.dart';
@@ -366,19 +367,27 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   Widget _buildHeader(ThemeData theme) {
     return Column(
       children: [
-        Container(
-          padding: EdgeInsets.all(14.w),
-          decoration: BoxDecoration(
-            color: theme.colorScheme.primary,
-            shape: BoxShape.circle,
-          ),
-          child: Icon(
-            Icons.people_alt_rounded,
-            size: 32.sp,
-            color: theme.colorScheme.onPrimary,
-          ),
+        Image.asset(
+          Assets.logoRounded,
+          width: 180.w,
+          height: 180.h,
+          fit: BoxFit.contain,
+          errorBuilder: (context, error, stackTrace) {
+            return Container(
+              padding: EdgeInsets.all(24.w),
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.onSurface,
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                Icons.business_center_rounded,
+                size: 60.sp,
+                color: Theme.of(context).colorScheme.surface,
+              ),
+            );
+          },
         ),
-        SizedBox(height: 20.h),
+        SizedBox(height: 6.h),
         Text(
           'Welcome Back',
           style: TextStyle(

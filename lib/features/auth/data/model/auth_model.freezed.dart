@@ -148,7 +148,7 @@ return error(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function(@JsonKey(name: 'access_token')  String accessToken, @JsonKey(name: 'expTime')  String expTime, @JsonKey(name: 'refresh_token')  String refreshToken)?  success,TResult Function( String message)?  error,required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function(@JsonKey(name: 'accessToken')  String accessToken, @JsonKey(name: 'expTime')  String expTime, @JsonKey(name: 'refreshToken')  String refreshToken)?  success,TResult Function( String message)?  error,required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _AuthSuccess() when success != null:
 return success(_that.accessToken,_that.expTime,_that.refreshToken);case _AuthError() when error != null:
@@ -170,7 +170,7 @@ return error(_that.message);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function(@JsonKey(name: 'access_token')  String accessToken, @JsonKey(name: 'expTime')  String expTime, @JsonKey(name: 'refresh_token')  String refreshToken)  success,required TResult Function( String message)  error,}) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function(@JsonKey(name: 'accessToken')  String accessToken, @JsonKey(name: 'expTime')  String expTime, @JsonKey(name: 'refreshToken')  String refreshToken)  success,required TResult Function( String message)  error,}) {final _that = this;
 switch (_that) {
 case _AuthSuccess():
 return success(_that.accessToken,_that.expTime,_that.refreshToken);case _AuthError():
@@ -191,7 +191,7 @@ return error(_that.message);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function(@JsonKey(name: 'access_token')  String accessToken, @JsonKey(name: 'expTime')  String expTime, @JsonKey(name: 'refresh_token')  String refreshToken)?  success,TResult? Function( String message)?  error,}) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function(@JsonKey(name: 'accessToken')  String accessToken, @JsonKey(name: 'expTime')  String expTime, @JsonKey(name: 'refreshToken')  String refreshToken)?  success,TResult? Function( String message)?  error,}) {final _that = this;
 switch (_that) {
 case _AuthSuccess() when success != null:
 return success(_that.accessToken,_that.expTime,_that.refreshToken);case _AuthError() when error != null:
@@ -207,12 +207,12 @@ return error(_that.message);case _:
 @JsonSerializable()
 
 class _AuthSuccess implements AuthModel {
-  const _AuthSuccess({@JsonKey(name: 'access_token') required this.accessToken, @JsonKey(name: 'expTime') required this.expTime, @JsonKey(name: 'refresh_token') required this.refreshToken, final  String? $type}): $type = $type ?? 'success';
+  const _AuthSuccess({@JsonKey(name: 'accessToken') required this.accessToken, @JsonKey(name: 'expTime') required this.expTime, @JsonKey(name: 'refreshToken') required this.refreshToken, final  String? $type}): $type = $type ?? 'success';
   factory _AuthSuccess.fromJson(Map<String, dynamic> json) => _$AuthSuccessFromJson(json);
 
-@JsonKey(name: 'access_token') final  String accessToken;
+@JsonKey(name: 'accessToken') final  String accessToken;
 @JsonKey(name: 'expTime') final  String expTime;
-@JsonKey(name: 'refresh_token') final  String refreshToken;
+@JsonKey(name: 'refreshToken') final  String refreshToken;
 
 @JsonKey(name: 'runtimeType')
 final String $type;
@@ -251,7 +251,7 @@ abstract mixin class _$AuthSuccessCopyWith<$Res> implements $AuthModelCopyWith<$
   factory _$AuthSuccessCopyWith(_AuthSuccess value, $Res Function(_AuthSuccess) _then) = __$AuthSuccessCopyWithImpl;
 @useResult
 $Res call({
-@JsonKey(name: 'access_token') String accessToken,@JsonKey(name: 'expTime') String expTime,@JsonKey(name: 'refresh_token') String refreshToken
+@JsonKey(name: 'accessToken') String accessToken,@JsonKey(name: 'expTime') String expTime,@JsonKey(name: 'refreshToken') String refreshToken
 });
 
 

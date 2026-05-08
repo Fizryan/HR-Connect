@@ -3,11 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:hr_connect/features/user_management/data/model/user_model.dart';
+import 'package:hr_connect/features/user_management/providers/user_provider.dart';
 import 'package:hr_connect/features/widgets/shared/custom_text_field.dart';
 
 class EditProfileScreen extends ConsumerStatefulWidget {
   final UserModel user;
-
   const EditProfileScreen({super.key, required this.user});
 
   @override
@@ -37,8 +37,38 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
   }
 
   void _saveProfile() {
-    // TODO: Implement profile update logic
-    // ref.read(userNotifierProvider.notifier).updateUser(emailIdentifier, updateData)
+    final updatedFirstName = _firstNameController.text;
+    final updatedLastName = _lastNameController.text;
+
+    if (updatedFirstName.isEmpty || updatedLastName.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Please fill in all fields',
+            style: TextStyle(
+              fontSize: 16.sp,
+              fontWeight: FontWeight.w600,
+              color: Theme.of(context).colorScheme.error,
+            ),
+          ),
+          backgroundColor: Theme.of(context).colorScheme.errorContainer,
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+      return;
+    }
+
+    final updateData = {
+      'firstName': updatedFirstName,
+      'lastName': updatedLastName,
+      'email': widget.user.email,
+      'role': widget.user.role.name,
+    };
+
+    ref
+        .read(userNotifierProvider.notifier)
+        .updateUser(widget.user.id, updateData);
+
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: const Text('Profile updated successfully'),
@@ -56,7 +86,6 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-
     return Scaffold(
       appBar: AppBar(
         backgroundColor: colorScheme.surfaceContainer,
@@ -150,7 +179,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
             ),
           ),
           SingleChildScrollView(
-            physics: const BouncingScrollPhysics(),
+            physics: const ClampingScrollPhysics(),
             child: Padding(
               padding: EdgeInsetsGeometry.symmetric(
                 horizontal: 24.w,
@@ -188,11 +217,8 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                         ),
                         errorWidget: (context, url, error) => CircleAvatar(
                           radius: 60.r,
-                          backgroundColor: colorScheme.errorContainer,
-                          child: Icon(
-                            Icons.error_outline,
-                            color: colorScheme.error,
-                          ),
+                          backgroundColor: colorScheme.primaryContainer,
+                          child: Icon(Icons.person, color: colorScheme.primary),
                         ),
                       ),
                       GestureDetector(

@@ -7,32 +7,34 @@ part of 'user_model.dart';
 // **************************************************************************
 
 _UserModel _$UserModelFromJson(Map<String, dynamic> json) => _UserModel(
+  id: json['id'] as String,
   email: json['email'] as String,
-  password: json['password'] as String,
+  password: json['password'] as String?,
   firstName: json['firstName'] as String,
   lastName: json['lastName'] as String,
   role: $enumDecode(_$UserRoleEnumMap, json['role']),
-  avatarUrl: json['avatar_url'] as String?,
-  isActive: json['is_active'] as bool? ?? true,
-  createdAt: json['created_at'] == null
+  avatarUrl: json['avatarUrl'] as String?,
+  isActive: json['isActive'] as bool? ?? true,
+  createdAt: json['createdAt'] == null
       ? null
-      : DateTime.parse(json['created_at'] as String),
-  updatedAt: json['updated_at'] == null
+      : DateTime.parse(json['createdAt'] as String),
+  updatedAt: json['updatedAt'] == null
       ? null
-      : DateTime.parse(json['updated_at'] as String),
+      : DateTime.parse(json['updatedAt'] as String),
 );
 
 Map<String, dynamic> _$UserModelToJson(_UserModel instance) =>
     <String, dynamic>{
+      'id': instance.id,
       'email': instance.email,
       'password': instance.password,
       'firstName': instance.firstName,
       'lastName': instance.lastName,
       'role': _$UserRoleEnumMap[instance.role]!,
-      'avatar_url': instance.avatarUrl,
-      'is_active': instance.isActive,
-      'created_at': instance.createdAt?.toIso8601String(),
-      'updated_at': instance.updatedAt?.toIso8601String(),
+      'avatarUrl': instance.avatarUrl,
+      'isActive': instance.isActive,
+      'createdAt': instance.createdAt?.toIso8601String(),
+      'updatedAt': instance.updatedAt?.toIso8601String(),
     };
 
 const _$UserRoleEnumMap = {

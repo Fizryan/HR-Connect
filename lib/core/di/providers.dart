@@ -61,7 +61,9 @@ class ThemeNotifier extends Notifier<ThemeMode> {
 
   void updateTheme(ThemeMode mode) {
     state = mode;
-    ref.read(sharedPreferencesProvider).setString(SharedPrefs.themeMode, mode.name);
+    ref
+        .read(sharedPreferencesProvider)
+        .setString(SharedPrefs.themeMode, mode.name);
   }
 
   void setThemeMode(ThemeMode mode) {

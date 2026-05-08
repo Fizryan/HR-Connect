@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:hr_connect/core/const/enums.dart';
+import 'package:hr_connect/features/auth/providers/auth_provider.dart';
 import 'package:hr_connect/features/user_management/data/model/user_model.dart';
+import 'package:hr_connect/features/widgets/presentation/dashboard/admin/user_management_screen.dart';
 import 'package:hr_connect/features/widgets/presentation/etc/about_screen.dart';
 import 'package:hr_connect/features/widgets/presentation/etc/edit_profile_screen.dart';
 import 'package:hr_connect/features/widgets/presentation/etc/support_screen.dart';
@@ -45,6 +47,7 @@ class MainScreen extends ConsumerWidget {
 
   List<_NavigationItem> _getNavigationItems(
     BuildContext context,
+    WidgetRef ref,
     ColorScheme colorScheme,
     UserRole role,
   ) {
@@ -69,7 +72,7 @@ class MainScreen extends ConsumerWidget {
           label: 'Management',
           icon: Icons.people_outlined,
           selectedIcon: Icons.people,
-          page: const Scaffold(),
+          page: const UserManagementScreen(),
         ),
       );
     }
@@ -79,7 +82,7 @@ class MainScreen extends ConsumerWidget {
         label: 'Profile',
         icon: Icons.person_outline,
         selectedIcon: Icons.person,
-        page: _buildProfileContent(context, colorScheme, role, user),
+        page: _buildProfileContent(context, ref, colorScheme, role, user),
       ),
     );
 
@@ -91,7 +94,12 @@ class MainScreen extends ConsumerWidget {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final role = user.role;
-    final navigationItems = _getNavigationItems(context, colorScheme, role);
+    final navigationItems = _getNavigationItems(
+      context,
+      ref,
+      colorScheme,
+      role,
+    );
     final selectedIndex = ref.watch(navIndexProvider);
     final safeIndex = selectedIndex >= navigationItems.length
         ? 0
@@ -128,6 +136,7 @@ class MainScreen extends ConsumerWidget {
 
   Widget _buildProfileContent(
     BuildContext context,
+    WidgetRef ref,
     ColorScheme colorScheme,
     UserRole role,
     UserModel user,
@@ -169,8 +178,8 @@ class MainScreen extends ConsumerWidget {
                   ),
                   errorWidget: (context, url, error) => CircleAvatar(
                     radius: 40.r,
-                    backgroundColor: colorScheme.errorContainer,
-                    child: Icon(Icons.error_outline, color: colorScheme.error),
+                    backgroundColor: colorScheme.primaryContainer,
+                    child: Icon(Icons.person, color: colorScheme.primary),
                   ),
                 ),
                 SizedBox(width: 16.w),
@@ -257,7 +266,9 @@ class MainScreen extends ConsumerWidget {
                     onTap: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => const AboutScreen()),
+                        MaterialPageRoute(
+                          builder: (context) => const AboutScreen(),
+                        ),
                       );
                     },
                   ),
@@ -273,7 +284,9 @@ class MainScreen extends ConsumerWidget {
                     onTap: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => const ThemeScreen()),
+                        MaterialPageRoute(
+                          builder: (context) => const ThemeScreen(),
+                        ),
                       );
                     },
                   ),
@@ -289,7 +302,9 @@ class MainScreen extends ConsumerWidget {
                     onTap: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => const SupportScreen()),
+                        MaterialPageRoute(
+                          builder: (context) => const SupportScreen(),
+                        ),
                       );
                     },
                   ),
@@ -311,13 +326,71 @@ class MainScreen extends ConsumerWidget {
                 title: 'Logout',
                 iconColor: colorScheme.onErrorContainer,
                 textColor: colorScheme.onErrorContainer,
-                onTap: () {},
+                onTap: () => _showLogoutDialog(context, ref, colorScheme),
               ),
             ),
             SizedBox(height: 24.h),
           ],
         ),
       ),
+    );
+  }
+
+  void _showLogoutDialog(
+    BuildContext context,
+    WidgetRef ref,
+    ColorScheme colorScheme,
+  ) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: colorScheme.surfaceContainerLowest,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20.r),
+          ),
+          title: Text(
+            'Confirm Logout',
+            style: TextStyle(
+              fontSize: 20.sp,
+              fontWeight: FontWeight.bold,
+              color: colorScheme.onSurface,
+            ),
+          ),
+          content: Text(
+            'Are you sure you want to log out of your account?',
+            style: TextStyle(
+              fontSize: 14.sp,
+              color: colorScheme.onSurfaceVariant,
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: Text(
+                'Cancel',
+                style: TextStyle(
+                  color: colorScheme.onSurfaceVariant,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+            FilledButton(
+              style: FilledButton.styleFrom(
+                backgroundColor: colorScheme.error,
+                foregroundColor: colorScheme.onError,
+              ),
+              onPressed: () {
+                Navigator.pop(context);
+                ref.read(authNotifierProvider.notifier).logout();
+              },
+              child: const Text('Logout'),
+            ),
+          ],
+        );
+      },
     );
   }
 

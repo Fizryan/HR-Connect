@@ -7,17 +7,17 @@ part of 'auth_model.dart';
 // **************************************************************************
 
 _AuthSuccess _$AuthSuccessFromJson(Map<String, dynamic> json) => _AuthSuccess(
-  accessToken: json['access_token'] as String,
+  accessToken: json['accessToken'] as String,
   expTime: json['expTime'] as String,
-  refreshToken: json['refresh_token'] as String,
+  refreshToken: json['refreshToken'] as String,
   $type: json['runtimeType'] as String?,
 );
 
 Map<String, dynamic> _$AuthSuccessToJson(_AuthSuccess instance) =>
     <String, dynamic>{
-      'access_token': instance.accessToken,
+      'accessToken': instance.accessToken,
       'expTime': instance.expTime,
-      'refresh_token': instance.refreshToken,
+      'refreshToken': instance.refreshToken,
       'runtimeType': instance.$type,
     };
 

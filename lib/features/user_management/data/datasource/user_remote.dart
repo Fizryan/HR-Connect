@@ -1,3 +1,4 @@
+import 'package:hr_connect/core/const/api_endpoints.dart';
 import 'package:hr_connect/core/error/exception.dart';
 import 'package:hr_connect/core/network/api_client.dart';
 import 'package:hr_connect/features/user_management/data/model/user_model.dart';
@@ -6,7 +7,8 @@ abstract class UserRemote {
   Future<List<UserModel>> getUsers({int page = 1, int limit = 20});
   Future<UserModel> getUserById(String id);
   Future<UserModel> updateUser(String id, Map<String, dynamic> updateData);
-  Future<void> deactivateUser(String id);
+  Future<UserModel> deactivateUser(String id, Map<String, dynamic> updateData);
+  Future<void> deleteUser(String id);
 }
 
 class UserRemoteImp implements UserRemote {
@@ -18,12 +20,14 @@ class UserRemoteImp implements UserRemote {
   Future<List<UserModel>> getUsers({int page = 1, int limit = 20}) async {
     try {
       final response = await apiClient.get(
-        '/v1/users',
+        ApiEndpoints.users,
         queryParameters: {'page': page, 'limit': limit},
       );
 
-      final List<dynamic> rawList = response['data'] ?? [];
-      return rawList.map((e) => UserModel.fromJson(e)).toList();
+      final List<dynamic> usersList = response['user'] ?? [];
+      return usersList.map((userJson) {
+        return UserModel.fromApi(userJson as Map<String, dynamic>);
+      }).toList();
     } on ServerException {
       rethrow;
     } catch (e) {
@@ -34,8 +38,8 @@ class UserRemoteImp implements UserRemote {
   @override
   Future<UserModel> getUserById(String id) async {
     try {
-      final response = await apiClient.get('v1/users/$id');
-      return UserModel.fromJson(response.data);
+      final response = await apiClient.get(ApiEndpoints.getUser(id));
+      return UserModel.fromApi(response.data);
     } on ServerException {
       rethrow;
     } catch (e) {
@@ -44,13 +48,16 @@ class UserRemoteImp implements UserRemote {
   }
 
   @override
-  Future<UserModel> updateUser(String id, Map<String, dynamic> updateData) async {
+  Future<UserModel> updateUser(
+    String id,
+    Map<String, dynamic> updateData,
+  ) async {
     try {
       final response = await apiClient.put(
-        '/v1/users/$id',
+        ApiEndpoints.putUser(id),
         data: updateData,
       );
-      return UserModel.fromJson(response.data);
+      return UserModel.fromApi(response.data);
     } on ServerException {
       rethrow;
     } catch (e) {
@@ -59,9 +66,24 @@ class UserRemoteImp implements UserRemote {
   }
 
   @override
-  Future<void> deactivateUser(String id) async {
+  Future<UserModel> deactivateUser(String id, Map<String, dynamic> updateData) async {
     try {
-      await apiClient.delete('/v1/users/$id');
+      final response = await apiClient.put(
+        ApiEndpoints.putUser(id),
+        data: updateData,
+      );
+      return UserModel.fromApi(response.data);
+    } on ServerException {
+      rethrow;
+    } catch (e) {
+      throw ServerException(message: e.toString());
+    }
+  }
+
+  @override
+  Future<void> deleteUser(String id) async {
+    try {
+      await apiClient.delete(ApiEndpoints.deleteUser(id));
     } on ServerException {
       rethrow;
     } catch (e) {
