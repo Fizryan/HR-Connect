@@ -397,7 +397,10 @@ class _UserManagementScreenState extends ConsumerState<UserManagementScreen> {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => EditProfileScreen(user: user),
+              builder: (context) => EditProfileScreen(
+                user: user,
+                isManagementPanel: true,
+              ),
             ),
           );
         },

@@ -40,7 +40,7 @@ class UserRemoteImp implements UserRemote {
   Future<UserModel> getUserById(String id) async {
     try {
       final response = await apiClient.get(ApiEndpoints.getUser(id));
-      return UserModel.fromApi(response.data);
+      return UserModel.fromApi(response as Map<String, dynamic>);
     } on ServerException {
       rethrow;
     } catch (e) {
@@ -54,11 +54,11 @@ class UserRemoteImp implements UserRemote {
     Map<String, dynamic> updateData,
   ) async {
     try {
-      final response = await apiClient.put(
+      await apiClient.put(
         ApiEndpoints.putUser(id),
-        data: updateData,
+        data: {'data': updateData},
       );
-      return UserModel.fromApi(response.data);
+      return await getUserById(id);
     } on ServerException {
       rethrow;
     } catch (e) {

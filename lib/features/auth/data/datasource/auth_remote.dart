@@ -1,5 +1,6 @@
 import 'package:hr_connect/core/const/api_endpoints.dart';
 import 'package:hr_connect/core/const/enums.dart';
+import 'package:hr_connect/core/const/role.dart';
 import 'package:hr_connect/core/error/exception.dart';
 import 'package:hr_connect/core/network/api_client.dart';
 import 'package:hr_connect/features/auth/data/model/auth_model.dart';
@@ -62,7 +63,7 @@ class AuthRemoteImpl implements AuthRemote {
             'email': email,
             'firstName': firstName,
             'lastName': lastName,
-            'role': role.name,
+            'role': Role.roleToRaw(role),
           },
           'password': password,
         },

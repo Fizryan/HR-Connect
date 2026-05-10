@@ -35,7 +35,7 @@ class AuthNotifier extends AsyncNotifier<UserModel?> {
     );
   }
 
-  Future<bool> register({
+  Future<void> register({
     String? avatarUrl,
     required String email,
     required String password,
@@ -43,8 +43,6 @@ class AuthNotifier extends AsyncNotifier<UserModel?> {
     required String lastName,
     required UserRole role,
   }) async {
-    state = const AsyncValue.loading();
-
     final repository = ref.read(authRepositoryProvider);
     final result = await repository.register(
       avatarUrl,
@@ -55,15 +53,9 @@ class AuthNotifier extends AsyncNotifier<UserModel?> {
       role,
     );
 
-    return result.fold(
-      (failure) {
-        state = AsyncValue.error(failure.message, StackTrace.current);
-        return false;
-      },
-      (_) {
-        state = const AsyncValue.data(null);
-        return true;
-      },
+    result.fold(
+      (failure) => throw failure.message,
+      (_) => null,
     );
   }
 

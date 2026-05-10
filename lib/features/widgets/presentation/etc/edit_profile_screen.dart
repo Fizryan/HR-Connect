@@ -2,6 +2,9 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:hr_connect/core/const/capitalize.dart';
+import 'package:hr_connect/core/const/enums.dart';
+import 'package:hr_connect/core/const/role.dart';
 import 'package:hr_connect/features/user_management/data/model/user_model.dart';
 import 'package:hr_connect/features/user_management/providers/user_provider.dart';
 import 'package:hr_connect/features/widgets/shared/bubble_particle.dart';
@@ -9,7 +12,13 @@ import 'package:hr_connect/features/widgets/shared/custom_text_field.dart';
 
 class EditProfileScreen extends ConsumerStatefulWidget {
   final UserModel user;
-  const EditProfileScreen({super.key, required this.user});
+  final bool isManagementPanel;
+
+  const EditProfileScreen({
+    super.key,
+    required this.user,
+    this.isManagementPanel = false,
+  });
 
   @override
   ConsumerState<EditProfileScreen> createState() => _EditProfileScreenState();
@@ -18,6 +27,7 @@ class EditProfileScreen extends ConsumerStatefulWidget {
 class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
   late TextEditingController _firstNameController;
   late TextEditingController _lastNameController;
+  UserRole? _selectedRole;
 
   late final email = widget.user.email;
   late final createdAt = widget.user.createdAt;
@@ -28,6 +38,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     super.initState();
     _firstNameController = TextEditingController(text: widget.user.firstName);
     _lastNameController = TextEditingController(text: widget.user.lastName);
+    _selectedRole = widget.user.role;
   }
 
   @override
@@ -60,10 +71,14 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     }
 
     final updateData = {
+      'avatarUrl': widget.user.avatarUrl ?? '',
+      'email': widget.user.email,
       'firstName': updatedFirstName,
       'lastName': updatedLastName,
-      'email': widget.user.email,
-      'role': widget.user.role.name,
+      'role': Role.roleToRaw(
+        (widget.isManagementPanel ? _selectedRole : widget.user.role) ??
+            widget.user.role,
+      ),
     };
 
     ref
@@ -192,6 +207,67 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                     theme: theme,
                     keyboardType: TextInputType.name,
                   ),
+                  if (widget.isManagementPanel) ...[
+                    SizedBox(height: 18.h),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Role',
+                          style: TextStyle(
+                            fontSize: 14.sp,
+                            fontWeight: FontWeight.w600,
+                            color: colorScheme.onSurface,
+                          ),
+                        ),
+                        SizedBox(height: 8.h),
+                        Container(
+                          padding: EdgeInsets.symmetric(horizontal: 16.w),
+                          decoration: BoxDecoration(
+                            color: colorScheme.surface,
+                            borderRadius: BorderRadius.circular(16.r),
+                            border: Border.all(
+                              color: colorScheme.outlineVariant.withValues(
+                                alpha: 0.5,
+                              ),
+                            ),
+                          ),
+                          child: DropdownButtonHideUnderline(
+                            child: DropdownButton<UserRole>(
+                              value: _selectedRole,
+                              isExpanded: true,
+                              icon: Icon(
+                                Icons.keyboard_arrow_down_rounded,
+                                color: colorScheme.onSurfaceVariant,
+                              ),
+                              items: UserRole.values
+                                  .where((role) => role != UserRole.unknown)
+                                  .map((role) {
+                                    return DropdownMenuItem(
+                                      value: role,
+                                      child: Text(
+                                        Capitalize.firstLetterUppercase(
+                                          role.name,
+                                        ),
+                                        style: TextStyle(
+                                          fontSize: 16.sp,
+                                          color: colorScheme.onSurface,
+                                        ),
+                                      ),
+                                    );
+                                  })
+                                  .toList(),
+                              onChanged: (UserRole? newValue) {
+                                if (newValue != null) {
+                                  setState(() => _selectedRole = newValue);
+                                }
+                              },
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
                   Divider(height: 30.h, indent: 10.w, endIndent: 10.w),
                   Text(
                     'Read Only',
