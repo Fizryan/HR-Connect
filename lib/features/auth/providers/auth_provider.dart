@@ -36,6 +36,7 @@ class AuthNotifier extends AsyncNotifier<UserModel?> {
   }
 
   Future<bool> register({
+    String? avatarUrl,
     required String email,
     required String password,
     required String firstName,
@@ -46,6 +47,7 @@ class AuthNotifier extends AsyncNotifier<UserModel?> {
 
     final repository = ref.read(authRepositoryProvider);
     final result = await repository.register(
+      avatarUrl,
       email,
       password,
       firstName,

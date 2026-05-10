@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-class CustomTextField extends StatelessWidget {
+class CustomTextField extends StatefulWidget {
   final TextEditingController? controller;
   final String? title;
   final String hint;
@@ -28,38 +28,61 @@ class CustomTextField extends StatelessWidget {
   });
 
   @override
+  State<CustomTextField> createState() => _CustomTextFieldState();
+}
+
+class _CustomTextFieldState extends State<CustomTextField> {
+  bool _isPasswordObscured = true;
+
+  @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         TextFormField(
-          controller: controller,
-          obscureText: isPassword,
-          enabled: !isLoading,
-          readOnly: readOnly,
-          keyboardType: keyboardType,
-          style: TextStyle(color: theme.colorScheme.onSurface, fontSize: 14.sp),
+          controller: widget.controller,
+          obscureText: widget.isPassword ? _isPasswordObscured : false,
+          enabled: !widget.isLoading,
+          readOnly: widget.readOnly,
+          keyboardType: widget.keyboardType,
+          style: TextStyle(color: widget.theme.colorScheme.onSurface, fontSize: 14.sp),
           decoration: InputDecoration(
             filled: true,
-            fillColor: theme.colorScheme.surfaceContainer,
-            label: Text(title ?? ''),
+            fillColor: widget.theme.colorScheme.surfaceContainer,
+            label: Text(widget.title ?? ''),
             labelStyle: TextStyle(
-              color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+              color: widget.theme.colorScheme.onSurface.withValues(alpha: 0.6),
               fontSize: 14.sp,
             ),
             floatingLabelBehavior: FloatingLabelBehavior.always,
-            hintText: hint,
+            hintText: widget.hint,
             hintStyle: TextStyle(
-              color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+              color: widget.theme.colorScheme.onSurface.withValues(alpha: 0.6),
               fontSize: 14.sp,
             ),
             prefixIcon: Icon(
-              icon,
-              color: (readOnly
-                  ? theme.colorScheme.onSurface
-                  : theme.colorScheme.primary),
+              widget.icon,
+              color: (widget.readOnly
+                  ? widget.theme.colorScheme.onSurface
+                  : widget.theme.colorScheme.primary),
               size: 20.sp,
             ),
+            suffixIcon: widget.isPassword
+                ? IconButton(
+                    icon: Icon(
+                      _isPasswordObscured
+                          ? Icons.visibility_outlined
+                          : Icons.visibility_off_outlined,
+                      color: widget.theme.colorScheme.onSurface,
+                      size: 20.sp,
+                    ),
+                    onPressed: widget.isLoading
+                        ? null
+                        : () => setState(
+                            () => _isPasswordObscured = !_isPasswordObscured,
+                          ),
+                  )
+                : null,
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(16.r),
               borderSide: BorderSide.none,
@@ -68,7 +91,7 @@ class CustomTextField extends StatelessWidget {
               borderRadius: BorderRadius.circular(16.r),
               borderSide: BorderSide.none,
             ),
-            focusedBorder: readOnly
+            focusedBorder: widget.readOnly
                 ? OutlineInputBorder(
                     borderRadius: BorderRadius.circular(16.r),
                     borderSide: BorderSide.none,
@@ -76,21 +99,21 @@ class CustomTextField extends StatelessWidget {
                 : OutlineInputBorder(
                     borderRadius: BorderRadius.circular(16.r),
                     borderSide: BorderSide(
-                      color: theme.colorScheme.onSurface,
+                      color: widget.theme.colorScheme.onSurface,
                       width: 1.5,
                     ),
                   ),
             errorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(16.r),
               borderSide: BorderSide(
-                color: theme.colorScheme.error,
+                color: widget.theme.colorScheme.error,
                 width: 1.5,
               ),
             ),
             focusedErrorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(16.r),
               borderSide: BorderSide(
-                color: theme.colorScheme.error,
+                color: widget.theme.colorScheme.error,
                 width: 1.5,
               ),
             ),
@@ -99,7 +122,7 @@ class CustomTextField extends StatelessWidget {
               horizontal: 16.w,
             ),
           ),
-          validator: validator,
+          validator: widget.validator,
         ),
       ],
     );

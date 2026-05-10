@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:hr_connect/features/user_management/data/model/user_model.dart';
 import 'package:hr_connect/features/user_management/providers/user_provider.dart';
+import 'package:hr_connect/features/widgets/shared/bubble_particle.dart';
 import 'package:hr_connect/features/widgets/shared/custom_text_field.dart';
 
 class EditProfileScreen extends ConsumerStatefulWidget {
@@ -106,78 +107,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
       ),
       body: Stack(
         children: [
-          Positioned(
-            top: 30.h,
-            right: 40.w,
-            child: Container(
-              width: 200.w,
-              height: 200.w,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: colorScheme.primary.withValues(alpha: 0.1),
-              ),
-            ),
-          ),
-          Positioned(
-            top: 10.h,
-            right: 10.w,
-            child: Container(
-              width: 50.w,
-              height: 50.w,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: colorScheme.primary.withValues(alpha: 0.1),
-              ),
-            ),
-          ),
-          Positioned(
-            top: 240.h,
-            right: 240.w,
-            child: Container(
-              width: 100.w,
-              height: 100.w,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: colorScheme.primary.withValues(alpha: 0.1),
-              ),
-            ),
-          ),
-          Positioned(
-            bottom: 30.h,
-            left: 40.w,
-            child: Container(
-              width: 200.w,
-              height: 200.w,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: colorScheme.primary.withValues(alpha: 0.1),
-              ),
-            ),
-          ),
-          Positioned(
-            bottom: 10.h,
-            left: 5.w,
-            child: Container(
-              width: 50.w,
-              height: 50.w,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: colorScheme.primary.withValues(alpha: 0.1),
-              ),
-            ),
-          ),
-          Positioned(
-            bottom: 240.h,
-            left: 240.w,
-            child: Container(
-              width: 100.w,
-              height: 100.w,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: colorScheme.primary.withValues(alpha: 0.1),
-              ),
-            ),
-          ),
+          const BubbleField(particleCount: 6),
           SingleChildScrollView(
             physics: const ClampingScrollPhysics(),
             child: Padding(

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:dio/dio.dart';
 import 'package:hr_connect/core/config/env_config.dart';
 import 'package:hr_connect/core/const/api_endpoints.dart';
@@ -13,6 +14,7 @@ class ApiClient {
 
   String? _cachedToken;
   bool _isRefreshing = false;
+  final Map<String, Future<dynamic>> _inFlightGetRequests = {};
 
   ApiClient({required this.secureStorage}) {
     _dio = Dio(
@@ -150,6 +152,16 @@ class ApiClient {
     Map<String, dynamic>? queryParameters,
     Map<String, dynamic>? headers,
   }) async {
+    final requestKey = '$path${queryParameters?.toString() ?? ''}';
+
+    if (_inFlightGetRequests.containsKey(requestKey)) {
+      _logger.i('Deduplicating GET request (cooldown): $requestKey');
+      return await _inFlightGetRequests[requestKey];
+    }
+
+    final completer = Completer<dynamic>();
+    _inFlightGetRequests[requestKey] = completer.future;
+
     try {
       final response = await _dio.get(
         path,
@@ -157,9 +169,27 @@ class ApiClient {
         queryParameters: queryParameters,
         options: Options(headers: headers),
       );
+
+      completer.complete(response.data);
+
+      Timer(const Duration(seconds: 5), () {
+        _inFlightGetRequests.remove(requestKey);
+      });
+
       return response.data;
-    } on DioException catch (e) {
-      throw CoreException.handleDioException(e);
+    } catch (e, st) {
+      _inFlightGetRequests.remove(requestKey);
+
+      Exception mappedException = e is Exception ? e : Exception(e.toString());
+      if (e is DioException) {
+        mappedException = CoreException.handleDioException(e);
+      }
+
+      if (!completer.isCompleted) {
+        completer.completeError(mappedException, st);
+      }
+
+      throw mappedException;
     }
   }
 

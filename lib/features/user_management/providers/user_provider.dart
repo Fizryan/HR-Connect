@@ -9,12 +9,16 @@ final userNotifierProvider =
 class UserNotifier extends AsyncNotifier<List<UserModel>> {
   int _currentPage = 1;
   bool _hasMore = true;
+  DateTime? lastFetchTime;
 
   @override
   FutureOr<List<UserModel>> build() async {
     _currentPage = 1;
     _hasMore = true;
-    return _fetchUsersLogic(page: _currentPage, limit: 20);
+    final data = await _fetchUsersLogic(page: _currentPage, limit: 20);
+    lastFetchTime = DateTime.now();
+
+    return data;
   }
 
   Future<List<UserModel>> _fetchUsersLogic({
@@ -31,12 +35,37 @@ class UserNotifier extends AsyncNotifier<List<UserModel>> {
   }
 
   Future<void> fetchUsers({int page = 1, int limit = 20}) async {
+    final isCacheValid =
+        lastFetchTime != null &&
+        DateTime.now().difference(lastFetchTime!).inMinutes < 15;
+
+    if (state.isLoading) return;
+
+    if (isCacheValid && state.hasValue && state.value!.isNotEmpty) {
+      return;
+    }
+
     state = const AsyncValue.loading();
     _currentPage = page;
     _hasMore = true;
     state = await AsyncValue.guard(
       () => _fetchUsersLogic(page: page, limit: limit),
     );
+    if (state.hasValue) {
+      lastFetchTime = DateTime.now();
+    }
+  }
+
+  Future<void> refreshUsers({int page = 1, int limit = 20}) async {
+    state = const AsyncValue.loading();
+    _currentPage = page;
+    _hasMore = true;
+    state = await AsyncValue.guard(
+      () => _fetchUsersLogic(page: page, limit: limit),
+    );
+    if (state.hasValue) {
+      lastFetchTime = DateTime.now();
+    }
   }
 
   Future<void> loadMore({int limit = 20}) async {
@@ -93,34 +122,52 @@ class UserNotifier extends AsyncNotifier<List<UserModel>> {
     );
   }
 
-  Future<void> deactivateUser(
-    String id,
-    Map<String, dynamic> updateData,
-  ) async {
+  Future<void> activateUser(String id) async {
     final previousState = state;
 
-    final repository = ref.read(userRepositoryProvider);
-    final result = await repository.deactivateUser(id, updateData);
+    if (previousState.hasValue) {
+      final optimisticList = previousState.value!.map((user) {
+        return user.id == id ? user.copyWith(isActive: true) : user;
+      }).toList();
+      state = AsyncValue.data(optimisticList);
+    }
 
-    result.fold(
-      (failure) {
-        state = AsyncValue<List<UserModel>>.error(
-          failure.message,
-          StackTrace.current,
-        );
-        Future.delayed(const Duration(seconds: 2), () {
-          state = previousState;
-        });
-      },
-      (updatedUser) {
-        if (previousState.hasValue) {
-          final updatedList = previousState.value!.map((user) {
-            return user.id == id ? updatedUser : user;
-          }).toList();
-          state = AsyncValue.data(updatedList);
-        }
-      },
-    );
+    final repository = ref.read(userRepositoryProvider);
+    final result = await repository.activateUser(id);
+
+    result.fold((failure) {
+      state = AsyncValue<List<UserModel>>.error(
+        failure.message,
+        StackTrace.current,
+      );
+      Future.delayed(const Duration(seconds: 2), () {
+        state = previousState;
+      });
+    }, (_) {});
+  }
+
+  Future<void> deactivateUser(String id) async {
+    final previousState = state;
+
+    if (previousState.hasValue) {
+      final optimisticList = previousState.value!.map((user) {
+        return user.id == id ? user.copyWith(isActive: false) : user;
+      }).toList();
+      state = AsyncValue.data(optimisticList);
+    }
+
+    final repository = ref.read(userRepositoryProvider);
+    final result = await repository.deactivateUser(id);
+
+    result.fold((failure) {
+      state = AsyncValue<List<UserModel>>.error(
+        failure.message,
+        StackTrace.current,
+      );
+      Future.delayed(const Duration(seconds: 2), () {
+        state = previousState;
+      });
+    }, (_) {});
   }
 
   Future<void> deleteUser(String id) async {
@@ -142,8 +189,8 @@ class UserNotifier extends AsyncNotifier<List<UserModel>> {
         StackTrace.current,
       );
       Future.delayed(const Duration(seconds: 2), () {
-          state = previousState;
-        });
+        state = previousState;
+      });
     }, (_) {});
   }
 }

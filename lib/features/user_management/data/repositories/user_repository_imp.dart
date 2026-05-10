@@ -79,13 +79,28 @@ class UserRepositoryImp implements UserRepository {
   }
 
   @override
-  Future<Either<Failure, UserModel>> deactivateUser(
-    String id,
-    Map<String, dynamic> updateData,
-  ) async {
+  Future<Either<Failure, void>> activateUser(String id) async {
     try {
-      final deactivateUser = await remoteDataSource.deactivateUser(id, updateData);
-      return Right(deactivateUser);
+      await remoteDataSource.activateUser(id);
+      return const Right(null);
+    } catch (e) {
+      debugPrint('[UserRepository] Activate User Error: $e');
+      return Left(
+        ServerFailure(
+          Intl.message(
+            'Failed to activate user. Please try again.',
+            name: 'activateUserFailed',
+          ),
+        ),
+      );
+    }
+  }
+
+  @override
+  Future<Either<Failure, void>> deactivateUser(String id) async {
+    try {
+      await remoteDataSource.deactivateUser(id);
+      return const Right(null);
     } on ServerException catch (e) {
       return Left(ServerFailure(e.message));
     } catch (e) {

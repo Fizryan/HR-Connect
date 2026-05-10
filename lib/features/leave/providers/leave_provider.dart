@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hr_connect/core/di/providers.dart';
 import 'package:hr_connect/features/leave/data/model/leave_request_model.dart';
@@ -10,9 +11,14 @@ final leaveNotifierProvider =
     );
 
 class LeaveNotifier extends AsyncNotifier<List<LeaveRequestModel>> {
+  DateTime? lastFetchTime;
+
   @override
   FutureOr<List<LeaveRequestModel>> build() async {
-    return _fetchLeaveRequestsLogic();
+    final data = await _fetchLeaveRequestsLogic();
+    lastFetchTime = DateTime.now();
+
+    return data;
   }
 
   Future<List<LeaveRequestModel>> _fetchLeaveRequestsLogic() async {
@@ -26,19 +32,50 @@ class LeaveNotifier extends AsyncNotifier<List<LeaveRequestModel>> {
   }
 
   Future<void> fetchLeaveRequests() async {
+    final isCacheValid = lastFetchTime != null &&
+        DateTime.now().difference(lastFetchTime!).inMinutes < 15;
+
+    if (state.isLoading) return;
+
+    if (isCacheValid && state.hasValue && state.value!.isNotEmpty) {
+      return;
+    }
+
     state = const AsyncValue.loading();
-    state = await AsyncValue.guard(_fetchLeaveRequestsLogic);
+    state = await AsyncValue.guard(
+      _fetchLeaveRequestsLogic,
+    );
+    if (state.hasValue) {
+      lastFetchTime = DateTime.now();
+    }
+  }
+
+  Future<void> refreshLeaveRequests() async {
+    state = const AsyncValue.loading();
+    state = await AsyncValue.guard(
+      _fetchLeaveRequestsLogic,
+    );
+    if (state.hasValue) {
+      lastFetchTime = DateTime.now();
+    }
   }
 
   Future<void> fetchLeaveRequestById(String id) async {
-    state = const AsyncValue.loading();
-
     final repository = ref.read(leaveRepositoryProvider);
     final result = await repository.getLeaveRequestById(id);
 
-    state = result.fold(
-      (failure) => AsyncValue.error(failure.message, StackTrace.current),
-      (leaveRequest) => AsyncValue.data([leaveRequest]),
+    result.fold(
+      (failure) {
+        debugPrint('Failed to fetch leave request: ${failure.message}');
+      },
+      (fetchedLeaveRequest) {
+        if (state.hasValue) {
+          final updatedList = state.value!.map((leaveRequest) {
+            return leaveRequest.id == id ? fetchedLeaveRequest : leaveRequest;
+          }).toList();
+          state = AsyncValue.data(updatedList);
+        }
+      },
     );
   }
 

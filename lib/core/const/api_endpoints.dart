@@ -15,10 +15,14 @@ class ApiEndpoints {
     static String getUser(String id) => '$_baseApi/users/$id';
     static String putUser(String id) => '$_baseApi/users/$id';
     static String deleteUser(String id) => '$_baseApi/users/$id';
+    static String activateUser(String id) => '$_baseApi/users/$id/activate';
+    static String deactivateUser(String id) => '$_baseApi/users/$id/deactivate';
 
     // LeaveService Endpoints
-    static String get leaveRequests => '$_baseApi/leave-requests';
-    static String leaveRequest(String id) => '$_baseApi/leave-requests/$id';
-    static String putLeaveRequest(String id) => '$_baseApi/leave-requests/$id';
-    static String deleteLeaveRequest(String id) => '$_baseApi/leave-requests/$id';
+    static String get leaveRequests => '$_baseApi/leavereqs';
+    static String leaveRequest(String id) => '$_baseApi/leavereqs/$id';
+    static String putLeaveRequest(String id) => '$_baseApi/leavereqs/$id';
+    static String deleteLeaveRequest(String id) => '$_baseApi/leavereqs/$id';
+    static String approveLeaveRequest(String id) => '$_baseApi/leavereqs/$id/approve';
+    static String rejectLeaveRequest(String id) => '$_baseApi/leavereqs/$id/reject';
 }

@@ -12,20 +12,37 @@ final goRouterProvider = Provider<GoRouter>((ref) {
     ref.read(authNotifierProvider),
   );
 
-  ref.onDispose(authStateNotifier.dispose);
+  final splashDelayNotifier = ValueNotifier<bool>(false);
+
+  ref.onDispose(() {
+    authStateNotifier.dispose();
+    splashDelayNotifier.dispose();
+  });
+
+  Future.delayed(const Duration(seconds: 4), () {
+    splashDelayNotifier.value = true;
+  });
 
   ref.listen<AsyncValue<UserModel?>>(authNotifierProvider, (_, next) {
     authStateNotifier.value = next;
   });
 
+  final refreshNotifier = Listenable.merge([
+    authStateNotifier,
+    splashDelayNotifier,
+  ]);
+
   return GoRouter(
     initialLocation: '/splash',
-    refreshListenable: authStateNotifier,
+    refreshListenable: refreshNotifier,
     debugLogDiagnostics: false,
     redirect: (context, state) {
       final authState = authStateNotifier.value;
       final isAtSplash = state.uri.path == '/splash';
       final isGoingToLogin = state.uri.path == '/login';
+
+      if (!isAtSplash && !splashDelayNotifier.value) return '/splash';
+      if (!splashDelayNotifier.value) return null;
 
       if (authState.isLoading) return null;
 

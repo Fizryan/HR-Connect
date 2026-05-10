@@ -7,6 +7,9 @@ import 'package:hr_connect/core/const/enums.dart';
 import 'package:hr_connect/features/user_management/data/model/user_model.dart';
 import 'package:hr_connect/features/user_management/providers/user_provider.dart';
 import 'package:hr_connect/features/widgets/presentation/etc/edit_profile_screen.dart';
+import 'package:hr_connect/features/widgets/presentation/role/admin/add_user_screen.dart';
+
+enum StatusFilter { all, active, nonActive }
 
 class UserManagementScreen extends ConsumerStatefulWidget {
   const UserManagementScreen({super.key});
@@ -20,6 +23,7 @@ class _UserManagementScreenState extends ConsumerState<UserManagementScreen> {
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
   UserRole? _selectedRole;
+  StatusFilter _selectedStatus = StatusFilter.all;
   bool _isSearchActive = false;
 
   @override
@@ -44,7 +48,12 @@ class _UserManagementScreenState extends ConsumerState<UserManagementScreen> {
 
       final matchesRole = _selectedRole == null || user.role == _selectedRole;
 
-      return matchesSearch && matchesRole;
+      final matchesStatus =
+          _selectedStatus == StatusFilter.all ||
+          (_selectedStatus == StatusFilter.active && user.isActive) ||
+          (_selectedStatus == StatusFilter.nonActive && !user.isActive);
+
+      return matchesSearch && matchesRole && matchesStatus;
     }).toList();
   }
 
@@ -55,6 +64,7 @@ class _UserManagementScreenState extends ConsumerState<UserManagementScreen> {
         _searchController.clear();
         _searchQuery = '';
         _selectedRole = null;
+        _selectedStatus = StatusFilter.all;
       }
     });
   }
@@ -90,9 +100,29 @@ class _UserManagementScreenState extends ConsumerState<UserManagementScreen> {
         ],
       ),
       body: userState.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (error, _) => _buildErrorState(error.toString(), colorScheme),
+        loading: () => userState.hasValue
+            ? _buildUserContent(userState.value!, colorScheme, isLoading: true)
+            : const Center(child: CircularProgressIndicator()),
+        error: (error, _) => userState.hasValue
+            ? _buildUserContent(
+                userState.value!,
+                colorScheme,
+                error: error.toString(),
+              )
+            : _buildErrorState(error.toString(), colorScheme),
         data: (users) => _buildUserContent(users, colorScheme),
+      ),
+      floatingActionButton: FloatingActionButton.small(
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const AddUserScreen()),
+          );
+        },
+        backgroundColor: colorScheme.primaryContainer,
+        foregroundColor: colorScheme.onPrimaryContainer,
+        elevation: 0,
+        child: Icon(Icons.add_rounded, size: 24.sp),
       ),
     );
   }
@@ -120,8 +150,9 @@ class _UserManagementScreenState extends ConsumerState<UserManagementScreen> {
             ),
             SizedBox(height: 24.h),
             FilledButton.icon(
-              onPressed: () =>
-                  ref.read(userNotifierProvider.notifier).fetchUsers(),
+              onPressed: () {
+                ref.read(userNotifierProvider.notifier).refreshUsers();
+              },
               icon: const Icon(Icons.refresh_rounded),
               label: const Text('Try Again'),
             ),
@@ -131,10 +162,53 @@ class _UserManagementScreenState extends ConsumerState<UserManagementScreen> {
     );
   }
 
-  Widget _buildUserContent(List<UserModel> users, ColorScheme colorScheme) {
+  Widget _buildUserContent(
+    List<UserModel> users,
+    ColorScheme colorScheme, {
+    bool isLoading = false,
+    String? error,
+  }) {
     final filteredUsers = _getFilteredUsers(users);
+    final lastFetchTime = ref.read(userNotifierProvider.notifier).lastFetchTime;
+
     return Column(
       children: [
+        if (isLoading) const LinearProgressIndicator(),
+        if (error != null)
+          Container(
+            color: colorScheme.errorContainer,
+            padding: const EdgeInsets.all(8),
+            child: Text(
+              error,
+              style: TextStyle(color: colorScheme.onErrorContainer),
+            ),
+          ),
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 6.h),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              StreamBuilder(
+                stream: Stream.periodic(const Duration(minutes: 1)),
+                builder: (context, _) {
+                  final minutes = lastFetchTime != null
+                      ? DateTime.now().difference(lastFetchTime).inMinutes
+                      : null;
+                  final timeString = minutes != null
+                      ? (minutes == 0 ? 'Just now' : '$minutes minutes ago')
+                      : 'Unknown';
+                  return Text(
+                    'Last updated: $timeString',
+                    style: TextStyle(
+                      fontSize: 12.sp,
+                      color: colorScheme.onSurfaceVariant,
+                    ),
+                  );
+                },
+              ),
+            ],
+          ),
+        ),
         if (_isSearchActive)
           Column(
             mainAxisSize: MainAxisSize.min,
@@ -187,6 +261,58 @@ class _UserManagementScreenState extends ConsumerState<UserManagementScreen> {
                     Padding(
                       padding: EdgeInsets.only(right: 8.w),
                       child: ChoiceChip(
+                        label: const Text('All Status'),
+                        selected: _selectedStatus == StatusFilter.all,
+                        showCheckmark: false,
+                        selectedColor: colorScheme.primaryContainer,
+                        onSelected: (selected) {
+                          if (selected) {
+                            setState(() => _selectedStatus = StatusFilter.all);
+                          }
+                        },
+                      ),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.only(right: 8.w),
+                      child: ChoiceChip(
+                        label: const Text('Active'),
+                        selected: _selectedStatus == StatusFilter.active,
+                        showCheckmark: false,
+                        selectedColor: colorScheme.primaryContainer,
+                        onSelected: (selected) {
+                          if (selected) {
+                            setState(
+                              () => _selectedStatus = StatusFilter.active,
+                            );
+                          }
+                        },
+                      ),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.only(right: 16.w),
+                      child: ChoiceChip(
+                        label: const Text('Non-Active'),
+                        selected: _selectedStatus == StatusFilter.nonActive,
+                        showCheckmark: false,
+                        selectedColor: colorScheme.primaryContainer,
+                        onSelected: (selected) {
+                          if (selected) {
+                            setState(
+                              () => _selectedStatus = StatusFilter.nonActive,
+                            );
+                          }
+                        },
+                      ),
+                    ),
+                    Container(
+                      width: 1.w,
+                      height: 20.h,
+                      color: colorScheme.outlineVariant,
+                      margin: EdgeInsets.only(right: 16.w),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.only(right: 8.w),
+                      child: ChoiceChip(
                         label: const Text('All Roles'),
                         selected: _selectedRole == null,
                         showCheckmark: false,
@@ -202,7 +328,9 @@ class _UserManagementScreenState extends ConsumerState<UserManagementScreen> {
                       return Padding(
                         padding: EdgeInsets.only(right: 8.w),
                         child: ChoiceChip(
-                          label: Text(Capitalize.firstLetterUppercase(role.name)),
+                          label: Text(
+                            Capitalize.firstLetterUppercase(role.name),
+                          ),
                           selected: _selectedRole == role,
                           showCheckmark: false,
                           selectedColor: colorScheme.primaryContainer,
@@ -233,7 +361,7 @@ class _UserManagementScreenState extends ConsumerState<UserManagementScreen> {
                 )
               : RefreshIndicator(
                   onRefresh: () async =>
-                      ref.read(userNotifierProvider.notifier).fetchUsers(),
+                      ref.read(userNotifierProvider.notifier).refreshUsers(),
                   backgroundColor: colorScheme.surfaceContainerHighest,
                   color: colorScheme.primary,
                   child: ListView.separated(
@@ -250,7 +378,10 @@ class _UserManagementScreenState extends ConsumerState<UserManagementScreen> {
                     ),
                     itemBuilder: (context, index) {
                       final user = filteredUsers[index];
-                      return _buildCompactUserTile(user, colorScheme);
+                      return Opacity(
+                        opacity: user.isActive ? 1.0 : 0.6,
+                        child: _buildCompactUserTile(user, colorScheme),
+                      );
                     },
                   ),
                 ),
@@ -306,7 +437,9 @@ class _UserManagementScreenState extends ConsumerState<UserManagementScreen> {
                     width: 12.w,
                     height: 12.w,
                     decoration: BoxDecoration(
-                      color: user.isActive ? Colors.green : colorScheme.error,
+                      color: user.isActive
+                          ? colorScheme.primary
+                          : colorScheme.error,
                       shape: BoxShape.circle,
                       border: Border.all(
                         color: colorScheme.surface,
@@ -331,6 +464,9 @@ class _UserManagementScreenState extends ConsumerState<UserManagementScreen> {
                               fontSize: 15.sp,
                               fontWeight: FontWeight.w600,
                               color: colorScheme.onSurface,
+                              decoration: user.isActive
+                                  ? TextDecoration.none
+                                  : TextDecoration.lineThrough,
                             ),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
@@ -383,8 +519,8 @@ class _UserManagementScreenState extends ConsumerState<UserManagementScreen> {
                   borderRadius: BorderRadius.circular(12.r),
                 ),
                 onSelected: (value) {
-                  if (value == 'deactivate') {
-                    _showDeactivateDialog(context, user, colorScheme);
+                  if (value == 'toggleActive') {
+                    _showToggleActiveDialog(context, user, colorScheme);
                   }
                   if (value == 'delete') {
                     _showDeleteDialog(context, user, colorScheme);
@@ -392,19 +528,25 @@ class _UserManagementScreenState extends ConsumerState<UserManagementScreen> {
                 },
                 itemBuilder: (context) => [
                   PopupMenuItem(
-                    value: 'deactivate',
+                    value: 'toggleActive',
                     child: Row(
                       children: [
                         Icon(
-                          Icons.block_rounded,
-                          color: colorScheme.error,
+                          user.isActive
+                              ? Icons.block_rounded
+                              : Icons.check_circle_outline_rounded,
+                          color: user.isActive
+                              ? colorScheme.error
+                              : colorScheme.primary,
                           size: 20.sp,
                         ),
                         SizedBox(width: 12.w),
                         Text(
                           user.isActive ? 'Deactivate' : 'Activate',
                           style: TextStyle(
-                            color: colorScheme.error,
+                            color: user.isActive
+                                ? colorScheme.error
+                                : colorScheme.primary,
                             fontWeight: FontWeight.w500,
                           ),
                         ),
@@ -440,7 +582,7 @@ class _UserManagementScreenState extends ConsumerState<UserManagementScreen> {
     );
   }
 
-  void _showDeactivateDialog(
+  void _showToggleActiveDialog(
     BuildContext context,
     UserModel targetUser,
     ColorScheme colorScheme,
@@ -455,7 +597,13 @@ class _UserManagementScreenState extends ConsumerState<UserManagementScreen> {
           ),
           title: Text(
             targetUser.isActive ? 'Deactivate User' : 'Activate User',
-            style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold),
+            style: TextStyle(
+              fontSize: 18.sp,
+              fontWeight: FontWeight.bold,
+              color: targetUser.isActive
+                  ? colorScheme.error
+                  : colorScheme.primary,
+            ),
           ),
           content: Text(
             'Are you sure you want to change the status for ${targetUser.fullName}?',
@@ -474,15 +622,24 @@ class _UserManagementScreenState extends ConsumerState<UserManagementScreen> {
             ),
             FilledButton(
               style: FilledButton.styleFrom(
-                backgroundColor: colorScheme.error,
-                foregroundColor: colorScheme.onError,
+                backgroundColor: targetUser.isActive
+                    ? colorScheme.error
+                    : colorScheme.primary,
+                foregroundColor: targetUser.isActive
+                    ? colorScheme.onError
+                    : colorScheme.onPrimary,
               ),
               onPressed: () {
                 Navigator.pop(context);
-                ref.read(userNotifierProvider.notifier).deactivateUser(
-                  targetUser.id,
-                  {'isActive': !targetUser.isActive},
-                );
+                if (targetUser.isActive) {
+                  ref
+                      .read(userNotifierProvider.notifier)
+                      .deactivateUser(targetUser.id);
+                } else {
+                  ref
+                      .read(userNotifierProvider.notifier)
+                      .activateUser(targetUser.id);
+                }
               },
               child: const Text('Confirm'),
             ),

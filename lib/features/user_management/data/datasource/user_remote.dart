@@ -7,7 +7,8 @@ abstract class UserRemote {
   Future<List<UserModel>> getUsers({int page = 1, int limit = 20});
   Future<UserModel> getUserById(String id);
   Future<UserModel> updateUser(String id, Map<String, dynamic> updateData);
-  Future<UserModel> deactivateUser(String id, Map<String, dynamic> updateData);
+  Future<void> activateUser(String id);
+  Future<void> deactivateUser(String id);
   Future<void> deleteUser(String id);
 }
 
@@ -66,13 +67,28 @@ class UserRemoteImp implements UserRemote {
   }
 
   @override
-  Future<UserModel> deactivateUser(String id, Map<String, dynamic> updateData) async {
+  Future<void> activateUser(
+    String id,
+  ) async {
     try {
-      final response = await apiClient.put(
-        ApiEndpoints.putUser(id),
-        data: updateData,
+      await apiClient.post(
+        ApiEndpoints.activateUser(id),
       );
-      return UserModel.fromApi(response.data);
+    } on ServerException {
+      rethrow;
+    } catch (e) {
+      throw ServerException(message: e.toString());
+    }
+  }
+
+  @override
+  Future<void> deactivateUser(
+    String id,
+  ) async {
+    try {
+      await apiClient.post(
+        ApiEndpoints.deactivateUser(id),
+      );
     } on ServerException {
       rethrow;
     } catch (e) {

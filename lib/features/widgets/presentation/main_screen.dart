@@ -6,7 +6,6 @@ import 'package:hr_connect/core/const/capitalize.dart';
 import 'package:hr_connect/core/const/enums.dart';
 import 'package:hr_connect/features/auth/providers/auth_provider.dart';
 import 'package:hr_connect/features/user_management/data/model/user_model.dart';
-import 'package:hr_connect/features/widgets/presentation/etc/request_screen.dart';
 import 'package:hr_connect/features/widgets/presentation/role/admin/user_management_screen.dart';
 import 'package:hr_connect/features/widgets/presentation/etc/about_screen.dart';
 import 'package:hr_connect/features/widgets/presentation/etc/edit_profile_screen.dart';
@@ -61,7 +60,7 @@ class MainScreen extends ConsumerWidget {
         label: 'Request',
         icon: Icons.file_open_outlined,
         selectedIcon: Icons.file_open,
-        page: const RequestScreen(),
+        page: const Scaffold(), // TODO: Replace with request screen
       ),
     ];
 

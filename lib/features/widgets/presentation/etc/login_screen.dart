@@ -20,7 +20,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   bool _isPasswordObscured = true;
 
   static final String _supportEmail = SupportInformation.supportEmail;
-  static final String _supportPhone = SupportInformation.supportPhone;
 
   void _handleLogin() {
     if (!_formKey.currentState!.validate()) return;
@@ -64,8 +63,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             ),
             SizedBox(height: 16.h),
             _buildContactInfo(Icons.email, _supportEmail, theme),
-            SizedBox(height: 8.h),
-            _buildContactInfo(Icons.phone, _supportPhone, theme),
           ],
         ),
         actions: [
@@ -136,8 +133,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             ),
             SizedBox(height: 16.h),
             _buildContactInfo(Icons.email, _supportEmail, theme),
-            SizedBox(height: 8.h),
-            _buildContactInfo(Icons.phone, _supportPhone, theme),
           ],
         ),
         actions: [

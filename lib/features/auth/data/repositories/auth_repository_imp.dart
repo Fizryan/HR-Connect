@@ -169,6 +169,7 @@ class AuthRepositoryImp implements AuthRepository {
 
   @override
   Future<Either<Failure, void>> register(
+    String? avatarUrl,
     String email,
     String password,
     String firstName,
@@ -177,6 +178,7 @@ class AuthRepositoryImp implements AuthRepository {
   ) async {
     try {
       await remoteDataSource.register(
+        avatarUrl,
         email,
         password,
         firstName,

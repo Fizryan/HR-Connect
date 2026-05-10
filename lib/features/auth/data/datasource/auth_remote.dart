@@ -8,6 +8,7 @@ import 'package:hr_connect/features/user_management/data/model/user_model.dart';
 abstract class AuthRemote {
   Future<AuthModel> login(String email, String password);
   Future<void> register(
+    String? avatarUrl,
     String email,
     String password,
     String firstName,
@@ -45,6 +46,7 @@ class AuthRemoteImpl implements AuthRemote {
 
   @override
   Future<void> register(
+    String? avatarUrl,
     String email,
     String password,
     String firstName,
@@ -55,11 +57,14 @@ class AuthRemoteImpl implements AuthRemote {
       await apiClient.post(
         ApiEndpoints.usersRegister,
         data: {
-          'email': email,
+          'data': {
+            'avatarUrl': avatarUrl,
+            'email': email,
+            'firstName': firstName,
+            'lastName': lastName,
+            'role': role.name,
+          },
           'password': password,
-          'firstName': firstName,
-          'lastName': lastName,
-          'role': role.name,
         },
       );
     } on ServerException {

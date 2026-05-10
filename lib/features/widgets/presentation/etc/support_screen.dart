@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:hr_connect/core/const/support_information.dart';
 
 class SupportScreen extends StatelessWidget {
   const SupportScreen({super.key});
 
+  static final String _supportEmail = SupportInformation.supportEmail;
+
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-
     return Scaffold(
       backgroundColor: colorScheme.surface,
       appBar: AppBar(
@@ -79,7 +81,7 @@ class SupportScreen extends StatelessWidget {
                       context: context,
                       icon: Icons.email_outlined,
                       title: 'Email Us',
-                      subtitle: 'support@hrconnect.com',
+                      subtitle: _supportEmail,
                       onTap: () {},
                     ),
                   ),

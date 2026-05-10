@@ -1,7 +1,5 @@
 class SupportInformation {
-  static const String _supportEmail = 'support@hrconnect.com';
-  static const String _supportPhone = '+62 812-3456-7890';
+  static const String _supportEmail = 'support@hrconnect.org';
 
   static String get supportEmail => _supportEmail;
-  static String get supportPhone => _supportPhone;
 }
