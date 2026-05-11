@@ -27,6 +27,21 @@ class AuthRepositoryImp implements AuthRepository {
     required this.apiClient,
   });
 
+  Future<Either<Failure, T>> _sourceCall<T>(
+    Future<T> Function() call,
+    String fallbackErrorMessage,
+  ) async {
+    try {
+      final result = await call();
+      return Right(result);
+    } on ServerException catch (e) {
+      return Left(ServerFailure(e.message));
+    } catch (e) {
+      debugPrint('[AuthRepository] Error: $e');
+      return Left(ServerFailure(fallbackErrorMessage));
+    }
+  }
+
   @override
   Future<Either<Failure, UserModel>> checkAuthStatus() async {
     try {
@@ -42,54 +57,13 @@ class AuthRepositoryImp implements AuthRepository {
       }
       return Left(
         CacheFailure(
-          Intl.message(
-            'No token found, please login again.',
-            name: 'noTokenFound',
-          ),
+          Intl.message('No token found, please login again.', name: 'noTokenFound'),
         ),
       );
     } catch (e) {
       return Left(
         CacheFailure(
-          Intl.message(
-            'Failed to verify session. Please log in again.',
-            name: 'failedVerifySession',
-          ),
-        ),
-      );
-    }
-  }
-
-  @override
-  Future<Either<Failure, void>> login(String email, String password) async {
-    try {
-      final authModel = await remoteDataSource.login(email, password);
-      return await authModel.when(
-        success: (accessToken, expTime, refreshToken) async {
-          await secureStorage.write(
-            key: SecureStorage.accessToken,
-            value: accessToken,
-          );
-          await secureStorage.write(
-            key: SecureStorage.refreshToken,
-            value: refreshToken,
-          );
-          apiClient.updateToken(accessToken);
-          await getUserInfo();
-          return const Right(null);
-        },
-        error: (message) async => Left(ServerFailure(message)),
-      );
-    } on ServerException catch (e) {
-      return Left(ServerFailure(e.message));
-    } catch (e) {
-      debugPrint('[AuthRepository] Login Error: $e');
-      return Left(
-        ServerFailure(
-          Intl.message(
-            'An unexpected error occurred while trying to log in.',
-            name: 'unexpectedLoginError',
-          ),
+          Intl.message('Failed to verify session. Please log in again.', name: 'failedVerifySession'),
         ),
       );
     }
@@ -98,9 +72,7 @@ class AuthRepositoryImp implements AuthRepository {
   @override
   Future<Either<Failure, void>> logout() async {
     try {
-      final refreshToken = await secureStorage.read(
-        key: SecureStorage.refreshToken,
-      );
+      final refreshToken = await secureStorage.read(key: SecureStorage.refreshToken);
       if (refreshToken != null) {
         try {
           await remoteDataSource.logout(refreshToken);
@@ -118,52 +90,55 @@ class AuthRepositoryImp implements AuthRepository {
       debugPrint('[AuthRepository] Local Logout Error: $e');
       return Left(
         CacheFailure(
-          Intl.message(
-            'An error occurred while trying to log out.',
-            name: 'logoutError',
-          ),
+          Intl.message('An error occurred while trying to log out.', name: 'logoutError'),
         ),
       );
     }
   }
 
   @override
+  Future<Either<Failure, void>> login(String email, String password) async {
+    return _sourceCall(
+      () async {
+        final authModel = await remoteDataSource.login(email, password);
+        await authModel.when(
+          success: (accessToken, expTime, refreshToken) async {
+            await secureStorage.write(key: SecureStorage.accessToken, value: accessToken);
+            await secureStorage.write(key: SecureStorage.refreshToken, value: refreshToken);
+            apiClient.updateToken(accessToken);
+            await getUserInfo();
+          },
+          error: (message) => throw ServerException(message: message),
+        );
+      },
+      Intl.message('An unexpected error occurred while trying to log in.', name: 'unexpectedLoginError'),
+    );
+  }
+
+  @override
   Future<Either<Failure, void>> refreshToken(String token) async {
     try {
-      final currentRefreshToken = await secureStorage.read(
-        key: SecureStorage.refreshToken,
-      );
+      final currentRefreshToken = await secureStorage.read(key: SecureStorage.refreshToken);
       if (currentRefreshToken == null || currentRefreshToken != token) {
-        return Left(
-          CacheFailure(
-            Intl.message('Invalid refresh token', name: 'invalidRefreshToken'),
-          ),
-        );
+        return Left(CacheFailure(Intl.message('Invalid refresh token', name: 'invalidRefreshToken')));
       }
 
-      final result = await remoteDataSource.refreshToken(currentRefreshToken);
-
-      return await result.when(
-        success: (accessToken, expTime, refreshToken) async {
-          await secureStorage.write(
-            key: SecureStorage.accessToken,
-            value: accessToken,
+      return await _sourceCall(
+        () async {
+          final result = await remoteDataSource.refreshToken(currentRefreshToken);
+          await result.when(
+            success: (accessToken, expTime, refreshToken) async {
+              await secureStorage.write(key: SecureStorage.accessToken, value: accessToken);
+              apiClient.updateToken(accessToken);
+            },
+            error: (message) => throw ServerException(message: message),
           );
-          apiClient.updateToken(accessToken);
-          return const Right(null);
         },
-        error: (message) async => Left(ServerFailure(message)),
+        Intl.message('Session has expired. Please log in again.', name: 'sessionExpired'),
       );
     } catch (e) {
       debugPrint('[AuthRepository] Refresh Token Error: $e');
-      return Left(
-        ServerFailure(
-          Intl.message(
-            'Session has expired. Please log in again.',
-            name: 'sessionExpired',
-          ),
-        ),
-      );
+      return Left(ServerFailure(Intl.message('Session has expired. Please log in again.', name: 'sessionExpired')));
     }
   }
 
@@ -176,57 +151,24 @@ class AuthRepositoryImp implements AuthRepository {
     String lastName,
     UserRole role,
   ) async {
-    try {
-      await remoteDataSource.register(
-        avatarUrl,
-        email,
-        password,
-        firstName,
-        lastName,
-        role,
-      );
-      return const Right(null);
-    } on ServerException catch (e) {
-      return Left(ServerFailure(e.message));
-    } catch (e) {
-      debugPrint('[AuthRepository] Register Error: $e');
-      return Left(
-        ServerFailure(
-          Intl.message(
-            'Registration failed. Please try again later.',
-            name: 'registrationFailed',
-          ),
-        ),
-      );
-    }
+    return _sourceCall(
+      () async => await remoteDataSource.register(avatarUrl, email, password, firstName, lastName, role),
+      Intl.message('Registration failed. Please try again later.', name: 'registrationFailed'),
+    );
   }
 
   @override
   Future<Either<Failure, UserModel>> getUserInfo() async {
-    try {
-      final user = await remoteDataSource.getUserInfo();
-      final userMap = user.toJson();
+    return _sourceCall(
+      () async {
+        final user = await remoteDataSource.getUserInfo();
+        final userMap = user.toJson();
+        userMap.remove('password');
 
-      userMap.remove('password');
-
-      await sharedPreferences.setString(
-        'cachedUser',
-        jsonEncode(userMap),
-      );
-
-      return Right(user);
-    } on ServerException catch (e) {
-      return Left(ServerFailure(e.message));
-    } catch (e) {
-      debugPrint('[AuthRepository] Get User Info Error: $e');
-      return Left(
-        ServerFailure(
-          Intl.message(
-            'Failed to load user information.',
-            name: 'loadUserInfoFailed',
-          ),
-        ),
-      );
-    }
+        await sharedPreferences.setString('cachedUser', jsonEncode(userMap));
+        return user;
+      },
+      Intl.message('Failed to load user information.', name: 'loadUserInfoFailed'),
+    );
   }
 }

@@ -11,6 +11,8 @@ abstract class LeaveRequestRemote {
     Map<String, dynamic> updateData,
   );
   Future<void> deleteLeaveRequest(String id);
+  Future<void> approveLeaveRequest(String id);
+  Future<void> rejectLeaveRequest(String id);
 }
 
 class LeaveRequestRemoteImp implements LeaveRequestRemote {
@@ -18,9 +20,19 @@ class LeaveRequestRemoteImp implements LeaveRequestRemote {
 
   LeaveRequestRemoteImp({required this.apiClient});
 
+  Future<T> _apiCall<T>(Future<T> Function() call) async {
+    try {
+      return await call();
+    } on ServerException {
+      rethrow;
+    } catch (e) {
+      throw ServerException(message: 'Something went wrong');
+    }
+  }
+
   @override
   Future<List<LeaveRequestModel>> getLeaveRequests() async {
-    try {
+    return _apiCall(() async {
       final response = await apiClient.get(ApiEndpoints.leaveRequests);
       final List<dynamic> leaveRequestsList = response['request'] ?? [];
       return leaveRequestsList.map((leaveRequestJson) {
@@ -28,23 +40,15 @@ class LeaveRequestRemoteImp implements LeaveRequestRemote {
           leaveRequestJson as Map<String, dynamic>,
         );
       }).toList();
-    } on ServerException {
-      rethrow;
-    } catch (e) {
-      throw ServerException(message: e.toString());
-    }
+    });
   }
 
   @override
   Future<LeaveRequestModel> getLeaveRequestsById(String id) async {
-    try {
+    return _apiCall(() async {
       final response = await apiClient.get(ApiEndpoints.leaveRequest(id));
       return LeaveRequestModel.fromApi(response.data);
-    } on ServerException {
-      rethrow;
-    } catch (e) {
-      throw ServerException(message: e.toString());
-    }
+    });
   }
 
   @override
@@ -52,27 +56,33 @@ class LeaveRequestRemoteImp implements LeaveRequestRemote {
     String id,
     Map<String, dynamic> updateData,
   ) async {
-    try {
+    return _apiCall(() async {
       final response = await apiClient.put(
         ApiEndpoints.putLeaveRequest(id),
         data: updateData,
       );
       return LeaveRequestModel.fromApi(response.data);
-    } on ServerException {
-      rethrow;
-    } catch (e) {
-      throw ServerException(message: e.toString());
-    }
+    });
   }
 
   @override
   Future<void> deleteLeaveRequest(String id) async {
-    try {
+    return _apiCall(() async {
       await apiClient.delete(ApiEndpoints.deleteLeaveRequest(id));
-    } on ServerException {
-      rethrow;
-    } catch (e) {
-      throw ServerException(message: e.toString());
-    }
+    });
+  }
+
+  @override
+  Future<void> approveLeaveRequest(String id) async {
+    return _apiCall(() async {
+      await apiClient.post(ApiEndpoints.approveLeaveRequest(id));
+    });
+  }
+
+  @override
+  Future<void> rejectLeaveRequest(String id) async {
+    return _apiCall(() async {
+      await apiClient.post(ApiEndpoints.rejectLeaveRequest(id));
+    });
   }
 }

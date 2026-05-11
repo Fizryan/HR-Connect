@@ -6,8 +6,8 @@ import 'package:hr_connect/core/const/capitalize.dart';
 import 'package:hr_connect/core/const/enums.dart';
 import 'package:hr_connect/features/user_management/data/model/user_model.dart';
 import 'package:hr_connect/features/user_management/providers/user_provider.dart';
-import 'package:hr_connect/features/widgets/presentation/etc/edit_profile_screen.dart';
-import 'package:hr_connect/features/widgets/presentation/role/admin/add_user_screen.dart';
+import 'package:hr_connect/features/widgets/presentation/features/etc/edit_profile_screen.dart';
+import 'package:hr_connect/features/widgets/presentation/features/user_management/add_user_screen.dart';
 
 enum StatusFilter { all, active, nonActive }
 

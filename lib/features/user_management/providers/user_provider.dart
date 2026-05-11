@@ -1,6 +1,10 @@
 import 'dart:async';
+
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:fpdart/fpdart.dart';
 import 'package:hr_connect/core/di/providers.dart';
+import 'package:hr_connect/core/error/failures.dart';
 import 'package:hr_connect/features/user_management/data/model/user_model.dart';
 
 final userNotifierProvider =
@@ -45,24 +49,18 @@ class UserNotifier extends AsyncNotifier<List<UserModel>> {
       return;
     }
 
-    state = const AsyncValue.loading();
-    _currentPage = page;
-    _hasMore = true;
-    state = await AsyncValue.guard(
-      () => _fetchUsersLogic(page: page, limit: limit),
-    );
-    if (state.hasValue) {
-      lastFetchTime = DateTime.now();
-    }
+    await refreshUsers(page: page, limit: limit);
   }
 
   Future<void> refreshUsers({int page = 1, int limit = 20}) async {
     state = const AsyncValue.loading();
     _currentPage = page;
     _hasMore = true;
+
     state = await AsyncValue.guard(
       () => _fetchUsersLogic(page: page, limit: limit),
     );
+
     if (state.hasValue) {
       lastFetchTime = DateTime.now();
     }
@@ -84,22 +82,36 @@ class UserNotifier extends AsyncNotifier<List<UserModel>> {
   }
 
   Future<void> fetchUserById(String id) async {
-    state = const AsyncValue.loading();
-
     final repository = ref.read(userRepositoryProvider);
     final result = await repository.getUserById(id);
 
-    state = result.fold(
-      (failure) => AsyncValue.error(failure.message, StackTrace.current),
-      (user) => AsyncValue.data([user]),
+    result.fold(
+      (failure) {
+        debugPrint('Failed to fetch user: ${failure.message}');
+      },
+      (fetchedUser) {
+        if (state.hasValue) {
+          final updatedList = state.value!.map((user) {
+            return user.id == id ? fetchedUser : user;
+          }).toList();
+          state = AsyncValue.data(updatedList);
+        }
+      },
     );
   }
 
-  Future<void> updateUser(String id, Map<String, dynamic> updateData) async {
+  Future<void> _handleMutation<T>({
+    required Future<Either<Failure, T>> Function() action,
+    List<UserModel> Function(List<UserModel> currentList)? optimisticUpdate,
+    void Function(T successData)? onSuccess,
+  }) async {
     final previousState = state;
 
-    final repository = ref.read(userRepositoryProvider);
-    final result = await repository.updateUser(id, updateData);
+    if (optimisticUpdate != null && previousState.hasValue) {
+      state = AsyncValue.data(optimisticUpdate(previousState.value!));
+    }
+
+    final result = await action();
 
     result.fold(
       (failure) {
@@ -111,9 +123,20 @@ class UserNotifier extends AsyncNotifier<List<UserModel>> {
           state = previousState;
         });
       },
-      (updatedUser) {
-        if (previousState.hasValue) {
-          final updatedList = previousState.value!.map((user) {
+      (successData) {
+        if (onSuccess != null) {
+          onSuccess(successData);
+        }
+      },
+    );
+  }
+
+  Future<void> updateUser(String id, Map<String, dynamic> updateData) async {
+    await _handleMutation(
+      action: () => ref.read(userRepositoryProvider).updateUser(id, updateData),
+      onSuccess: (updatedUser) {
+        if (state.hasValue) {
+          final updatedList = state.value!.map((user) {
             return user.id == id ? updatedUser : user;
           }).toList();
           state = AsyncValue.data(updatedList);
@@ -123,74 +146,28 @@ class UserNotifier extends AsyncNotifier<List<UserModel>> {
   }
 
   Future<void> activateUser(String id) async {
-    final previousState = state;
-
-    if (previousState.hasValue) {
-      final optimisticList = previousState.value!.map((user) {
+    await _handleMutation(
+      action: () => ref.read(userRepositoryProvider).activateUser(id),
+      optimisticUpdate: (current) => current.map((user) {
         return user.id == id ? user.copyWith(isActive: true) : user;
-      }).toList();
-      state = AsyncValue.data(optimisticList);
-    }
-
-    final repository = ref.read(userRepositoryProvider);
-    final result = await repository.activateUser(id);
-
-    result.fold((failure) {
-      state = AsyncValue<List<UserModel>>.error(
-        failure.message,
-        StackTrace.current,
-      );
-      Future.delayed(const Duration(seconds: 2), () {
-        state = previousState;
-      });
-    }, (_) {});
+      }).toList(),
+    );
   }
 
   Future<void> deactivateUser(String id) async {
-    final previousState = state;
-
-    if (previousState.hasValue) {
-      final optimisticList = previousState.value!.map((user) {
+    await _handleMutation(
+      action: () => ref.read(userRepositoryProvider).deactivateUser(id),
+      optimisticUpdate: (current) => current.map((user) {
         return user.id == id ? user.copyWith(isActive: false) : user;
-      }).toList();
-      state = AsyncValue.data(optimisticList);
-    }
-
-    final repository = ref.read(userRepositoryProvider);
-    final result = await repository.deactivateUser(id);
-
-    result.fold((failure) {
-      state = AsyncValue<List<UserModel>>.error(
-        failure.message,
-        StackTrace.current,
-      );
-      Future.delayed(const Duration(seconds: 2), () {
-        state = previousState;
-      });
-    }, (_) {});
+      }).toList(),
+    );
   }
 
   Future<void> deleteUser(String id) async {
-    final previousState = state;
-
-    if (previousState.hasValue) {
-      final optimisticList = previousState.value!
-          .where((user) => user.id != id)
-          .toList();
-      state = AsyncValue.data(optimisticList);
-    }
-
-    final repository = ref.read(userRepositoryProvider);
-    final result = await repository.deleteUser(id);
-
-    result.fold((failure) {
-      state = AsyncValue<List<UserModel>>.error(
-        failure.message,
-        StackTrace.current,
-      );
-      Future.delayed(const Duration(seconds: 2), () {
-        state = previousState;
-      });
-    }, (_) {});
+    await _handleMutation(
+      action: () => ref.read(userRepositoryProvider).deleteUser(id),
+      optimisticUpdate: (current) =>
+          current.where((user) => user.id != id).toList(),
+    );
   }
 }

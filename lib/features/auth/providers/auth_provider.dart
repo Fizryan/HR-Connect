@@ -11,6 +11,10 @@ final authNotifierProvider = AsyncNotifierProvider<AuthNotifier, UserModel?>(
 class AuthNotifier extends AsyncNotifier<UserModel?> {
   @override
   FutureOr<UserModel?> build() async {
+    return _fetchUser();
+  }
+
+  Future<UserModel?> _fetchUser() async {
     final repository = ref.read(authRepositoryProvider);
     final result = await repository.checkAuthStatus();
 
@@ -20,19 +24,22 @@ class AuthNotifier extends AsyncNotifier<UserModel?> {
   Future<void> login(String email, String password) async {
     state = const AsyncValue.loading();
 
-    final repository = ref.read(authRepositoryProvider);
-    final result = await repository.login(email, password);
+    state = await AsyncValue.guard(() async {
+      final repository = ref.read(authRepositoryProvider);
+      
+      final loginResult = await repository.login(email, password);
+      
+      loginResult.fold(
+        (failure) => throw failure.message,
+        (_) => null,
+      );
 
-    state = await result.fold(
-      (failure) async => AsyncValue.error(failure.message, StackTrace.current),
-      (_) async {
-        final authResult = await repository.checkAuthStatus();
-        return authResult.fold(
-          (failure) => AsyncValue.error(failure.message, StackTrace.current),
-          AsyncValue.data,
-        );
-      },
-    );
+      final authResult = await repository.checkAuthStatus();
+      return authResult.fold(
+        (failure) => throw failure.message,
+        (user) => user,
+      );
+    });
   }
 
   Future<void> register({
@@ -61,8 +68,10 @@ class AuthNotifier extends AsyncNotifier<UserModel?> {
 
   Future<void> logout() async {
     state = const AsyncValue.loading();
+    
     final repository = ref.read(authRepositoryProvider);
     await repository.logout();
+    
     state = const AsyncValue.data(null);
   }
 }

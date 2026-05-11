@@ -17,9 +17,19 @@ class UserRemoteImp implements UserRemote {
 
   UserRemoteImp({required this.apiClient});
 
+  Future<T>_apiCall<T>(Future<T> Function() call) async {
+    try {
+      return await call();
+    } on ServerException {
+      rethrow;
+    } catch (e) {
+      throw ServerException(message: 'Something went wrong');
+    }
+  }
+
   @override
   Future<List<UserModel>> getUsers({int page = 1, int limit = 20}) async {
-    try {
+    return _apiCall(() async {
       final response = await apiClient.get(
         ApiEndpoints.users,
         queryParameters: {'page': page, 'limit': limit},
@@ -29,23 +39,15 @@ class UserRemoteImp implements UserRemote {
       return usersList.map((userJson) {
         return UserModel.fromApi(userJson as Map<String, dynamic>);
       }).toList();
-    } on ServerException {
-      rethrow;
-    } catch (e) {
-      throw ServerException(message: e.toString());
-    }
+    });
   }
 
   @override
   Future<UserModel> getUserById(String id) async {
-    try {
+    return _apiCall(() async {
       final response = await apiClient.get(ApiEndpoints.getUser(id));
       return UserModel.fromApi(response as Map<String, dynamic>);
-    } on ServerException {
-      rethrow;
-    } catch (e) {
-      throw ServerException(message: e.toString());
-    }
+    });
   }
 
   @override
@@ -53,57 +55,41 @@ class UserRemoteImp implements UserRemote {
     String id,
     Map<String, dynamic> updateData,
   ) async {
-    try {
+    return _apiCall(() async {
       await apiClient.put(
         ApiEndpoints.putUser(id),
         data: {'data': updateData},
       );
       return await getUserById(id);
-    } on ServerException {
-      rethrow;
-    } catch (e) {
-      throw ServerException(message: e.toString());
-    }
+    });
   }
 
   @override
   Future<void> activateUser(
     String id,
   ) async {
-    try {
+    return _apiCall(() async {
       await apiClient.post(
         ApiEndpoints.activateUser(id),
       );
-    } on ServerException {
-      rethrow;
-    } catch (e) {
-      throw ServerException(message: e.toString());
-    }
+    });
   }
 
   @override
   Future<void> deactivateUser(
     String id,
   ) async {
-    try {
+    return _apiCall(() async {
       await apiClient.post(
         ApiEndpoints.deactivateUser(id),
       );
-    } on ServerException {
-      rethrow;
-    } catch (e) {
-      throw ServerException(message: e.toString());
-    }
+    });
   }
 
   @override
   Future<void> deleteUser(String id) async {
-    try {
+    return _apiCall(() async {
       await apiClient.delete(ApiEndpoints.deleteUser(id));
-    } on ServerException {
-      rethrow;
-    } catch (e) {
-      throw ServerException(message: e.toString());
-    }
+    });
   }
 }

@@ -12,38 +12,43 @@ class LeaveRepositoryImp implements LeaveRepository {
 
   LeaveRepositoryImp({required this.remoteDataSource});
 
+  Future<Either<Failure, T>> _sourceCall<T>(
+    Future<T> Function() call,
+    String fallbackErrorMessage,
+  ) async {
+    try {
+      final result = await call();
+      return Right(result);
+    } on ServerException catch (e) {
+      return Left(ServerFailure(e.message));
+    } catch (e) {
+      debugPrint('[LeaveRepository] Error: $e');
+      return Left(ServerFailure(fallbackErrorMessage));
+    }
+  }
+
   @override
   Future<Either<Failure, List<LeaveRequestModel>>> getLeaveRequests() async {
-    try {
-      final leaveRequests = await remoteDataSource.getLeaveRequests();
-      return Right(leaveRequests);
-    } on ServerException catch (e) {
-      throw ServerException(message: e.message);
-    } catch (e) {
-      throw ServerException(message: e.toString());
-    }
+    return _sourceCall(
+      remoteDataSource.getLeaveRequests,
+      Intl.message(
+        'Failed to load leave requests data. Please try again.',
+        name: 'loadLeaveRequestDataFailed',
+      ),
+    );
   }
 
   @override
   Future<Either<Failure, LeaveRequestModel>> getLeaveRequestById(
     String id,
   ) async {
-    try {
-      final leaveRequest = await remoteDataSource.getLeaveRequestsById(id);
-      return Right(leaveRequest);
-    } on ServerException catch (e) {
-      throw ServerException(message: e.message);
-    } catch (e) {
-      debugPrint('[LeaveRepository] Get Leave Request By ID Error: $e');
-      return Left(
-        ServerFailure(
-          Intl.message(
-            'Failed to load leave request data. Please try again.',
-            name: 'loadLeaveRequestDataFailed',
-          ),
-        ),
-      );
-    }
+    return _sourceCall(
+      () => remoteDataSource.getLeaveRequestsById(id),
+      Intl.message(
+        'Failed to load leave request data. Please try again.',
+        name: 'loadLeaveRequestDataFailed',
+      ),
+    );
   }
 
   @override
@@ -51,44 +56,45 @@ class LeaveRepositoryImp implements LeaveRepository {
     String id,
     Map<String, dynamic> updateData,
   ) async {
-    try {
-      final updateLeaveRequest = await remoteDataSource.updateLeaveRequest(
-        id,
-        updateData,
-      );
-      return Right(updateLeaveRequest);
-    } on ServerException catch (e) {
-      return Left(ServerFailure(e.message));
-    } catch (e) {
-      debugPrint('[LeaveRepository] Update Leave Request Error: $e');
-      return Left(
-        ServerFailure(
-          Intl.message(
-            'Failed to update leave request data. Please check again.',
-            name: 'updateLeaveRequestDataFailed',
-          ),
-        ),
-      );
-    }
+    return _sourceCall(
+      () => remoteDataSource.updateLeaveRequest(id, updateData),
+      Intl.message(
+        'Failed to update leave request. Please try again.',
+        name: 'updateLeaveRequestFailed',
+      ),
+    );
   }
 
   @override
   Future<Either<Failure, void>> deleteLeaveRequest(String id) async {
-    try {
-      await remoteDataSource.deleteLeaveRequest(id);
-      return const Right(null);
-    } on ServerException catch (e) {
-      return Left(ServerFailure(e.message));
-    } catch (e) {
-      debugPrint('[LeaveRepository] Delete Leave Request Error: $e');
-      return Left(
-        ServerFailure(
-          Intl.message(
-            'Failed to delete leave request. Please try again.',
-            name: 'deleteLeaveRequestFailed',
-          ),
-        ),
-      );
-    }
+    return _sourceCall(
+      () => remoteDataSource.deleteLeaveRequest(id),
+      Intl.message(
+        'Failed to delete leave request. Please try again.',
+        name: 'deleteLeaveRequestFailed',
+      ),
+    );
+  }
+
+  @override
+  Future<Either<Failure, void>> approveLeaveRequest(String id) async {
+    return _sourceCall(
+      () => remoteDataSource.approveLeaveRequest(id),
+      Intl.message(
+        'Failed to approve leave request. Please try again.',
+        name: 'approveLeaveRequestFailed',
+      ),
+    );
+  }
+
+  @override
+  Future<Either<Failure, void>> rejectLeaveRequest(String id) async {
+    return _sourceCall(
+      () => remoteDataSource.rejectLeaveRequest(id),
+      Intl.message(
+        'Failed to reject leave request. Please try again.',
+        name: 'rejectLeaveRequestFailed',
+      ),
+    );
   }
 }

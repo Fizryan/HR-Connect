@@ -6,11 +6,12 @@ import 'package:hr_connect/core/const/capitalize.dart';
 import 'package:hr_connect/core/const/enums.dart';
 import 'package:hr_connect/features/auth/providers/auth_provider.dart';
 import 'package:hr_connect/features/user_management/data/model/user_model.dart';
-import 'package:hr_connect/features/widgets/presentation/role/admin/user_management_screen.dart';
-import 'package:hr_connect/features/widgets/presentation/etc/about_screen.dart';
-import 'package:hr_connect/features/widgets/presentation/etc/edit_profile_screen.dart';
-import 'package:hr_connect/features/widgets/presentation/etc/support_screen.dart';
-import 'package:hr_connect/features/widgets/presentation/etc/theme_screen.dart';
+import 'package:hr_connect/features/widgets/presentation/features/request/request_screen.dart';
+import 'package:hr_connect/features/widgets/presentation/features/user_management/user_management_screen.dart';
+import 'package:hr_connect/features/widgets/presentation/features/etc/about_screen.dart';
+import 'package:hr_connect/features/widgets/presentation/features/etc/edit_profile_screen.dart';
+import 'package:hr_connect/features/widgets/presentation/features/etc/support_screen.dart';
+import 'package:hr_connect/features/widgets/presentation/features/etc/theme_screen.dart';
 import 'package:hr_connect/features/widgets/shared/profile_menu_tile.dart';
 
 class NavIndexNotifier extends Notifier<int> {
@@ -57,14 +58,20 @@ class MainScreen extends ConsumerWidget {
         page: _buildDashboardContent(colorScheme, role),
       ),
       _NavigationItem(
+        label: 'Attendance',
+        icon: Icons.calendar_today_outlined,
+        selectedIcon: Icons.calendar_today,
+        page: const Center(child: Text('Attendance')),
+      ),
+      _NavigationItem(
         label: 'Request',
         icon: Icons.file_open_outlined,
         selectedIcon: Icons.file_open,
-        page: const Scaffold(), // TODO: Replace with request screen
+        page: const RequestScreen(),
       ),
     ];
 
-    if (role == UserRole.admin) {
+    if (role == UserRole.admin || role == UserRole.manager) {
       items.add(
         _NavigationItem(
           label: 'Management',

@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hr_connect/features/auth/providers/auth_provider.dart';
 import 'package:hr_connect/features/user_management/data/model/user_model.dart';
-import 'package:hr_connect/features/widgets/presentation/etc/login_screen.dart';
+import 'package:hr_connect/features/widgets/presentation/features/login/login_screen.dart';
 import 'package:hr_connect/features/widgets/presentation/main_screen.dart';
 import 'package:hr_connect/features/widgets/presentation/splash_screen.dart';
 
