@@ -4,6 +4,9 @@ import 'package:hr_connect/core/network/api_client.dart';
 import 'package:hr_connect/features/auth/data/datasource/auth_remote.dart';
 import 'package:hr_connect/features/auth/data/repositories/auth_repository.dart';
 import 'package:hr_connect/features/auth/data/repositories/auth_repository_imp.dart';
+import 'package:hr_connect/features/business_trip/data/datasource/business_trip_remote.dart';
+import 'package:hr_connect/features/business_trip/data/repositories/business_trip_repository.dart';
+import 'package:hr_connect/features/business_trip/data/repositories/business_trip_repository_imp.dart';
 import 'package:hr_connect/features/leave/data/datasource/leave_request_remote.dart';
 import 'package:hr_connect/features/leave/data/repositories/leave_repository.dart';
 import 'package:hr_connect/features/leave/data/repositories/leave_repository_imp.dart';
@@ -54,4 +57,14 @@ final leaveRemoteProvider = Provider<LeaveRequestRemote>((ref) {
 
 final leaveRepositoryProvider = Provider<LeaveRepository>((ref) {
   return LeaveRepositoryImp(remoteDataSource: ref.watch(leaveRemoteProvider));
+});
+
+final businessTripProvider = Provider<BusinessTripRemote>((ref) {
+  return BusinessTripRemoteImp(apiclient: ref.watch(apiClientProvider));
+});
+
+final businessRepositoryProvider = Provider<BusinessTripRepository>((ref) {
+  return BusinessTripRepositoryImp(
+    remoteDataSource: ref.watch(businessTripProvider),
+  );
 });

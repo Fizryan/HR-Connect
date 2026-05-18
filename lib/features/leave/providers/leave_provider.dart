@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fpdart/fpdart.dart';
@@ -36,7 +35,8 @@ class LeaveNotifier extends AsyncNotifier<List<LeaveRequestModel>> {
   Future<void> fetchLeaveRequests() async {
     if (state.isLoading) return;
 
-    final isCacheValid = lastFetchTime != null &&
+    final isCacheValid =
+        lastFetchTime != null &&
         DateTime.now().difference(lastFetchTime!).inMinutes < 15;
 
     if (isCacheValid && state.hasValue && state.value!.isNotEmpty) {
@@ -75,7 +75,8 @@ class LeaveNotifier extends AsyncNotifier<List<LeaveRequestModel>> {
 
   Future<void> _handleMutation<T>({
     required Future<Either<Failure, T>> Function() action,
-    List<LeaveRequestModel> Function(List<LeaveRequestModel> currentList)? optimisticUpdate,
+    List<LeaveRequestModel> Function(List<LeaveRequestModel> currentList)?
+    optimisticUpdate,
     void Function(T successData)? onSuccess,
   }) async {
     final previousState = state;
@@ -104,9 +105,13 @@ class LeaveNotifier extends AsyncNotifier<List<LeaveRequestModel>> {
     );
   }
 
-  Future<void> updateLeaveRequest(String id, Map<String, dynamic> updateData) async {
+  Future<void> updateLeaveRequest(
+    String id,
+    Map<String, dynamic> updateData,
+  ) async {
     await _handleMutation(
-      action: () => ref.read(leaveRepositoryProvider).updateLeaveRequest(id, updateData),
+      action: () =>
+          ref.read(leaveRepositoryProvider).updateLeaveRequest(id, updateData),
       onSuccess: (updatedLeaveRequest) {
         if (state.hasValue) {
           final updatedList = state.value!.map((leave) {
@@ -121,7 +126,8 @@ class LeaveNotifier extends AsyncNotifier<List<LeaveRequestModel>> {
   Future<void> deleteLeaveRequest(String id) async {
     await _handleMutation(
       action: () => ref.read(leaveRepositoryProvider).deleteLeaveRequest(id),
-      optimisticUpdate: (current) => current.where((leave) => leave.id != id).toList(),
+      optimisticUpdate: (current) =>
+          current.where((leave) => leave.id != id).toList(),
     );
   }
 
@@ -129,7 +135,9 @@ class LeaveNotifier extends AsyncNotifier<List<LeaveRequestModel>> {
     await _handleMutation(
       action: () => ref.read(leaveRepositoryProvider).approveLeaveRequest(id),
       optimisticUpdate: (current) => current.map((leave) {
-        return leave.id == id ? leave.copyWith(status: RequestStatus.approved) : leave;
+        return leave.id == id
+            ? leave.copyWith(status: RequestStatus.approved)
+            : leave;
       }).toList(),
     );
   }
@@ -138,7 +146,9 @@ class LeaveNotifier extends AsyncNotifier<List<LeaveRequestModel>> {
     await _handleMutation(
       action: () => ref.read(leaveRepositoryProvider).rejectLeaveRequest(id),
       optimisticUpdate: (current) => current.map((leave) {
-        return leave.id == id ? leave.copyWith(status: RequestStatus.rejected) : leave;
+        return leave.id == id
+            ? leave.copyWith(status: RequestStatus.rejected)
+            : leave;
       }).toList(),
     );
   }

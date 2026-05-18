@@ -25,4 +25,12 @@ class ApiEndpoints {
     static String deleteLeaveRequest(String id) => '$_baseApi/leavereqs/$id';
     static String approveLeaveRequest(String id) => '$_baseApi/leavereqs/$id/approve';
     static String rejectLeaveRequest(String id) => '$_baseApi/leavereqs/$id/reject';
+
+    // BusinessService Endpoints
+    static String get businessTrips => '$_baseApi/businesstrips';
+    static String businessTrip(String id) => '$_baseApi/businesstrips/$id';
+    static String putBusinessTrip(String id) => '$_baseApi/businesstrips/$id';
+    static String deleteBusinessTrip(String id) => '$_baseApi/businesstrips/$id';
+    static String approveBusinessTrip(String id) => '$_baseApi/businesstrips/$id/approve';
+    static String rejectBusinessTrip(String id) => '$_baseApi/businesstrips/$id/reject';
 }

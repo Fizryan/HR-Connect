@@ -37,6 +37,23 @@ enum LeaveType {
   other,
 }
 
+enum BusinessTripType {
+  @JsonValue('meeting')
+  meeting,
+
+  @JsonValue('travel')
+  travel,
+
+  @JsonValue('conference')
+  conference,
+
+  @JsonValue('seminar')
+  seminar,
+
+  @JsonValue('other')
+  other,
+}
+
 enum RequestStatus {
   @JsonValue('pending')
   pending,

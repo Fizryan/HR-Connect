@@ -113,6 +113,7 @@ class _UserManagementScreenState extends ConsumerState<UserManagementScreen> {
         data: (users) => _buildUserContent(users, colorScheme),
       ),
       floatingActionButton: FloatingActionButton.small(
+        heroTag: 'user_management_fab',
         onPressed: () {
           Navigator.push(
             context,

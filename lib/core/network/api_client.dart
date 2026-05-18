@@ -15,6 +15,7 @@ class ApiClient {
   String? _cachedToken;
   bool _isRefreshing = false;
   final Map<String, Future<dynamic>> _inFlightGetRequests = {};
+  final Map<String, Timer> _requestCooldownTimers = {};
 
   ApiClient({required this.secureStorage}) {
     _dio = Dio(
@@ -138,6 +139,17 @@ class ApiClient {
     );
   }
 
+  void _cacheRequestCooldown(String requestKey) {
+    _requestCooldownTimers.remove(requestKey)?.cancel();
+    _requestCooldownTimers[requestKey] = Timer(
+      const Duration(seconds: 5),
+      () {
+        _inFlightGetRequests.remove(requestKey);
+        _requestCooldownTimers.remove(requestKey);
+      },
+    );
+  }
+
   void updateToken(String token) {
     _cachedToken = token;
   }
@@ -171,15 +183,10 @@ class ApiClient {
       );
 
       completer.complete(response.data);
-
-      Timer(const Duration(seconds: 5), () {
-        _inFlightGetRequests.remove(requestKey);
-      });
+      _cacheRequestCooldown(requestKey);
 
       return response.data;
     } catch (e, st) {
-      _inFlightGetRequests.remove(requestKey);
-
       Exception mappedException = e is Exception ? e : Exception(e.toString());
       if (e is DioException) {
         mappedException = CoreException.handleDioException(e);
@@ -188,6 +195,8 @@ class ApiClient {
       if (!completer.isCompleted) {
         completer.completeError(mappedException, st);
       }
+
+      _cacheRequestCooldown(requestKey);
 
       throw mappedException;
     }
