@@ -74,4 +74,10 @@ class AuthNotifier extends AsyncNotifier<UserModel?> {
     
     state = const AsyncValue.data(null);
   }
+
+  void updateCurrentUser(UserModel user) {
+    if (state.hasValue && state.value?.id == user.id) {
+      state = AsyncValue.data(user);
+    }
+  }
 }

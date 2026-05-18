@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:hr_connect/core/const/assets.dart';
 import 'package:hr_connect/core/const/support_information.dart';
 import 'package:hr_connect/features/auth/providers/auth_provider.dart';
+import 'package:hr_connect/features/widgets/shared/bubble_particle.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
@@ -209,30 +210,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     return Scaffold(
       body: Stack(
         children: [
-          Positioned(
-            top: -100.h,
-            right: -100.w,
-            child: Container(
-              width: 300.w,
-              height: 300.w,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: theme.colorScheme.primary.withValues(alpha: 0.2),
-              ),
-            ),
-          ),
-          Positioned(
-            bottom: -50.h,
-            left: -50.w,
-            child: Container(
-              width: 200.w,
-              height: 200.w,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: theme.colorScheme.primary.withValues(alpha: 0.1),
-              ),
-            ),
-          ),
+          const BubbleField(particleCount: 5),
           SafeArea(
             child: Center(
               child: SingleChildScrollView(

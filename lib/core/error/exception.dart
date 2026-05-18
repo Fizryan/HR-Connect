@@ -1,16 +1,16 @@
 import 'package:dio/dio.dart';
 
 class CoreException {
-  static Never handleDioException(DioException e) {
+  static ServerException handleDioException(DioException e) {
     if (e.type == DioExceptionType.connectionTimeout ||
         e.type == DioExceptionType.receiveTimeout ||
         e.type == DioExceptionType.sendTimeout ||
         e.type == DioExceptionType.connectionError) {
-      throw ServerException(message: 'Connection timeout. Please check your internet and try again.');
+      return ServerException(message: 'Connection timeout. Please check your internet and try again.');
     }
 
     if (e.type == DioExceptionType.cancel) {
-      throw ServerException(message: 'Request canceled.');
+      return ServerException(message: 'Request canceled.');
     }
 
     String errorMessage = 'An error occurred';
@@ -19,7 +19,7 @@ class CoreException {
       errorMessage = e.response?.data['message'] ?? errorMessage;
     }
     
-    throw ServerException(message: errorMessage);
+    return ServerException(message: errorMessage);
   }
 }
 

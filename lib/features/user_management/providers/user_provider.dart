@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:hr_connect/core/di/providers.dart';
 import 'package:hr_connect/core/error/failures.dart';
+import 'package:hr_connect/features/auth/providers/auth_provider.dart';
 import 'package:hr_connect/features/user_management/data/model/user_model.dart';
 
 final userNotifierProvider =
@@ -141,6 +142,9 @@ class UserNotifier extends AsyncNotifier<List<UserModel>> {
           }).toList();
           state = AsyncValue.data(updatedList);
         }
+
+        // Notify AuthNotifier if the current logged-in user is updated
+        ref.read(authNotifierProvider.notifier).updateCurrentUser(updatedUser);
       },
     );
   }

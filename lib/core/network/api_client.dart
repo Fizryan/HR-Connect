@@ -116,6 +116,12 @@ class ApiClient {
                         'Bearer $newAccessToken';
                     final retryResponse = await _dio.fetch(retryOptions);
                     return handler.resolve(retryResponse);
+                  } else {
+                    _logger.e('Failed to retrieve new access token');
+                    _isRefreshing = false;
+                    clearToken();
+                    await secureStorage.deleteAll();
+                    return handler.reject(e);
                   }
                 } catch (refreshError) {
                   _logger.e('Failed to refresh token: $refreshError');
@@ -124,6 +130,12 @@ class ApiClient {
                   await secureStorage.deleteAll();
                   return handler.reject(e);
                 }
+              } else {
+                _logger.e('Refresh token is empty or null');
+                _isRefreshing = false;
+                clearToken();
+                await secureStorage.deleteAll();
+                return handler.reject(e);
               }
             } else {
               return handler.next(e);
@@ -196,7 +208,9 @@ class ApiClient {
         completer.completeError(mappedException, st);
       }
 
-      _cacheRequestCooldown(requestKey);
+      // Do NOT cache errors. Allow immediate retry.
+      _inFlightGetRequests.remove(requestKey);
+      _requestCooldownTimers.remove(requestKey)?.cancel();
 
       throw mappedException;
     }

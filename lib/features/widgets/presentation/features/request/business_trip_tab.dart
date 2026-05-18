@@ -17,13 +17,12 @@ class _BusinessTripTabState extends ConsumerState<BusinessTripTab> {
   final TextEditingController _searchController = TextEditingController();
   RequestStatus? _selectedStatus;
   bool _isSearchActive = false;
+  late final Stream<void> _timeStream;
 
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(businessNotifierProvider.notifier).fetchBusinessTrip();
-    });
+    _timeStream = Stream.periodic(const Duration(minutes: 1));
   }
 
   @override
@@ -216,7 +215,7 @@ class _BusinessTripTabState extends ConsumerState<BusinessTripTab> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               StreamBuilder(
-                stream: Stream.periodic(const Duration(minutes: 1)),
+                stream: _timeStream,
                 builder: (context, _) {
                   final minutes = lastFetchTime != null
                       ? DateTime.now().difference(lastFetchTime).inMinutes
