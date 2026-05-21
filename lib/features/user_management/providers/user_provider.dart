@@ -119,9 +119,12 @@ class UserNotifier extends AsyncNotifier<List<UserModel>> {
         state = AsyncValue<List<UserModel>>.error(
           failure.message,
           StackTrace.current,
-        );
+          // ignore: invalid_use_of_internal_member
+        ).copyWithPrevious(previousState);
         Future.delayed(const Duration(seconds: 2), () {
-          state = previousState;
+          if (state.hasError && state.hasValue) {
+            state = AsyncValue.data(state.value!);
+          }
         });
       },
       (successData) {
@@ -142,8 +145,6 @@ class UserNotifier extends AsyncNotifier<List<UserModel>> {
           }).toList();
           state = AsyncValue.data(updatedList);
         }
-
-        // Notify AuthNotifier if the current logged-in user is updated
         ref.read(authNotifierProvider.notifier).updateCurrentUser(updatedUser);
       },
     );

@@ -5,6 +5,7 @@ import 'package:hr_connect/core/const/capitalize.dart';
 import 'package:hr_connect/core/const/enums.dart';
 import 'package:hr_connect/features/business_trip/data/model/business_trip_model.dart';
 import 'package:hr_connect/features/business_trip/provider/business_provider.dart';
+import 'package:hr_connect/features/widgets/shared/shared_request_card.dart';
 
 class BusinessApprovalTab extends ConsumerStatefulWidget {
   const BusinessApprovalTab({super.key});
@@ -18,9 +19,12 @@ class _BusinessApprovalTabState extends ConsumerState<BusinessApprovalTab> {
   RequestStatus? _selectedStatus = RequestStatus.pending;
   bool _isSearchActive = false;
 
+  late final Stream<void> _timeStream;
+
   @override
   void initState() {
     super.initState();
+    _timeStream = Stream.periodic(const Duration(minutes: 1));
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(businessNotifierProvider.notifier).fetchBusinessTrip();
     });
@@ -121,193 +125,163 @@ class _BusinessApprovalTabState extends ConsumerState<BusinessApprovalTab> {
 
         Expanded(
           child: businessState.when(
-            loading: () => const Center(child: CircularProgressIndicator()),
-            error: (err, _) => Center(
-              child: Text(
-                err.toString(),
-                style: TextStyle(color: colorScheme.error),
-              ),
-            ),
-            data: (requests) {
-              final filteredRequests = _getFilteredRequests(requests);
-              if (filteredRequests.isEmpty) {
-                return Center(
-                  child: Text(
-                    'No requests found.',
-                    style: TextStyle(
-                      color: colorScheme.onSurfaceVariant,
-                      fontSize: 15.sp,
-                    ),
-                  ),
-                );
-              }
-              return RefreshIndicator(
-                onRefresh: () async => ref
-                    .read(businessNotifierProvider.notifier)
-                    .refreshBusinessTrip(),
-                backgroundColor: colorScheme.surfaceContainerHighest,
-                color: colorScheme.primary,
-                child: ListView.separated(
-                  physics: const AlwaysScrollableScrollPhysics(
-                    parent: BouncingScrollPhysics(),
-                  ),
-                  padding: EdgeInsets.symmetric(
-                    vertical: 8.h,
-                    horizontal: 20.w,
-                  ),
-                  itemCount: filteredRequests.length,
-                  separatorBuilder: (context, index) => SizedBox(height: 12.h),
-                  itemBuilder: (context, index) {
-                    return _buildActionCard(
-                      filteredRequests[index],
-                      colorScheme,
-                    );
-                  },
-                ),
-              );
-            },
+            loading: () => businessState.hasValue
+                ? _buildBusinessList(
+                    businessState.value!,
+                    colorScheme,
+                    isLoading: true,
+                  )
+                : const Center(child: CircularProgressIndicator()),
+            error: (error, _) => businessState.hasValue
+                ? _buildBusinessList(
+                    businessState.value!,
+                    colorScheme,
+                    error: error.toString(),
+                  )
+                : _buildErrorState(error.toString(), colorScheme),
+            data: (businessTrip) =>
+                _buildBusinessList(businessTrip, colorScheme),
           ),
         ),
       ],
     );
   }
 
-  Widget _buildActionCard(BusinessTripModel req, ColorScheme colorScheme) {
-    final isPending = req.status == RequestStatus.pending;
-
-    return Container(
-      padding: EdgeInsets.all(16.r),
-      decoration: BoxDecoration(
-        color: colorScheme.surfaceContainerLowest,
-        borderRadius: BorderRadius.circular(20.r),
-        border: Border.all(
-          color: colorScheme.outlineVariant.withValues(alpha: 0.4),
-        ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              CircleAvatar(
-                radius: 20.r,
-                backgroundColor: colorScheme.tertiaryContainer,
-                child: Icon(
-                  Icons.work_rounded,
-                  color: colorScheme.tertiary,
-                  size: 20.sp,
-                ),
-              ),
-              SizedBox(width: 12.w),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      req.requestId,
-                      style: TextStyle(
-                        fontSize: 14.sp,
-                        fontWeight: FontWeight.w700,
-                        color: colorScheme.onSurface,
-                      ),
-                    ),
-                    Text(
-                      'Trip ${Capitalize.firstLetterUppercase(req.businessTripType.name)}',
-                      style: TextStyle(
-                        fontSize: 12.sp,
-                        color: colorScheme.onSurfaceVariant,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              if (!isPending) _buildStatusBadge(req.status, colorScheme),
-            ],
-          ),
-          SizedBox(height: 16.h),
-          Row(
-            children: [
-              Icon(
-                Icons.date_range_rounded,
-                size: 16.sp,
+  Widget _buildErrorState(String message, ColorScheme colorScheme) {
+    return Center(
+      child: Padding(
+        padding: EdgeInsets.symmetric(horizontal: 24.w),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.error_outline_rounded,
+              size: 64.sp,
+              color: colorScheme.error,
+            ),
+            SizedBox(height: 16.h),
+            Text(
+              message,
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 14.sp,
                 color: colorScheme.onSurfaceVariant,
               ),
-              SizedBox(width: 8.w),
-              Text(
-                '${req.startDate.day}/${req.startDate.month}/${req.startDate.year} - ${req.endDate.day}/${req.endDate.month}/${req.endDate.year}',
-                style: TextStyle(
-                  fontSize: 13.sp,
-                  fontWeight: FontWeight.w500,
-                  color: colorScheme.onSurface,
-                ),
-              ),
-            ],
-          ),
-
-          if (isPending) ...[
-            SizedBox(height: 16.h),
-            Divider(
-              height: 1,
-              color: colorScheme.outlineVariant.withValues(alpha: 0.3),
             ),
-            SizedBox(height: 12.h),
-            Row(
-              children: [
-                Expanded(
-                  child: OutlinedButton.icon(
-                    onPressed: () => ref
-                        .read(businessNotifierProvider.notifier)
-                        .rejectBusinessTrip(req.id),
-                    style: OutlinedButton.styleFrom(
-                      foregroundColor: colorScheme.error,
-                      side: BorderSide(
-                        color: colorScheme.error.withValues(alpha: 0.5),
-                      ),
-                    ),
-                    icon: Icon(Icons.close_rounded, size: 18.sp),
-                    label: const Text('Reject'),
-                  ),
-                ),
-                SizedBox(width: 12.w),
-                Expanded(
-                  child: FilledButton.icon(
-                    onPressed: () => ref
-                        .read(businessNotifierProvider.notifier)
-                        .approveBusinessTrip(req.id),
-                    style: FilledButton.styleFrom(
-                      backgroundColor: Colors.green.shade600,
-                      foregroundColor: Colors.white,
-                    ),
-                    icon: Icon(Icons.check_rounded, size: 18.sp),
-                    label: const Text('Approve'),
-                  ),
-                ),
-              ],
+            SizedBox(height: 24.h),
+            FilledButton.icon(
+              onPressed: () => ref
+                  .read(businessNotifierProvider.notifier)
+                  .refreshBusinessTrip(),
+              icon: const Icon(Icons.refresh_rounded),
+              label: const Text('Try Again'),
             ),
           ],
-        ],
+        ),
       ),
     );
   }
 
-  Widget _buildStatusBadge(RequestStatus status, ColorScheme colorScheme) {
-    final isApproved = status == RequestStatus.approved;
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
-      decoration: BoxDecoration(
-        color: isApproved
-            ? Colors.green.withValues(alpha: 0.15)
-            : colorScheme.errorContainer,
-        borderRadius: BorderRadius.circular(12.r),
-      ),
-      child: Text(
-        Capitalize.firstLetterUppercase(status.name),
-        style: TextStyle(
-          fontSize: 11.sp,
-          fontWeight: FontWeight.bold,
-          color: isApproved ? Colors.green.shade700 : colorScheme.error,
+  Widget _buildBusinessList(
+    List<BusinessTripModel> businessTrip,
+    ColorScheme colorScheme, {
+    bool isLoading = false,
+    String? error,
+  }) {
+    final filteredTrip = _getFilteredRequests(businessTrip);
+    final lastFetchTime = ref
+        .read(businessNotifierProvider.notifier)
+        .lastFetchTime;
+
+    return Column(
+      children: [
+        if (isLoading) const LinearProgressIndicator(),
+        if (error != null)
+          Container(
+            width: double.infinity,
+            color: colorScheme.errorContainer,
+            padding: EdgeInsets.symmetric(vertical: 8.h, horizontal: 20.w),
+            child: Text(
+              error,
+              style: TextStyle(color: colorScheme.onErrorContainer),
+            ),
+          ),
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 6.h),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              StreamBuilder(
+                stream: _timeStream,
+                builder: (context, _) {
+                  final minutes = lastFetchTime != null
+                      ? DateTime.now().difference(lastFetchTime).inMinutes
+                      : null;
+                  final timeString = minutes != null
+                      ? (minutes == 0 ? 'Just now' : '$minutes minutes ago')
+                      : 'Unknown';
+                  return Text(
+                    'Last updated: $timeString',
+                    style: TextStyle(
+                      fontSize: 12.sp,
+                      color: colorScheme.onSurfaceVariant,
+                    ),
+                  );
+                },
+              ),
+            ],
+          ),
         ),
-      ),
+        Expanded(
+          child: filteredTrip.isEmpty
+              ? Center(
+                  child: Text(
+                    'No business trip found.',
+                    style: TextStyle(
+                      color: colorScheme.onSurfaceVariant,
+                      fontSize: 15.sp,
+                    ),
+                  ),
+                )
+              : RefreshIndicator(
+                  onRefresh: () async => ref
+                      .read(businessNotifierProvider.notifier)
+                      .refreshBusinessTrip(),
+                  backgroundColor: colorScheme.surfaceContainerHighest,
+                  color: colorScheme.primary,
+                  child: ListView.separated(
+                    physics: const AlwaysScrollableScrollPhysics(
+                      parent: BouncingScrollPhysics(),
+                    ),
+                    padding: EdgeInsets.fromLTRB(0, 8.h, 0, 80.h),
+                    itemCount: filteredTrip.length,
+                    separatorBuilder: (context, index) => Divider(
+                      height: 1,
+                      indent: 76.w,
+                      endIndent: 20.w,
+                      color: colorScheme.outlineVariant.withValues(alpha: 0.3),
+                    ),
+                    itemBuilder: (context, index) {
+                      final trip = filteredTrip[index];
+                      return SharedRequestCard(
+                        title: 'Business Trip - ${Capitalize.firstLetterUppercase(trip.businessTripType.name)}',
+                        startDate: trip.startDate,
+                        endDate: trip.endDate,
+                        status: trip.status,
+                        icon: Icons.work_rounded,
+                        colorScheme: colorScheme,
+                        onApprove: () => ref
+                            .read(businessNotifierProvider.notifier)
+                            .approveBusinessTrip(trip.id),
+                        onReject: () => ref
+                            .read(businessNotifierProvider.notifier)
+                            .rejectBusinessTrip(trip.id),
+                      );
+                    },
+                  ),
+                ),
+        ),
+      ],
     );
   }
 }

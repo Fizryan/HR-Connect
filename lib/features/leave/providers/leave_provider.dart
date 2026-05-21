@@ -92,9 +92,12 @@ class LeaveNotifier extends AsyncNotifier<List<LeaveRequestModel>> {
         state = AsyncValue<List<LeaveRequestModel>>.error(
           failure.message,
           StackTrace.current,
-        );
+        // ignore: invalid_use_of_internal_member
+        ).copyWithPrevious(previousState);
         Future.delayed(const Duration(seconds: 2), () {
-          state = previousState;
+          if (state.hasError && state.hasValue) {
+            state = AsyncValue.data(state.value!);
+          }
         });
       },
       (successData) {

@@ -5,6 +5,8 @@ import 'package:hr_connect/core/const/assets.dart';
 import 'package:hr_connect/core/const/support_information.dart';
 import 'package:hr_connect/features/auth/providers/auth_provider.dart';
 import 'package:hr_connect/features/widgets/shared/bubble_particle.dart';
+import 'package:hr_connect/features/widgets/shared/custom_text_field.dart';
+import 'package:hr_connect/features/widgets/shared/custom_button.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
@@ -17,8 +19,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
-
-  bool _isPasswordObscured = true;
 
   static final String _supportEmail = SupportInformation.supportEmail;
 
@@ -240,26 +240,38 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            _buildLabel('Email Address', theme),
-                            SizedBox(height: 6.h),
-                            _buildInput(
+                            CustomTextField(
                               controller: _emailController,
+                              title: 'Email Address',
                               hint: 'name@hrconnect.com',
                               icon: Icons.email_outlined,
                               theme: theme,
                               isLoading: isLoading,
-                              isEmail: true,
+                              keyboardType: TextInputType.emailAddress,
+                              textInputAction: TextInputAction.next,
+                              validator: (value) {
+                                if (value == null || value.trim().isEmpty) return 'Email is required';
+                                final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+                                if (!emailRegex.hasMatch(value.trim())) return 'Please enter a valid email address';
+                                return null;
+                              },
                             ),
                             SizedBox(height: 16.h),
-                            _buildLabel('Password', theme),
-                            SizedBox(height: 6.h),
-                            _buildInput(
+                            CustomTextField(
                               controller: _passwordController,
+                              title: 'Password',
                               hint: 'Enter your password',
                               icon: Icons.lock_outline,
-                              isPassword: true,
-                              isLoading: isLoading,
                               theme: theme,
+                              isLoading: isLoading,
+                              isPassword: true,
+                              textInputAction: TextInputAction.done,
+                              onFieldSubmitted: (_) => _handleLogin(),
+                              validator: (value) {
+                                if (value == null || value.trim().isEmpty) return 'Password is required';
+                                if (value.length < 6) return 'Password must be at least 6 characters';
+                                return null;
+                              },
                             ),
                             SizedBox(height: 10.h),
                             Align(
@@ -285,7 +297,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                               ),
                             ),
                             SizedBox(height: 24.h),
-                            _buildLoginButton(theme, isLoading),
+                            CustomButton(
+                              text: 'Sign In',
+                              isLoading: isLoading,
+                              theme: theme,
+                              onPressed: _handleLogin,
+                            ),
                           ],
                         ),
                       ),
@@ -374,136 +391,4 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     );
   }
 
-  Widget _buildInput({
-    required TextEditingController controller,
-    required String hint,
-    required IconData icon,
-    required ThemeData theme,
-    required bool isLoading,
-    bool isPassword = false,
-    bool isEmail = false,
-  }) {
-    return TextFormField(
-      controller: controller,
-      obscureText: isPassword ? _isPasswordObscured : false,
-      keyboardType: isEmail ? TextInputType.emailAddress : TextInputType.text,
-      textInputAction: isPassword ? TextInputAction.done : TextInputAction.next,
-      enabled: !isLoading,
-      style: TextStyle(
-        color: theme.colorScheme.onSurface,
-        fontSize: 14.sp,
-        fontWeight: FontWeight.w500,
-      ),
-      decoration: InputDecoration(
-        filled: true,
-        fillColor: theme.colorScheme.surfaceContainerHighest,
-        hintText: hint,
-        hintStyle: TextStyle(
-          color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
-          fontSize: 14.sp,
-        ),
-        prefixIcon: Icon(icon, color: theme.colorScheme.onSurface, size: 20.sp),
-        suffixIcon: isPassword
-            ? IconButton(
-                icon: Icon(
-                  _isPasswordObscured
-                      ? Icons.visibility_outlined
-                      : Icons.visibility_off_outlined,
-                  color: theme.colorScheme.onSurface,
-                  size: 20.sp,
-                ),
-                onPressed: isLoading
-                    ? null
-                    : () => setState(
-                        () => _isPasswordObscured = !_isPasswordObscured,
-                      ),
-              )
-            : null,
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16.r),
-          borderSide: BorderSide.none,
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16.r),
-          borderSide: BorderSide.none,
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16.r),
-          borderSide: BorderSide(color: theme.colorScheme.primary, width: 1.5),
-        ),
-        errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16.r),
-          borderSide: BorderSide(color: theme.colorScheme.error, width: 1.5),
-        ),
-        focusedErrorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14.r),
-          borderSide: BorderSide(color: theme.colorScheme.error, width: 1.5),
-        ),
-        contentPadding: EdgeInsets.symmetric(vertical: 14.h, horizontal: 16.w),
-      ),
-      validator: (value) {
-        if (value == null || value.trim().isEmpty) {
-          return isEmail ? 'Email is required' : 'Password is required';
-        }
-        if (isEmail) {
-          final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
-          if (!emailRegex.hasMatch(value.trim())) {
-            return 'Please enter a valid email address';
-          }
-        }
-        if (isPassword && value.length < 6) {
-          return 'Password must be at least 6 characters';
-        }
-        return null;
-      },
-      onFieldSubmitted: isPassword && !isLoading ? (_) => _handleLogin() : null,
-    );
-  }
-
-  Widget _buildLabel(String text, ThemeData theme) {
-    return Text(
-      text,
-      style: TextStyle(
-        fontWeight: FontWeight.w600,
-        color: theme.colorScheme.onSurface,
-        fontSize: 14.sp,
-      ),
-    );
-  }
-
-  Widget _buildLoginButton(ThemeData theme, bool isLoading) {
-    return SizedBox(
-      width: double.infinity,
-      height: 48.h,
-      child: FilledButton(
-        onPressed: isLoading ? null : _handleLogin,
-        style: FilledButton.styleFrom(
-          backgroundColor: theme.colorScheme.primary,
-          foregroundColor: theme.colorScheme.onPrimary,
-          disabledBackgroundColor: theme.colorScheme.primaryContainer,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(14.r),
-          ),
-        ),
-        child: isLoading
-            ? SizedBox(
-                height: 4.w,
-                width: double.infinity,
-                child: LinearProgressIndicator(
-                  color: theme.colorScheme.primary,
-                  backgroundColor: theme.colorScheme.onPrimary,
-                  borderRadius: BorderRadius.circular(4.r),
-                ),
-              )
-            : Text(
-                'Sign In',
-                style: TextStyle(
-                  fontSize: 15.sp,
-                  fontWeight: FontWeight.bold,
-                  letterSpacing: 0.5,
-                ),
-              ),
-      ),
-    );
-  }
 }

@@ -89,12 +89,11 @@ class BusinessNotifier extends AsyncNotifier<List<BusinessTripModel>> {
 
     result.fold(
       (failure) {
-        state = AsyncValue<List<BusinessTripModel>>.error(
-          failure.message,
-          StackTrace.current,
-        );
+        state = previousState.whenData((_) => throw failure.message);
         Future.delayed(const Duration(seconds: 2), () {
-          state = previousState;
+          if (state.hasError && previousState.hasValue) {
+            state = AsyncValue.data(previousState.value!);
+          }
         });
       },
       (successData) {
@@ -113,10 +112,10 @@ class BusinessNotifier extends AsyncNotifier<List<BusinessTripModel>> {
       action: () => ref
           .read(businessRepositoryProvider)
           .updateBusinessTrip(id, updateData),
-      onSuccess: (uodatedBusinessTrip) {
+      onSuccess: (updatedBusinessTrip) {
         if (state.hasValue) {
           final updatedList = state.value!.map((business) {
-            return business.id == id ? uodatedBusinessTrip : business;
+            return business.id == id ? updatedBusinessTrip : business;
           }).toList();
           state = AsyncValue.data(updatedList);
         }

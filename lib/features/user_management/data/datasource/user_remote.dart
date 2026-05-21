@@ -23,7 +23,7 @@ class UserRemoteImp implements UserRemote {
     } on ServerException {
       rethrow;
     } catch (e) {
-      throw ServerException(message: 'Something went wrong');
+      throw ServerException(message: e.toString());
     }
   }
 

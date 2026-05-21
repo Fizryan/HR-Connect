@@ -4,6 +4,7 @@ import 'package:hr_connect/core/config/env_config.dart';
 import 'package:hr_connect/core/const/api_endpoints.dart';
 import 'package:hr_connect/core/const/secure_storage.dart';
 import 'package:hr_connect/core/error/exception.dart';
+import 'package:hr_connect/core/network/rate_limit_interceptor.dart';
 import 'package:logger/logger.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
@@ -13,9 +14,7 @@ class ApiClient {
   final FlutterSecureStorage secureStorage;
 
   String? _cachedToken;
-  bool _isRefreshing = false;
-  final Map<String, Future<dynamic>> _inFlightGetRequests = {};
-  final Map<String, Timer> _requestCooldownTimers = {};
+  final Map<String, Future<dynamic>> _inFlightRequests = {};
 
   ApiClient({required this.secureStorage}) {
     _dio = Dio(
@@ -30,6 +29,7 @@ class ApiClient {
       ),
     );
 
+    _dio.interceptors.add(RateLimitInterceptor());
     _dio.interceptors.add(
       QueuedInterceptorsWrapper(
         onRequest: (options, handler) async {
@@ -68,77 +68,66 @@ class ApiClient {
               return handler.resolve(retryResponse);
             }
 
-            if (!_isRefreshing) {
-              _isRefreshing = true;
+            final refreshToken = await secureStorage.read(
+              key: SecureStorage.refreshToken,
+            );
 
-              final refreshToken = await secureStorage.read(
-                key: SecureStorage.refreshToken,
-              );
+            if (refreshToken != null && refreshToken.isNotEmpty) {
+              try {
+                final refreshDio = Dio(
+                  BaseOptions(
+                    baseUrl: _dio.options.baseUrl,
+                    headers: {
+                      'Content-Type': 'application/json',
+                      'Accept': 'application/json',
+                    },
+                  ),
+                );
 
-              if (refreshToken != null && refreshToken.isNotEmpty) {
-                try {
-                  final refreshDio = Dio(
-                    BaseOptions(
-                      baseUrl: _dio.options.baseUrl,
-                      headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json',
-                      },
-                    ),
+                final response = await refreshDio.post(
+                  ApiEndpoints.authRefresh,
+                  data: {'refreshToken': refreshToken},
+                );
+
+                final newAccessToken = response.data['accessToken'];
+                final newRefreshToken = response.data['refreshToken'];
+
+                if (newAccessToken != null) {
+                  updateToken(newAccessToken);
+                  await secureStorage.write(
+                    key: SecureStorage.accessToken,
+                    value: newAccessToken,
                   );
 
-                  final response = await refreshDio.post(
-                    ApiEndpoints.authRefresh,
-                    data: {'refreshToken': refreshToken},
-                  );
-
-                  final newAccessToken = response.data['accessToken'];
-                  final newRefreshToken = response.data['refreshToken'];
-
-                  if (newAccessToken != null) {
-                    updateToken(newAccessToken);
+                  if (newRefreshToken != null) {
                     await secureStorage.write(
-                      key: SecureStorage.accessToken,
-                      value: newAccessToken,
+                      key: SecureStorage.refreshToken,
+                      value: newRefreshToken,
                     );
-
-                    if (newRefreshToken != null) {
-                      await secureStorage.write(
-                        key: SecureStorage.refreshToken,
-                        value: newRefreshToken,
-                      );
-                    }
-
-                    _isRefreshing = false;
-
-                    final retryOptions = e.requestOptions;
-                    retryOptions.headers['Authorization'] =
-                        'Bearer $newAccessToken';
-                    final retryResponse = await _dio.fetch(retryOptions);
-                    return handler.resolve(retryResponse);
-                  } else {
-                    _logger.e('Failed to retrieve new access token');
-                    _isRefreshing = false;
-                    clearToken();
-                    await secureStorage.deleteAll();
-                    return handler.reject(e);
                   }
-                } catch (refreshError) {
-                  _logger.e('Failed to refresh token: $refreshError');
-                  _isRefreshing = false;
+
+                  final retryOptions = e.requestOptions;
+                  retryOptions.headers['Authorization'] =
+                      'Bearer $newAccessToken';
+                  final retryResponse = await _dio.fetch(retryOptions);
+                  return handler.resolve(retryResponse);
+                } else {
+                  _logger.e('Failed to retrieve new access token');
                   clearToken();
                   await secureStorage.deleteAll();
                   return handler.reject(e);
                 }
-              } else {
-                _logger.e('Refresh token is empty or null');
-                _isRefreshing = false;
+              } catch (refreshError) {
+                _logger.e('Failed to refresh token: $refreshError');
                 clearToken();
                 await secureStorage.deleteAll();
                 return handler.reject(e);
               }
             } else {
-              return handler.next(e);
+              _logger.e('Refresh token is empty or null');
+              clearToken();
+              await secureStorage.deleteAll();
+              return handler.reject(e);
             }
           }
 
@@ -151,14 +140,6 @@ class ApiClient {
     );
   }
 
-  void _cacheRequestCooldown(String requestKey) {
-    _requestCooldownTimers.remove(requestKey)?.cancel();
-    _requestCooldownTimers[requestKey] = Timer(const Duration(seconds: 5), () {
-      _inFlightGetRequests.remove(requestKey);
-      _requestCooldownTimers.remove(requestKey);
-    });
-  }
-
   void updateToken(String token) {
     _cachedToken = token;
   }
@@ -167,33 +148,27 @@ class ApiClient {
     _cachedToken = null;
   }
 
-  Future<dynamic> get(
-    String path, {
+  Future<dynamic> _handleRequest(
+    String method,
+    String path,
+    Future<Response> Function() requestAction, {
     Object? data,
     Map<String, dynamic>? queryParameters,
-    Map<String, dynamic>? headers,
   }) async {
-    final requestKey = '$path${queryParameters?.toString() ?? ''}';
+    final requestKey = '$method:$path:${queryParameters?.toString() ?? ''}:${data?.toString() ?? ''}';
 
-    if (_inFlightGetRequests.containsKey(requestKey)) {
-      _logger.i('Deduplicating GET request (cooldown): $requestKey');
-      return await _inFlightGetRequests[requestKey];
+    if (_inFlightRequests.containsKey(requestKey)) {
+      _logger.i('Deduplicating $method request (in-flight): $requestKey');
+      return await _inFlightRequests[requestKey];
     }
 
     final completer = Completer<dynamic>();
-    _inFlightGetRequests[requestKey] = completer.future;
+    _inFlightRequests[requestKey] = completer.future;
 
     try {
-      final response = await _dio.get(
-        path,
-        data: data,
-        queryParameters: queryParameters,
-        options: Options(headers: headers),
-      );
-
+      final response = await requestAction();
       completer.complete(response.data);
-      _cacheRequestCooldown(requestKey);
-
+      _inFlightRequests.remove(requestKey);
       return response.data;
     } catch (e, st) {
       Exception mappedException = e is Exception ? e : Exception(e.toString());
@@ -205,10 +180,29 @@ class ApiClient {
         completer.completeError(mappedException, st);
       }
 
-      _cacheRequestCooldown(requestKey);
-
+      _inFlightRequests.remove(requestKey);
       throw mappedException;
     }
+  }
+
+  Future<dynamic> get(
+    String path, {
+    Object? data,
+    Map<String, dynamic>? queryParameters,
+    Map<String, dynamic>? headers,
+  }) async {
+    return _handleRequest(
+      'GET',
+      path,
+      () => _dio.get(
+        path,
+        data: data,
+        queryParameters: queryParameters,
+        options: Options(headers: headers),
+      ),
+      data: data,
+      queryParameters: queryParameters,
+    );
   }
 
   Future<dynamic> post(
@@ -217,17 +211,18 @@ class ApiClient {
     Map<String, dynamic>? queryParameters,
     Map<String, dynamic>? headers,
   }) async {
-    try {
-      final response = await _dio.post(
+    return _handleRequest(
+      'POST',
+      path,
+      () => _dio.post(
         path,
         data: data,
         queryParameters: queryParameters,
         options: Options(headers: headers),
-      );
-      return response.data;
-    } on DioException catch (e) {
-      throw CoreException.handleDioException(e);
-    }
+      ),
+      data: data,
+      queryParameters: queryParameters,
+    );
   }
 
   Future<dynamic> put(
@@ -236,17 +231,18 @@ class ApiClient {
     Map<String, dynamic>? queryParameters,
     Map<String, dynamic>? headers,
   }) async {
-    try {
-      final response = await _dio.put(
+    return _handleRequest(
+      'PUT',
+      path,
+      () => _dio.put(
         path,
         data: data,
         queryParameters: queryParameters,
         options: Options(headers: headers),
-      );
-      return response.data;
-    } on DioException catch (e) {
-      throw CoreException.handleDioException(e);
-    }
+      ),
+      data: data,
+      queryParameters: queryParameters,
+    );
   }
 
   Future<dynamic> delete(
@@ -255,16 +251,17 @@ class ApiClient {
     Map<String, dynamic>? queryParameters,
     Map<String, dynamic>? headers,
   }) async {
-    try {
-      final response = await _dio.delete(
+    return _handleRequest(
+      'DELETE',
+      path,
+      () => _dio.delete(
         path,
         data: data,
         queryParameters: queryParameters,
         options: Options(headers: headers),
-      );
-      return response.data;
-    } on DioException catch (e) {
-      throw CoreException.handleDioException(e);
-    }
+      ),
+      data: data,
+      queryParameters: queryParameters,
+    );
   }
 }

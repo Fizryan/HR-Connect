@@ -5,7 +5,7 @@ import 'package:hr_connect/core/const/capitalize.dart';
 import 'package:hr_connect/core/const/enums.dart';
 import 'package:hr_connect/features/business_trip/data/model/business_trip_model.dart';
 import 'package:hr_connect/features/business_trip/provider/business_provider.dart';
-
+import 'package:hr_connect/features/widgets/shared/shared_request_card.dart';
 class BusinessTripTab extends ConsumerStatefulWidget {
   const BusinessTripTab({super.key});
 
@@ -266,8 +266,12 @@ class _BusinessTripTabState extends ConsumerState<BusinessTripTab> {
                     ),
                     itemBuilder: (context, index) {
                       final trip = filteredBusinessTrip[index];
-                      return _buildCompactRequestItem(
-                        trip: trip,
+                      return SharedRequestCard(
+                        title: 'Business Trip - ${Capitalize.firstLetterUppercase(trip.businessTripType.name)}',
+                        startDate: trip.startDate,
+                        endDate: trip.endDate,
+                        status: trip.status,
+                        icon: Icons.calendar_today_rounded,
                         colorScheme: colorScheme,
                       );
                     },
@@ -278,105 +282,4 @@ class _BusinessTripTabState extends ConsumerState<BusinessTripTab> {
     );
   }
 
-  Widget _buildCompactRequestItem({
-    required BusinessTripModel trip,
-    required ColorScheme colorScheme,
-  }) {
-    Color statusColor;
-    Color statusBgColor;
-    if (trip.status == RequestStatus.pending) {
-      statusColor = colorScheme.onPrimary;
-      statusBgColor = colorScheme.primary;
-    } else if (trip.status == RequestStatus.approved) {
-      statusColor = colorScheme.onSecondary;
-      statusBgColor = colorScheme.secondary;
-    } else {
-      statusColor = colorScheme.onError;
-      statusBgColor = colorScheme.error;
-    }
-
-    return Material(
-      child: InkWell(
-        onTap: () {
-          // TODO: Handle item tap
-        },
-        child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 14.h),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Container(
-                padding: EdgeInsets.all(12.w),
-                decoration: BoxDecoration(
-                  color: colorScheme.surfaceContainer,
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(
-                  Icons.calendar_today_rounded,
-                  size: 24.sp,
-                  color: colorScheme.primary,
-                ),
-              ),
-              SizedBox(width: 16.w),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Business Trip - ${Capitalize.firstLetterUppercase(trip.businessTripType.name)}',
-                      style: TextStyle(
-                        fontSize: 15.sp,
-                        fontWeight: FontWeight.w600,
-                        color: colorScheme.onSurface,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    SizedBox(height: 4.h),
-                    Row(
-                      children: [
-                        Icon(
-                          Icons.calendar_month_outlined,
-                          size: 12.sp,
-                          color: colorScheme.onSurfaceVariant,
-                        ),
-                        SizedBox(width: 4.w),
-                        Expanded(
-                          child: Text(
-                            '${trip.startDate.day}/${trip.startDate.month}/${trip.startDate.year} - ${trip.endDate.day}/${trip.endDate.month}/${trip.endDate.year}',
-                            style: TextStyle(
-                              fontSize: 12.sp,
-                              color: colorScheme.onSurfaceVariant,
-                            ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-              SizedBox(width: 8.w),
-              Container(
-                padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
-                decoration: BoxDecoration(
-                  color: statusBgColor,
-                  borderRadius: BorderRadius.circular(24.r),
-                ),
-                child: Text(
-                  Capitalize.firstLetterUppercase(trip.status.name),
-                  style: TextStyle(
-                    fontSize: 11.sp,
-                    fontWeight: FontWeight.w600,
-                    color: statusColor,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
 }

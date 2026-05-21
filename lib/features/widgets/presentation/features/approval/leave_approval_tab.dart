@@ -5,6 +5,7 @@ import 'package:hr_connect/core/const/capitalize.dart';
 import 'package:hr_connect/core/const/enums.dart';
 import 'package:hr_connect/features/leave/data/model/leave_request_model.dart';
 import 'package:hr_connect/features/leave/providers/leave_provider.dart';
+import 'package:hr_connect/features/widgets/shared/shared_request_card.dart';
 
 class LeaveApprovalTab extends ConsumerStatefulWidget {
   const LeaveApprovalTab({super.key});
@@ -17,9 +18,12 @@ class _LeaveApprovalTabState extends ConsumerState<LeaveApprovalTab> {
   RequestStatus? _selectedStatus = RequestStatus.pending;
   bool _isSearchActive = false;
 
+  late final Stream<void> _timeStream;
+
   @override
   void initState() {
     super.initState();
+    _timeStream = Stream.periodic(const Duration(minutes: 1));
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(leaveNotifierProvider.notifier).fetchLeaveRequests();
     });
@@ -120,193 +124,163 @@ class _LeaveApprovalTabState extends ConsumerState<LeaveApprovalTab> {
 
         Expanded(
           child: leaveState.when(
-            loading: () => const Center(child: CircularProgressIndicator()),
-            error: (err, _) => Center(
-              child: Text(
-                err.toString(),
-                style: TextStyle(color: colorScheme.error),
-              ),
-            ),
-            data: (requests) {
-              final filteredRequests = _getFilteredRequests(requests);
-              if (filteredRequests.isEmpty) {
-                return Center(
-                  child: Text(
-                    'No requests found.',
-                    style: TextStyle(
-                      color: colorScheme.onSurfaceVariant,
-                      fontSize: 15.sp,
-                    ),
-                  ),
-                );
-              }
-              return RefreshIndicator(
-                onRefresh: () async => ref
-                    .read(leaveNotifierProvider.notifier)
-                    .refreshLeaveRequests(),
-                backgroundColor: colorScheme.surfaceContainerHighest,
-                color: colorScheme.primary,
-                child: ListView.separated(
-                  physics: const AlwaysScrollableScrollPhysics(
-                    parent: BouncingScrollPhysics(),
-                  ),
-                  padding: EdgeInsets.symmetric(
-                    vertical: 8.h,
-                    horizontal: 20.w,
-                  ),
-                  itemCount: filteredRequests.length,
-                  separatorBuilder: (context, index) => SizedBox(height: 12.h),
-                  itemBuilder: (context, index) {
-                    return _buildActionCard(
-                      filteredRequests[index],
-                      colorScheme,
-                    );
-                  },
-                ),
-              );
-            },
+            loading: () => leaveState.hasValue
+                ? _buildLeaveList(
+                    leaveState.value!,
+                    colorScheme,
+                    isLoading: true,
+                  )
+                : const Center(child: CircularProgressIndicator()),
+            error: (error, _) => leaveState.hasValue
+                ? _buildLeaveList(
+                    leaveState.value!,
+                    colorScheme,
+                    error: error.toString(),
+                  )
+                : _buildErrorState(error.toString(), colorScheme),
+            data: (leaveRequests) =>
+                _buildLeaveList(leaveRequests, colorScheme),
           ),
         ),
       ],
     );
   }
 
-  Widget _buildActionCard(LeaveRequestModel req, ColorScheme colorScheme) {
-    final isPending = req.status == RequestStatus.pending;
-
-    return Container(
-      padding: EdgeInsets.all(16.r),
-      decoration: BoxDecoration(
-        color: colorScheme.surfaceContainerLowest,
-        borderRadius: BorderRadius.circular(20.r),
-        border: Border.all(
-          color: colorScheme.outlineVariant.withValues(alpha: 0.4),
-        ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              CircleAvatar(
-                radius: 20.r,
-                backgroundColor: colorScheme.primaryContainer,
-                child: Icon(
-                  Icons.person,
-                  color: colorScheme.primary,
-                  size: 20.sp,
-                ),
-              ),
-              SizedBox(width: 12.w),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      req.requestId,
-                      style: TextStyle(
-                        fontSize: 14.sp,
-                        fontWeight: FontWeight.w700,
-                        color: colorScheme.onSurface,
-                      ),
-                    ),
-                    Text(
-                      'Leave ${Capitalize.firstLetterUppercase(req.leaveType.name)}',
-                      style: TextStyle(
-                        fontSize: 12.sp,
-                        color: colorScheme.onSurfaceVariant,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              if (!isPending) _buildStatusBadge(req.status, colorScheme),
-            ],
-          ),
-          SizedBox(height: 16.h),
-          Row(
-            children: [
-              Icon(
-                Icons.calendar_month_rounded,
-                size: 16.sp,
+  Widget _buildErrorState(String message, ColorScheme colorScheme) {
+    return Center(
+      child: Padding(
+        padding: EdgeInsets.symmetric(horizontal: 24.w),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.error_outline_rounded,
+              size: 64.sp,
+              color: colorScheme.error,
+            ),
+            SizedBox(height: 16.h),
+            Text(
+              message,
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 14.sp,
                 color: colorScheme.onSurfaceVariant,
               ),
-              SizedBox(width: 8.w),
-              Text(
-                '${req.startDate.day}/${req.startDate.month}/${req.startDate.year} - ${req.endDate.day}/${req.endDate.month}/${req.endDate.year}',
-                style: TextStyle(
-                  fontSize: 13.sp,
-                  fontWeight: FontWeight.w500,
-                  color: colorScheme.onSurface,
-                ),
-              ),
-            ],
-          ),
-
-          if (isPending) ...[
-            SizedBox(height: 16.h),
-            Divider(
-              height: 1,
-              color: colorScheme.outlineVariant.withValues(alpha: 0.3),
             ),
-            SizedBox(height: 12.h),
-            Row(
-              children: [
-                Expanded(
-                  child: OutlinedButton.icon(
-                    onPressed: () => ref
-                        .read(leaveNotifierProvider.notifier)
-                        .rejectLeaveRequest(req.id),
-                    style: OutlinedButton.styleFrom(
-                      foregroundColor: colorScheme.error,
-                      side: BorderSide(
-                        color: colorScheme.error.withValues(alpha: 0.5),
-                      ),
-                    ),
-                    icon: Icon(Icons.close_rounded, size: 18.sp),
-                    label: const Text('Reject'),
-                  ),
-                ),
-                SizedBox(width: 12.w),
-                Expanded(
-                  child: FilledButton.icon(
-                    onPressed: () => ref
-                        .read(leaveNotifierProvider.notifier)
-                        .approveLeaveRequest(req.id),
-                    style: FilledButton.styleFrom(
-                      backgroundColor: Colors.green.shade600,
-                      foregroundColor: Colors.white,
-                    ),
-                    icon: Icon(Icons.check_rounded, size: 18.sp),
-                    label: const Text('Approve'),
-                  ),
-                ),
-              ],
+            SizedBox(height: 24.h),
+            FilledButton.icon(
+              onPressed: () => ref
+                  .read(leaveNotifierProvider.notifier)
+                  .refreshLeaveRequests(),
+              icon: const Icon(Icons.refresh_rounded),
+              label: const Text('Try Again'),
             ),
           ],
-        ],
+        ),
       ),
     );
   }
 
-  Widget _buildStatusBadge(RequestStatus status, ColorScheme colorScheme) {
-    final isApproved = status == RequestStatus.approved;
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
-      decoration: BoxDecoration(
-        color: isApproved
-            ? Colors.green.withValues(alpha: 0.15)
-            : colorScheme.errorContainer,
-        borderRadius: BorderRadius.circular(12.r),
-      ),
-      child: Text(
-        Capitalize.firstLetterUppercase(status.name),
-        style: TextStyle(
-          fontSize: 11.sp,
-          fontWeight: FontWeight.bold,
-          color: isApproved ? Colors.green.shade700 : colorScheme.error,
+  Widget _buildLeaveList(
+    List<LeaveRequestModel> leaveRequests,
+    ColorScheme colorScheme, {
+    bool isLoading = false,
+    String? error,
+  }) {
+    final filteredLeave = _getFilteredRequests(leaveRequests);
+    final lastFetchTime = ref
+        .read(leaveNotifierProvider.notifier)
+        .lastFetchTime;
+
+    return Column(
+      children: [
+        if (isLoading) const LinearProgressIndicator(),
+        if (error != null)
+          Container(
+            width: double.infinity,
+            color: colorScheme.errorContainer,
+            padding: EdgeInsets.symmetric(vertical: 8.h, horizontal: 20.w),
+            child: Text(
+              error,
+              style: TextStyle(color: colorScheme.onErrorContainer),
+            ),
+          ),
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 6.h),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              StreamBuilder(
+                stream: _timeStream,
+                builder: (context, _) {
+                  final minutes = lastFetchTime != null
+                      ? DateTime.now().difference(lastFetchTime).inMinutes
+                      : null;
+                  final timeString = minutes != null
+                      ? (minutes == 0 ? 'Just now' : '$minutes minutes ago')
+                      : 'Unknown';
+                  return Text(
+                    'Last updated: $timeString',
+                    style: TextStyle(
+                      fontSize: 12.sp,
+                      color: colorScheme.onSurfaceVariant,
+                    ),
+                  );
+                },
+              ),
+            ],
+          ),
         ),
-      ),
+        Expanded(
+          child: filteredLeave.isEmpty
+              ? Center(
+                  child: Text(
+                    'No leave requests found.',
+                    style: TextStyle(
+                      color: colorScheme.onSurfaceVariant,
+                      fontSize: 15.sp,
+                    ),
+                  ),
+                )
+              : RefreshIndicator(
+                  onRefresh: () async => ref
+                      .read(leaveNotifierProvider.notifier)
+                      .refreshLeaveRequests(),
+                  backgroundColor: colorScheme.surfaceContainerHighest,
+                  color: colorScheme.primary,
+                  child: ListView.separated(
+                    physics: const AlwaysScrollableScrollPhysics(
+                      parent: BouncingScrollPhysics(),
+                    ),
+                    padding: EdgeInsets.fromLTRB(0, 8.h, 0, 80.h),
+                    itemCount: filteredLeave.length,
+                    separatorBuilder: (context, index) => Divider(
+                      height: 1,
+                      indent: 76.w,
+                      endIndent: 20.w,
+                      color: colorScheme.outlineVariant.withValues(alpha: 0.3),
+                    ),
+                    itemBuilder: (context, index) {
+                      final leave = filteredLeave[index];
+                      return SharedRequestCard(
+                        title: 'Leave ${Capitalize.firstLetterUppercase(leave.leaveType.name)}',
+                        startDate: leave.startDate,
+                        endDate: leave.endDate,
+                        status: leave.status,
+                        icon: Icons.person,
+                        colorScheme: colorScheme,
+                        onApprove: () => ref
+                            .read(leaveNotifierProvider.notifier)
+                            .approveLeaveRequest(leave.id),
+                        onReject: () => ref
+                            .read(leaveNotifierProvider.notifier)
+                            .rejectLeaveRequest(leave.id),
+                      );
+                    },
+                  ),
+                ),
+        ),
+      ],
     );
   }
 }

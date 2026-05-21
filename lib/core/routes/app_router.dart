@@ -19,7 +19,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
     splashDelayNotifier.dispose();
   });
 
-  Future.delayed(const Duration(seconds: 4), () {
+  Future.delayed(const Duration(seconds: 1), () {
     splashDelayNotifier.value = true;
   });
 

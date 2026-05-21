@@ -25,10 +25,12 @@ class _UserManagementScreenState extends ConsumerState<UserManagementScreen> {
   UserRole? _selectedRole;
   StatusFilter _selectedStatus = StatusFilter.all;
   bool _isSearchActive = false;
+  late final Stream<void> _timeStream;
 
   @override
   void initState() {
     super.initState();
+    _timeStream = Stream.periodic(const Duration(minutes: 1));
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(userNotifierProvider.notifier).fetchUsers();
     });
@@ -190,7 +192,7 @@ class _UserManagementScreenState extends ConsumerState<UserManagementScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               StreamBuilder(
-                stream: Stream.periodic(const Duration(minutes: 1)),
+                stream: _timeStream,
                 builder: (context, _) {
                   final minutes = lastFetchTime != null
                       ? DateTime.now().difference(lastFetchTime).inMinutes

@@ -5,7 +5,7 @@ import 'package:hr_connect/core/const/capitalize.dart';
 import 'package:hr_connect/core/const/enums.dart';
 import 'package:hr_connect/features/leave/data/model/leave_request_model.dart';
 import 'package:hr_connect/features/leave/providers/leave_provider.dart';
-
+import 'package:hr_connect/features/widgets/shared/shared_request_card.dart';
 class LeaveRequestTab extends ConsumerStatefulWidget {
   const LeaveRequestTab({super.key});
 
@@ -267,8 +267,12 @@ class _LeaveRequestTabState extends ConsumerState<LeaveRequestTab> {
                     ),
                     itemBuilder: (context, index) {
                       final leave = filteredLeave[index];
-                      return _buildCompactRequestItem(
-                        leave: leave,
+                      return SharedRequestCard(
+                        title: 'Leave ${Capitalize.firstLetterUppercase(leave.leaveType.name)}',
+                        startDate: leave.startDate,
+                        endDate: leave.endDate,
+                        status: leave.status,
+                        icon: Icons.calendar_today_rounded,
                         colorScheme: colorScheme,
                       );
                     },
@@ -279,105 +283,4 @@ class _LeaveRequestTabState extends ConsumerState<LeaveRequestTab> {
     );
   }
 
-  Widget _buildCompactRequestItem({
-    required LeaveRequestModel leave,
-    required ColorScheme colorScheme,
-  }) {
-    Color statusColor;
-    Color statusBgColor;
-    if (leave.status == RequestStatus.pending) {
-      statusColor = colorScheme.onPrimary;
-      statusBgColor = colorScheme.primary;
-    } else if (leave.status == RequestStatus.approved) {
-      statusColor = colorScheme.onSecondary;
-      statusBgColor = colorScheme.secondary;
-    } else {
-      statusColor = colorScheme.onError;
-      statusBgColor = colorScheme.error;
-    }
-
-    return Material(
-      child: InkWell(
-        onTap: () {
-          // TODO: Handle item tap
-        },
-        child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 14.h),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Container(
-                padding: EdgeInsets.all(12.w),
-                decoration: BoxDecoration(
-                  color: colorScheme.surfaceContainer,
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(
-                  Icons.calendar_today_rounded,
-                  size: 24.sp,
-                  color: colorScheme.primary,
-                ),
-              ),
-              SizedBox(width: 16.w),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Leave ${Capitalize.firstLetterUppercase(leave.leaveType.name)}',
-                      style: TextStyle(
-                        fontSize: 15.sp,
-                        fontWeight: FontWeight.w600,
-                        color: colorScheme.onSurface,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    SizedBox(height: 4.h),
-                    Row(
-                      children: [
-                        Icon(
-                          Icons.calendar_month_outlined,
-                          size: 12.sp,
-                          color: colorScheme.onSurfaceVariant,
-                        ),
-                        SizedBox(width: 4.w),
-                        Expanded(
-                          child: Text(
-                            '${leave.startDate.day}/${leave.startDate.month}/${leave.startDate.year} - ${leave.endDate.day}/${leave.endDate.month}/${leave.endDate.year}',
-                            style: TextStyle(
-                              fontSize: 12.sp,
-                              color: colorScheme.onSurfaceVariant,
-                            ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-              SizedBox(width: 8.w),
-              Container(
-                padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
-                decoration: BoxDecoration(
-                  color: statusBgColor,
-                  borderRadius: BorderRadius.circular(24.r),
-                ),
-                child: Text(
-                  Capitalize.firstLetterUppercase(leave.status.name),
-                  style: TextStyle(
-                    fontSize: 11.sp,
-                    fontWeight: FontWeight.w600,
-                    color: statusColor,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
 }

@@ -11,6 +11,8 @@ class CustomTextField extends StatefulWidget {
   final bool isLoading;
   final bool readOnly;
   final TextInputType? keyboardType;
+  final TextInputAction? textInputAction;
+  final void Function(String)? onFieldSubmitted;
   final String? Function(String?)? validator;
 
   const CustomTextField({
@@ -24,6 +26,8 @@ class CustomTextField extends StatefulWidget {
     this.isLoading = false,
     this.readOnly = false,
     this.keyboardType,
+    this.textInputAction,
+    this.onFieldSubmitted,
     this.validator,
   });
 
@@ -45,11 +49,13 @@ class _CustomTextFieldState extends State<CustomTextField> {
           enabled: !widget.isLoading,
           readOnly: widget.readOnly,
           keyboardType: widget.keyboardType,
+          textInputAction: widget.textInputAction,
+          onFieldSubmitted: widget.onFieldSubmitted,
           style: TextStyle(color: widget.theme.colorScheme.onSurface, fontSize: 14.sp),
           decoration: InputDecoration(
             filled: true,
             fillColor: widget.theme.colorScheme.surfaceContainer,
-            label: Text(widget.title ?? ''),
+            label: widget.title != null ? Text(widget.title!) : null,
             labelStyle: TextStyle(
               color: widget.theme.colorScheme.onSurface.withValues(alpha: 0.6),
               fontSize: 14.sp,
