@@ -10,9 +10,11 @@ abstract class LeaveRequestRemote {
     String id,
     Map<String, dynamic> updateData,
   );
-  Future<void> deleteLeaveRequest(String id);
+  Future<List<LeaveRequestModel>> getLeaveRequestsMe();
+  Future<List<LeaveRequestModel>> getLeaveRequestsPendingMe();
+  Future<void> createLeaveRequest(Map<String, dynamic> request);
   Future<void> approveLeaveRequest(String id);
-  Future<void> rejectLeaveRequest(String id);
+  Future<void> rejectLeaveRequest(String id, String reason);
 }
 
 class LeaveRequestRemoteImp implements LeaveRequestRemote {
@@ -33,8 +35,8 @@ class LeaveRequestRemoteImp implements LeaveRequestRemote {
   @override
   Future<List<LeaveRequestModel>> getLeaveRequests() async {
     return _apiCall(() async {
-      final response = await apiClient.get(ApiEndpoints.leaveRequests);
-      final List<dynamic> leaveRequestsList = response['request'] ?? [];
+      final response = await apiClient.get(ApiEndpoints.leaveRequests) as Map<String, dynamic>;
+      final List<dynamic> leaveRequestsList = response['requests'] as List<dynamic>? ?? [];
       return leaveRequestsList.map((leaveRequestJson) {
         return LeaveRequestModel.fromApi(
           leaveRequestJson as Map<String, dynamic>,
@@ -46,8 +48,8 @@ class LeaveRequestRemoteImp implements LeaveRequestRemote {
   @override
   Future<LeaveRequestModel> getLeaveRequestsById(String id) async {
     return _apiCall(() async {
-      final response = await apiClient.get(ApiEndpoints.leaveRequest(id));
-      return LeaveRequestModel.fromApi(response.data);
+      final response = await apiClient.get(ApiEndpoints.leaveRequest(id)) as Map<String, dynamic>;
+      return LeaveRequestModel.fromApi(response);
     });
   }
 
@@ -60,15 +62,44 @@ class LeaveRequestRemoteImp implements LeaveRequestRemote {
       final response = await apiClient.put(
         ApiEndpoints.putLeaveRequest(id),
         data: updateData,
-      );
-      return LeaveRequestModel.fromApi(response.data);
+      ) as Map<String, dynamic>;
+      return LeaveRequestModel.fromApi(response);
     });
   }
 
   @override
-  Future<void> deleteLeaveRequest(String id) async {
+  Future<List<LeaveRequestModel>> getLeaveRequestsMe() async {
     return _apiCall(() async {
-      await apiClient.delete(ApiEndpoints.deleteLeaveRequest(id));
+      final response = await apiClient.get(ApiEndpoints.leaveMe) as Map<String, dynamic>;
+      final List<dynamic> leaveRequestsList = response['requests'] as List<dynamic>? ?? [];
+      return leaveRequestsList.map((leaveRequestJson) {
+        return LeaveRequestModel.fromApi(
+          leaveRequestJson as Map<String, dynamic>,
+        );
+      }).toList();
+    });
+  }
+
+  @override
+  Future<List<LeaveRequestModel>> getLeaveRequestsPendingMe() async {
+    return _apiCall(() async {
+      final response = await apiClient.get(ApiEndpoints.leavePendingMe) as Map<String, dynamic>;
+      final List<dynamic> leaveRequestsList = response['requests'] as List<dynamic>? ?? [];
+      return leaveRequestsList.map((leaveRequestJson) {
+        return LeaveRequestModel.fromApi(
+          leaveRequestJson as Map<String, dynamic>,
+        );
+      }).toList();
+    });
+  }
+
+  @override
+  Future<void> createLeaveRequest(Map<String, dynamic> request) async {
+    return _apiCall(() async {
+      await apiClient.post(
+        ApiEndpoints.createLeaveRequest,
+        data: request,
+      );
     });
   }
 
@@ -80,9 +111,12 @@ class LeaveRequestRemoteImp implements LeaveRequestRemote {
   }
 
   @override
-  Future<void> rejectLeaveRequest(String id) async {
+  Future<void> rejectLeaveRequest(String id, String reason) async {
     return _apiCall(() async {
-      await apiClient.post(ApiEndpoints.rejectLeaveRequest(id));
+      await apiClient.post(
+        ApiEndpoints.rejectLeaveRequest(id),
+        data: {'reason': reason},
+      );
     });
   }
 }

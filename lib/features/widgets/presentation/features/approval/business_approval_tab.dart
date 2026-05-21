@@ -5,6 +5,7 @@ import 'package:hr_connect/core/const/capitalize.dart';
 import 'package:hr_connect/core/const/enums.dart';
 import 'package:hr_connect/features/business_trip/data/model/business_trip_model.dart';
 import 'package:hr_connect/features/business_trip/provider/business_provider.dart';
+import 'package:hr_connect/features/widgets/presentation/features/approval/request_detail_screen.dart';
 import 'package:hr_connect/features/widgets/shared/shared_request_card.dart';
 
 class BusinessApprovalTab extends ConsumerStatefulWidget {
@@ -270,12 +271,33 @@ class _BusinessApprovalTabState extends ConsumerState<BusinessApprovalTab> {
                         status: trip.status,
                         icon: Icons.work_rounded,
                         colorScheme: colorScheme,
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => RequestDetailScreen(
+                                title: 'Business Trip - ${Capitalize.firstLetterUppercase(trip.businessTripType.name)}',
+                                description: trip.description ?? 'No description provided.',
+                                startDate: trip.startDate,
+                                endDate: trip.endDate,
+                                status: trip.status,
+                                icon: Icons.work_rounded,
+                                onApprove: () => ref
+                                    .read(businessNotifierProvider.notifier)
+                                    .approveBusinessTrip(trip.id),
+                                onReject: () => ref
+                                    .read(businessNotifierProvider.notifier)
+                                    .rejectBusinessTrip(trip.id, 'Rejected by approver'),
+                              ),
+                            ),
+                          );
+                        },
                         onApprove: () => ref
                             .read(businessNotifierProvider.notifier)
                             .approveBusinessTrip(trip.id),
                         onReject: () => ref
                             .read(businessNotifierProvider.notifier)
-                            .rejectBusinessTrip(trip.id),
+                            .rejectBusinessTrip(trip.id, 'Rejected by approver'),
                       );
                     },
                   ),

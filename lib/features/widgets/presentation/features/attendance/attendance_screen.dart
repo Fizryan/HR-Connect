@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:hr_connect/features/widgets/presentation/features/attendance/attendance_scan_tab.dart';
+import 'package:hr_connect/features/widgets/presentation/features/attendance/attendance_generate_tab.dart';
 
 class AttendanceScreen extends StatelessWidget {
   const AttendanceScreen({super.key});
@@ -38,7 +39,7 @@ class AttendanceScreen extends StatelessWidget {
                   physics: BouncingScrollPhysics(),
                   children: [
                     AttendanceScanTab(),
-                    Center(child: Text('My QR Tab Content')),
+                    AttendanceGenerateTab(),
                   ],
                 ),
               ),

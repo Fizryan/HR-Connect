@@ -9,7 +9,9 @@ abstract class LeaveRepository {
     String id,
     Map<String, dynamic> updateData,
   );
-  Future<Either<Failure, void>> deleteLeaveRequest(String id);
+  Future<Either<Failure, List<LeaveRequestModel>>> getLeaveRequestsMe();
+  Future<Either<Failure, List<LeaveRequestModel>>> getLeaveRequestsPendingMe();
+  Future<Either<Failure, void>> createLeaveRequest(Map<String, dynamic> request);
   Future<Either<Failure, void>> approveLeaveRequest(String id);
-  Future<Either<Failure, void>> rejectLeaveRequest(String id);
+  Future<Either<Failure, void>> rejectLeaveRequest(String id, String reason);
 }

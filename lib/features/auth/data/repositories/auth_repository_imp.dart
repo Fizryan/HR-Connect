@@ -75,7 +75,7 @@ class AuthRepositoryImp implements AuthRepository {
       final refreshToken = await secureStorage.read(key: SecureStorage.refreshToken);
       if (refreshToken != null) {
         try {
-          await remoteDataSource.logout(refreshToken);
+          await remoteDataSource.logout();
         } catch (e) {
           debugPrint('[AuthRepository] API Logout failed (ignored): $e');
         }
@@ -169,6 +169,22 @@ class AuthRepositoryImp implements AuthRepository {
         return user;
       },
       Intl.message('Failed to load user information.', name: 'loadUserInfoFailed'),
+    );
+  }
+
+  @override
+  Future<Either<Failure, void>> changePassword(String newPassword, String oldPassword) async {
+    return _sourceCall(
+      () async => await remoteDataSource.changePassword(newPassword, oldPassword),
+      Intl.message('Failed to change password.', name: 'changePasswordFailed'),
+    );
+  }
+
+  @override
+  Future<Either<Failure, void>> resetPassword(String id, String newPassword) async {
+    return _sourceCall(
+      () async => await remoteDataSource.resetPassword(id, newPassword),
+      Intl.message('Failed to reset password.', name: 'resetPasswordFailed'),
     );
   }
 }

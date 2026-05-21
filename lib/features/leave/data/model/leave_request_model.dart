@@ -27,10 +27,10 @@ abstract class LeaveRequestModel with _$LeaveRequestModel {
   factory LeaveRequestModel.fromApi(Map<String, dynamic> json) {
     final requestNode = json['request'] as Map<String, dynamic>? ?? json;
     final dataNode = requestNode['data'] as Map<String, dynamic>? ?? {};
-    final rawLeaveType = dataNode['leaveType'] as String? ?? '';
+    final rawLeaveType = dataNode['type'] as String? ?? '';
     String mappedLeaveType = 'other';
 
-    switch (rawLeaveType) {
+    switch (rawLeaveType.toUpperCase()) {
       case 'SICK':
         mappedLeaveType = 'sick';
         break;
@@ -47,16 +47,20 @@ abstract class LeaveRequestModel with _$LeaveRequestModel {
         mappedLeaveType = 'other';
         break;
       default:
-        mappedLeaveType = 'other';
+        mappedLeaveType = rawLeaveType.toLowerCase();
     }
 
     return LeaveRequestModel.fromJson({
-      'requestId': requestNode['id'],
+      'id': requestNode['id'] ?? '',
+      'requestId': requestNode['id'] ?? '',
       'leaveType': mappedLeaveType,
-      'desciprtion': dataNode['description'],
-      'approverId': dataNode['approverId'],
-      'createdAt': dataNode['createdAt'],
-      'updatedAt': dataNode['updatedAt'],
+      'description': dataNode['description'],
+      'approverId': requestNode['approverId'],
+      'status': (requestNode['status'] as String?)?.toLowerCase() ?? 'pending',
+      'startDate': dataNode['startDate'] ?? DateTime.now().toIso8601String(),
+      'endDate': dataNode['endDate'] ?? DateTime.now().toIso8601String(),
+      'createdAt': requestNode['createdAt'],
+      'updatedAt': requestNode['updatedAt'],
     }); 
   }
 }

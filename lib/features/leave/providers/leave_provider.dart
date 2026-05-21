@@ -126,14 +126,6 @@ class LeaveNotifier extends AsyncNotifier<List<LeaveRequestModel>> {
     );
   }
 
-  Future<void> deleteLeaveRequest(String id) async {
-    await _handleMutation(
-      action: () => ref.read(leaveRepositoryProvider).deleteLeaveRequest(id),
-      optimisticUpdate: (current) =>
-          current.where((leave) => leave.id != id).toList(),
-    );
-  }
-
   Future<void> approveLeaveRequest(String id) async {
     await _handleMutation(
       action: () => ref.read(leaveRepositoryProvider).approveLeaveRequest(id),
@@ -145,14 +137,23 @@ class LeaveNotifier extends AsyncNotifier<List<LeaveRequestModel>> {
     );
   }
 
-  Future<void> rejectLeaveRequest(String id) async {
+  Future<void> rejectLeaveRequest(String id, String reason) async {
     await _handleMutation(
-      action: () => ref.read(leaveRepositoryProvider).rejectLeaveRequest(id),
+      action: () => ref.read(leaveRepositoryProvider).rejectLeaveRequest(id, reason),
       optimisticUpdate: (current) => current.map((leave) {
         return leave.id == id
             ? leave.copyWith(status: RequestStatus.rejected)
             : leave;
       }).toList(),
+    );
+  }
+
+  Future<void> createLeaveRequest(Map<String, dynamic> request) async {
+    await _handleMutation(
+      action: () => ref.read(leaveRepositoryProvider).createLeaveRequest(request),
+      onSuccess: (_) {
+        fetchLeaveRequests();
+      },
     );
   }
 }

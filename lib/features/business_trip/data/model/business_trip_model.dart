@@ -27,10 +27,10 @@ abstract class BusinessTripModel with _$BusinessTripModel {
   factory BusinessTripModel.fromApi(Map<String, dynamic> json) {
     final requestNode = json['request'] as Map<String, dynamic>? ?? json;
     final dataNode = requestNode['data'] as Map<String, dynamic>? ?? {};
-    final rawBusinessTripType = dataNode['businessTripType'] as String? ?? '';
+    final rawBusinessTripType = dataNode['type'] as String? ?? '';
     String mappedBusinessTripType = 'other';
 
-    switch (rawBusinessTripType) {
+    switch (rawBusinessTripType.toUpperCase()) {
       case 'MEETING':
         mappedBusinessTripType = 'meeting';
         break;
@@ -47,16 +47,20 @@ abstract class BusinessTripModel with _$BusinessTripModel {
         mappedBusinessTripType = 'other';
         break;
       default:
-        mappedBusinessTripType = 'other';
+        mappedBusinessTripType = rawBusinessTripType.toLowerCase();
     }
 
     return BusinessTripModel.fromJson({
-      'requestId': requestNode['id'],
+      'id': requestNode['id'] ?? '',
+      'requestId': requestNode['id'] ?? '',
       'businessTripType': mappedBusinessTripType,
-      'desciprtion': dataNode['description'],
-      'approverId': dataNode['approverId'],
-      'createdAt': dataNode['createdAt'],
-      'updatedAt': dataNode['updatedAt'],
+      'description': dataNode['description'],
+      'approverId': requestNode['approverId'],
+      'status': (requestNode['status'] as String?)?.toLowerCase() ?? 'pending',
+      'startDate': dataNode['startDate'] ?? DateTime.now().toIso8601String(),
+      'endDate': dataNode['endDate'] ?? DateTime.now().toIso8601String(),
+      'createdAt': requestNode['createdAt'],
+      'updatedAt': requestNode['updatedAt'],
     });
   }
 }

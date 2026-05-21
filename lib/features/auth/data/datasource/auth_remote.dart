@@ -16,9 +16,11 @@ abstract class AuthRemote {
     String lastName,
     UserRole role,
   );
-  Future<void> logout(String refreshToken);
+  Future<void> logout();
   Future<AuthModel> refreshToken(String token);
   Future<UserModel> getUserInfo();
+  Future<void> changePassword(String newPassword, String oldPassword);
+  Future<void> resetPassword(String id, String newPassword);
 }
 
 class AuthRemoteImpl implements AuthRemote {
@@ -42,11 +44,11 @@ class AuthRemoteImpl implements AuthRemote {
       final response = await apiClient.post(
         ApiEndpoints.authLogin,
         data: {'email': email, 'password': password},
-      );
+      ) as Map<String, dynamic>;
       return AuthModel.success(
-        accessToken: response['accessToken'],
-        expTime: response['expTime'],
-        refreshToken: response['refreshToken'],
+        accessToken: response['accessToken'] as String,
+        expTime: response['expTime'].toString(),
+        refreshToken: response['refreshToken'] as String,
       );
     });
   }
@@ -78,11 +80,10 @@ class AuthRemoteImpl implements AuthRemote {
   }
 
   @override
-  Future<void> logout(String refreshToken) async {
+  Future<void> logout() async {
     return _apiCall(() async {
       await apiClient.post(
         ApiEndpoints.authLogout,
-        data: {'refresh': refreshToken},
       );
     });
   }
@@ -92,12 +93,32 @@ class AuthRemoteImpl implements AuthRemote {
     return _apiCall(() async {
       final response = await apiClient.post(
         ApiEndpoints.authRefresh,
-        data: {'refresh': token},
-      );
+        data: {'refreshToken': token},
+      ) as Map<String, dynamic>;
       return AuthModel.success(
-        accessToken: response['accessToken'],
-        expTime: response['expTime'],
-        refreshToken: response['refreshToken'],
+        accessToken: response['accessToken'] as String,
+        expTime: response['expTime'].toString(),
+        refreshToken: response['refreshToken'] as String,
+      );
+    });
+  }
+
+  @override
+  Future<void> changePassword(String newPassword, String oldPassword) async {
+    return _apiCall(() async {
+      await apiClient.post(
+        ApiEndpoints.authChange,
+        data: {'newPassword': newPassword, 'oldPassword': oldPassword},
+      );
+    });
+  }
+
+  @override
+  Future<void> resetPassword(String id, String newPassword) async {
+    return _apiCall(() async {
+      await apiClient.post(
+        ApiEndpoints.authReset,
+        data: {'id': id, 'newPassword': newPassword},
       );
     });
   }

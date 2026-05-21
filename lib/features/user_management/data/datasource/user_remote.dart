@@ -33,9 +33,9 @@ class UserRemoteImp implements UserRemote {
       final response = await apiClient.get(
         ApiEndpoints.users,
         queryParameters: {'page': page, 'limit': limit},
-      );
+      ) as Map<String, dynamic>;
 
-      final List<dynamic> usersList = response['user'] ?? [];
+      final List<dynamic> usersList = response['user'] as List<dynamic>? ?? [];
       return usersList.map((userJson) {
         return UserModel.fromApi(userJson as Map<String, dynamic>);
       }).toList();
@@ -71,6 +71,7 @@ class UserRemoteImp implements UserRemote {
     return _apiCall(() async {
       await apiClient.post(
         ApiEndpoints.activateUser(id),
+        data: {},
       );
     });
   }
@@ -82,6 +83,7 @@ class UserRemoteImp implements UserRemote {
     return _apiCall(() async {
       await apiClient.post(
         ApiEndpoints.deactivateUser(id),
+        data: {},
       );
     });
   }

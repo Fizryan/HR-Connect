@@ -10,9 +10,11 @@ abstract class BusinessTripRemote {
     String id,
     Map<String, dynamic> updateData,
   );
-  Future<void> deleteBusinessTrip(String id);
+  Future<List<BusinessTripModel>> getBusinessTripMe();
+  Future<List<BusinessTripModel>> getBusinessTripPendingMe();
+  Future<void> createBusinessTrip(Map<String, dynamic> request);
   Future<void> approveBusinessTrip(String id);
-  Future<void> rejectBusinessTrip(String id);
+  Future<void> rejectBusinessTrip(String id, String reason);
 }
 
 class BusinessTripRemoteImp implements BusinessTripRemote {
@@ -33,8 +35,8 @@ class BusinessTripRemoteImp implements BusinessTripRemote {
   @override
   Future<List<BusinessTripModel>> getBusinessTrip() async {
     return _apiCall(() async {
-      final response = await apiclient.get(ApiEndpoints.businessTrips);
-      final List<dynamic> businessTripList = response['trip'] ?? [];
+      final response = await apiclient.get(ApiEndpoints.businessTrips) as Map<String, dynamic>;
+      final List<dynamic> businessTripList = response['requests'] as List<dynamic>? ?? [];
       return businessTripList.map((businessTripJson) {
         return BusinessTripModel.fromApi(
           businessTripJson as Map<String, dynamic>,
@@ -46,8 +48,8 @@ class BusinessTripRemoteImp implements BusinessTripRemote {
   @override
   Future<BusinessTripModel> getBusinessTripById(String id) async {
     return _apiCall(() async {
-      final response = await apiclient.get(ApiEndpoints.businessTrip(id));
-      return BusinessTripModel.fromApi(response.data);
+      final response = await apiclient.get(ApiEndpoints.businessTrip(id)) as Map<String, dynamic>;
+      return BusinessTripModel.fromApi(response);
     });
   }
 
@@ -60,15 +62,44 @@ class BusinessTripRemoteImp implements BusinessTripRemote {
       final response = await apiclient.put(
         ApiEndpoints.putBusinessTrip(id),
         data: updateData,
-      );
-      return BusinessTripModel.fromApi(response.data);
+      ) as Map<String, dynamic>;
+      return BusinessTripModel.fromApi(response);
     });
   }
 
   @override
-  Future<void> deleteBusinessTrip(String id) async {
+  Future<List<BusinessTripModel>> getBusinessTripMe() async {
     return _apiCall(() async {
-      await apiclient.delete(ApiEndpoints.deleteBusinessTrip(id));
+      final response = await apiclient.get(ApiEndpoints.businessTripMe) as Map<String, dynamic>;
+      final List<dynamic> businessTripList = response['requests'] as List<dynamic>? ?? [];
+      return businessTripList.map((businessTripJson) {
+        return BusinessTripModel.fromApi(
+          businessTripJson as Map<String, dynamic>,
+        );
+      }).toList();
+    });
+  }
+
+  @override
+  Future<List<BusinessTripModel>> getBusinessTripPendingMe() async {
+    return _apiCall(() async {
+      final response = await apiclient.get(ApiEndpoints.businessTripPendingMe) as Map<String, dynamic>;
+      final List<dynamic> businessTripList = response['requests'] as List<dynamic>? ?? [];
+      return businessTripList.map((businessTripJson) {
+        return BusinessTripModel.fromApi(
+          businessTripJson as Map<String, dynamic>,
+        );
+      }).toList();
+    });
+  }
+
+  @override
+  Future<void> createBusinessTrip(Map<String, dynamic> request) async {
+    return _apiCall(() async {
+      await apiclient.post(
+        ApiEndpoints.createBusinessTrip,
+        data: request,
+      );
     });
   }
 
@@ -80,9 +111,12 @@ class BusinessTripRemoteImp implements BusinessTripRemote {
   }
 
   @override
-  Future<void> rejectBusinessTrip(String id) async {
+  Future<void> rejectBusinessTrip(String id, String reason) async {
     return _apiCall(() async {
-      await apiclient.post(ApiEndpoints.rejectBusinessTrip(id));
+      await apiclient.post(
+        ApiEndpoints.rejectBusinessTrip(id),
+        data: {'reason': reason},
+      );
     });
   }
 }

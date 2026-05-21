@@ -66,17 +66,6 @@ class LeaveRepositoryImp implements LeaveRepository {
   }
 
   @override
-  Future<Either<Failure, void>> deleteLeaveRequest(String id) async {
-    return _sourceCall(
-      () => remoteDataSource.deleteLeaveRequest(id),
-      Intl.message(
-        'Failed to delete leave request. Please try again.',
-        name: 'deleteLeaveRequestFailed',
-      ),
-    );
-  }
-
-  @override
   Future<Either<Failure, void>> approveLeaveRequest(String id) async {
     return _sourceCall(
       () => remoteDataSource.approveLeaveRequest(id),
@@ -88,12 +77,45 @@ class LeaveRepositoryImp implements LeaveRepository {
   }
 
   @override
-  Future<Either<Failure, void>> rejectLeaveRequest(String id) async {
+  Future<Either<Failure, void>> rejectLeaveRequest(String id, String reason) async {
     return _sourceCall(
-      () => remoteDataSource.rejectLeaveRequest(id),
+      () => remoteDataSource.rejectLeaveRequest(id, reason),
       Intl.message(
         'Failed to reject leave request. Please try again.',
         name: 'rejectLeaveRequestFailed',
+      ),
+    );
+  }
+
+  @override
+  Future<Either<Failure, List<LeaveRequestModel>>> getLeaveRequestsMe() async {
+    return _sourceCall(
+      remoteDataSource.getLeaveRequestsMe,
+      Intl.message(
+        'Failed to load leave requests. Please try again.',
+        name: 'loadLeaveRequestsFailed',
+      ),
+    );
+  }
+
+  @override
+  Future<Either<Failure, List<LeaveRequestModel>>> getLeaveRequestsPendingMe() async {
+    return _sourceCall(
+      remoteDataSource.getLeaveRequestsPendingMe,
+      Intl.message(
+        'Failed to load pending leave requests. Please try again.',
+        name: 'loadPendingLeaveRequestsFailed',
+      ),
+    );
+  }
+
+  @override
+  Future<Either<Failure, void>> createLeaveRequest(Map<String, dynamic> request) async {
+    return _sourceCall(
+      () => remoteDataSource.createLeaveRequest(request),
+      Intl.message(
+        'Failed to create leave request. Please try again.',
+        name: 'createLeaveRequestFailed',
       ),
     );
   }

@@ -9,6 +9,8 @@ import 'package:hr_connect/features/business_trip/data/model/business_trip_model
 import 'package:hr_connect/features/business_trip/provider/business_provider.dart';
 import 'package:hr_connect/features/leave/data/model/leave_request_model.dart';
 import 'package:hr_connect/features/leave/providers/leave_provider.dart';
+import 'package:hr_connect/features/dashboard/data/model/dashboard_model.dart';
+import 'package:hr_connect/features/dashboard/providers/dashboard_provider.dart';
 import 'package:hr_connect/features/user_management/data/model/user_model.dart';
 import 'package:hr_connect/features/widgets/presentation/features/etc/about_screen.dart';
 import 'package:hr_connect/features/widgets/presentation/features/etc/edit_profile_screen.dart';
@@ -28,6 +30,7 @@ class DashboardScreen extends ConsumerWidget {
 
     final leaveState = ref.watch(leaveNotifierProvider);
     final businessTripState = ref.watch(businessNotifierProvider);
+    final dashboardState = ref.watch(dashboardNotifierProvider);
 
     return Scaffold(
       body: Stack(
@@ -43,6 +46,9 @@ class DashboardScreen extends ConsumerWidget {
                   ref
                       .read(businessNotifierProvider.notifier)
                       .refreshBusinessTrip(),
+                  ref
+                      .read(dashboardNotifierProvider.notifier)
+                      .refreshDashboard(),
                 ]);
               },
               backgroundColor: colorScheme.surfaceContainerHighest,
@@ -56,13 +62,28 @@ class DashboardScreen extends ConsumerWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     _buildProfileCard(colorScheme, context, ref),
+                    SizedBox(height: 24.h),
+                    dashboardState.when(
+                      loading: () => const Center(child: CircularProgressIndicator()),
+                      error: (err, _) => _buildErrorCard(err.toString(), colorScheme),
+                      data: (dashboard) => dashboard == null 
+                          ? const SizedBox.shrink() 
+                          : _buildMetricsGrid(dashboard, colorScheme),
+                    ),
+                    
                     SizedBox(height: 32.h),
                     _buildSectionHeader(
                       title: 'Recent Leaves',
                       showSeeAll:
                           leaveState.hasValue && leaveState.value!.isNotEmpty,
                       onSeeAll: () {
-                        // TODO: Implement see all leaves
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: const Text('Navigate to All Leaves...'),
+                            behavior: SnackBarBehavior.floating,
+                            backgroundColor: colorScheme.primary,
+                          ),
+                        );
                       },
                       colorScheme: colorScheme,
                     ),
@@ -96,7 +117,13 @@ class DashboardScreen extends ConsumerWidget {
                           businessTripState.hasValue &&
                           businessTripState.value!.isNotEmpty,
                       onSeeAll: () {
-                        // TODO: Implement see all business trips
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: const Text('Navigate to All Business Trips...'),
+                            behavior: SnackBarBehavior.floating,
+                            backgroundColor: colorScheme.primary,
+                          ),
+                        );
                       },
                       colorScheme: colorScheme,
                     ),
@@ -125,6 +152,94 @@ class DashboardScreen extends ConsumerWidget {
                   ],
                 ),
               ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMetricsGrid(DashboardModel dashboard, ColorScheme colorScheme) {
+    return GridView.count(
+      crossAxisCount: 2,
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      crossAxisSpacing: 12.w,
+      mainAxisSpacing: 12.h,
+      childAspectRatio: 1.5,
+      children: [
+        _buildMetricCard(
+          title: 'Attendance Rate',
+          value: '${dashboard.attendanceRate}%',
+          icon: Icons.percent_rounded,
+          colorScheme: colorScheme,
+        ),
+        _buildMetricCard(
+          title: 'Pending Leaves',
+          value: '${dashboard.pendingLeave}',
+          icon: Icons.beach_access_rounded,
+          colorScheme: colorScheme,
+        ),
+        _buildMetricCard(
+          title: 'Pending Trips',
+          value: '${dashboard.pendingTrip}',
+          icon: Icons.business_center_rounded,
+          colorScheme: colorScheme,
+        ),
+        _buildMetricCard(
+          title: 'Total Users',
+          value: '${dashboard.totalUser}',
+          icon: Icons.people_rounded,
+          colorScheme: colorScheme,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildMetricCard({
+    required String title,
+    required String value,
+    required IconData icon,
+    required ColorScheme colorScheme,
+  }) {
+    return Container(
+      padding: EdgeInsets.all(12.r),
+      decoration: BoxDecoration(
+        color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.6),
+        borderRadius: BorderRadius.circular(16.r),
+        border: Border.all(
+          color: colorScheme.outlineVariant.withValues(alpha: 0.3),
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Row(
+            children: [
+              Icon(icon, size: 20.sp, color: colorScheme.primary),
+              SizedBox(width: 8.w),
+              Expanded(
+                child: Text(
+                  title,
+                  style: TextStyle(
+                    fontSize: 12.sp,
+                    color: colorScheme.onSurfaceVariant,
+                    fontWeight: FontWeight.w500,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: 12.h),
+          Text(
+            value,
+            style: TextStyle(
+              fontSize: 24.sp,
+              fontWeight: FontWeight.w700,
+              color: colorScheme.onSurface,
             ),
           ),
         ],

@@ -75,6 +75,27 @@ class _AddUserScreenState extends ConsumerState<AddUserScreen> {
       return;
     }
 
+    if (password.length < 6 ||
+        !password.contains(RegExp(r'[A-Z]')) ||
+        !password.contains(RegExp(r'[0-9]')) ||
+        !password.contains(RegExp(r'[^a-zA-Z0-9\s]'))) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Password must be at least 6 characters and contain an uppercase letter, a number, and a symbol.',
+            style: TextStyle(
+              fontSize: 14.sp,
+              fontWeight: FontWeight.w600,
+              color: Theme.of(context).colorScheme.onErrorContainer,
+            ),
+          ),
+          backgroundColor: Theme.of(context).colorScheme.errorContainer,
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+      return;
+    }
+
     setState(() => _isLoading = true);
 
     try {
@@ -175,7 +196,13 @@ class _AddUserScreenState extends ConsumerState<AddUserScreen> {
                       ),
                       GestureDetector(
                         onTap: () {
-                          // TODO: Implement image upload logic
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: const Text('Image upload is not available yet.'),
+                              behavior: SnackBarBehavior.floating,
+                              backgroundColor: colorScheme.secondary,
+                            ),
+                          );
                         },
                         child: Container(
                           padding: EdgeInsets.all(8.r),

@@ -2,16 +2,22 @@ import 'package:hr_connect/core/const/enums.dart';
 
 class Role {
   static UserRole rawToRole(String rawRole) {
-    switch (rawRole) {
-      case 'ROLE_ADMIN':
+    switch (rawRole.toLowerCase()) {
+      case 'admin':
+      case 'role_admin':
         return UserRole.admin;
-      case 'ROLE_DIRECTOR':
+      case 'director':
+      case 'role_director':
         return UserRole.director;
-      case 'ROLE_MANAGER':
+      case 'manager':
+      case 'role_manager':
         return UserRole.manager;
-      case 'ROLE_SUPERVISOR':
+      case 'supervisor':
+      case 'role_supervisor':
         return UserRole.supervisor;
-      case 'ROLE_STAFF_UNSPECIFIED':
+      case 'staff':
+      case 'role_staff_unspecified':
+      case 'role_staff':
         return UserRole.staff;
       default:
         return UserRole.unknown;
@@ -19,26 +25,19 @@ class Role {
   }
 
   static String roleToRaw(UserRole role) {
-    String mappedRole = 'unknown';
     switch (role) {
       case UserRole.admin:
-        mappedRole = 'ROLE_ADMIN';
-        return mappedRole;
+        return 'admin';
       case UserRole.director:
-        mappedRole = 'ROLE_DIRECTOR';
-        return mappedRole;
+        return 'director';
       case UserRole.manager:
-        mappedRole = 'ROLE_MANAGER';
-        return mappedRole;
+        return 'manager';
       case UserRole.supervisor:
-        mappedRole = 'ROLE_SUPERVISOR';
-        return mappedRole;
+        return 'supervisor';
       case UserRole.staff:
-        mappedRole = 'ROLE_STAFF_UNSPECIFIED';
-        return mappedRole;
+        return 'staff';
       default:
-        mappedRole = 'ROLE_UNKNOWN';
-        return mappedRole;
+        return 'unknown';
     }
   }
 }

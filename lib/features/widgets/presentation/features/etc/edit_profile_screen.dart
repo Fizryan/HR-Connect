@@ -168,7 +168,13 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                       ),
                       GestureDetector(
                         onTap: () {
-                          // TODO: Implement image upload logic
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: const Text('Image upload is not available yet.'),
+                              behavior: SnackBarBehavior.floating,
+                              backgroundColor: colorScheme.secondary,
+                            ),
+                          );
                         },
                         child: Container(
                           padding: EdgeInsets.all(8.r),

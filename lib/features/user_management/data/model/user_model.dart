@@ -31,15 +31,6 @@ abstract class UserModel with _$UserModel {
     final rawRole = dataNode['role'] as String? ?? '';
     final String mappedRole = Role.rawToRole(rawRole).name;
 
-    String? parseUnixToIso(dynamic timestamp) {
-      if (timestamp == null) return null;
-      final intSeconds = int.tryParse(timestamp.toString());
-      if (intSeconds == null) return null;
-      return DateTime.fromMillisecondsSinceEpoch(
-        intSeconds * 1000,
-      ).toIso8601String();
-    }
-
     return UserModel.fromJson({
       'id': userNode['id'],
       'email': dataNode['email'],
@@ -49,8 +40,8 @@ abstract class UserModel with _$UserModel {
       'role': mappedRole,
       'avatarUrl': dataNode['avatarUrl'],
       'isActive': userNode['isActive'] ?? true,
-      'createdAt': parseUnixToIso(userNode['createdAt']),
-      'updatedAt': parseUnixToIso(userNode['updatedAt']),
+      'createdAt': userNode['createdAt'],
+      'updatedAt': userNode['updatedAt'],
     });
   }
 

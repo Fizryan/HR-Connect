@@ -5,6 +5,7 @@ import 'package:hr_connect/core/const/capitalize.dart';
 import 'package:hr_connect/core/const/enums.dart';
 import 'package:hr_connect/features/business_trip/data/model/business_trip_model.dart';
 import 'package:hr_connect/features/business_trip/provider/business_provider.dart';
+import 'package:hr_connect/features/widgets/presentation/features/approval/request_detail_screen.dart';
 import 'package:hr_connect/features/widgets/shared/shared_request_card.dart';
 class BusinessTripTab extends ConsumerStatefulWidget {
   const BusinessTripTab({super.key});
@@ -273,6 +274,21 @@ class _BusinessTripTabState extends ConsumerState<BusinessTripTab> {
                         status: trip.status,
                         icon: Icons.calendar_today_rounded,
                         colorScheme: colorScheme,
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => RequestDetailScreen(
+                                title: 'Business Trip - ${Capitalize.firstLetterUppercase(trip.businessTripType.name)}',
+                                description: trip.description ?? 'No description provided.',
+                                startDate: trip.startDate,
+                                endDate: trip.endDate,
+                                status: trip.status,
+                                icon: Icons.calendar_today_rounded,
+                              ),
+                            ),
+                          );
+                        },
                       );
                     },
                   ),

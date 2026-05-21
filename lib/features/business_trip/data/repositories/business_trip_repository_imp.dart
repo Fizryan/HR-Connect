@@ -66,17 +66,6 @@ class BusinessTripRepositoryImp implements BusinessTripRepository {
   }
 
   @override
-  Future<Either<Failure, void>> deleteBusinessTrip(String id) async {
-    return _sourceCall(
-      () => remoteDataSource.deleteBusinessTrip(id),
-      Intl.message(
-        'Failed to delete business trip. Please try again.',
-        name: 'deleteBusinessTripFailed',
-      ),
-    );
-  }
-
-  @override
   Future<Either<Failure, void>> approveBusinessTrip(String id) async {
     return _sourceCall(
       () => remoteDataSource.approveBusinessTrip(id),
@@ -88,12 +77,45 @@ class BusinessTripRepositoryImp implements BusinessTripRepository {
   }
 
   @override
-  Future<Either<Failure, void>> rejectBusinessTrip(String id) async {
+  Future<Either<Failure, void>> rejectBusinessTrip(String id, String reason) async {
     return _sourceCall(
-      () => remoteDataSource.rejectBusinessTrip(id),
+      () => remoteDataSource.rejectBusinessTrip(id, reason),
       Intl.message(
         'Failed to reject business trip. Please try again.',
         name: 'rejectBusinessTripFailed',
+      ),
+    );
+  }
+
+  @override
+  Future<Either<Failure, List<BusinessTripModel>>> getBusinessTripMe() async {
+    return _sourceCall(
+      remoteDataSource.getBusinessTripMe,
+      Intl.message(
+        'Failed to load business trip data. Please try again.',
+        name: 'loadBusinessTripDataFailed',
+      ),
+    );
+  }
+
+  @override
+  Future<Either<Failure, List<BusinessTripModel>>> getBusinessTripPendingMe() async {
+    return _sourceCall(
+      remoteDataSource.getBusinessTripPendingMe,
+      Intl.message(
+        'Failed to load pending business trip data. Please try again.',
+        name: 'loadPendingBusinessTripDataFailed',
+      ),
+    );
+  }
+
+  @override
+  Future<Either<Failure, void>> createBusinessTrip(Map<String, dynamic> request) async {
+    return _sourceCall(
+      () => remoteDataSource.createBusinessTrip(request),
+      Intl.message(
+        'Failed to create business trip. Please try again.',
+        name: 'createBusinessTripFailed',
       ),
     );
   }

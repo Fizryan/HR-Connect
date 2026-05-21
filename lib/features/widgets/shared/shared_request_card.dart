@@ -12,6 +12,7 @@ class SharedRequestCard extends StatelessWidget {
   final ColorScheme colorScheme;
   final VoidCallback? onApprove;
   final VoidCallback? onReject;
+  final VoidCallback? onTap;
 
   const SharedRequestCard({
     super.key,
@@ -23,6 +24,7 @@ class SharedRequestCard extends StatelessWidget {
     required this.colorScheme,
     this.onApprove,
     this.onReject,
+    this.onTap,
   });
 
   @override
@@ -46,8 +48,14 @@ class SharedRequestCard extends StatelessWidget {
     return Material(
       color: Colors.transparent,
       child: InkWell(
-        onTap: () {
-          // TODO: Handle item tap
+        onTap: onTap ?? () {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: const Text('Item details coming soon!'),
+              behavior: SnackBarBehavior.floating,
+              backgroundColor: colorScheme.secondary,
+            ),
+          );
         },
         child: Padding(
           padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 14.h),

@@ -19,21 +19,34 @@ class ApiEndpoints {
     static String deactivateUser(String id) => '$_baseApi/users/$id/deactivate';
 
     // LeaveService Endpoints
-    static String get leaveRequests => '$_baseApi/leavereqs';
-    static String leaveRequest(String id) => '$_baseApi/leavereqs/$id';
-    static String putLeaveRequest(String id) => '$_baseApi/leavereqs/$id';
-    static String deleteLeaveRequest(String id) => '$_baseApi/leavereqs/$id';
-    static String approveLeaveRequest(String id) => '$_baseApi/leavereqs/$id/approve';
-    static String rejectLeaveRequest(String id) => '$_baseApi/leavereqs/$id/reject';
+    static String get leaveMe => '$_baseApi/me/leave';
+    static String get leavePendingMe => '$_baseApi/pending/leave';
+    static String get leaveRequests => '$_baseApi/leave';
+    static String get createLeaveRequest => '$_baseApi/leave/new';
+    static String leaveRequest(String id) => '$_baseApi/leave/$id';
+    static String putLeaveRequest(String id) => '$_baseApi/leave/$id';
+    static String approveLeaveRequest(String id) => '$_baseApi/leave/$id/approve';
+    static String rejectLeaveRequest(String id) => '$_baseApi/leave/$id/reject';
 
     // BusinessService Endpoints
-    static String get businessTrips => '$_baseApi/businesstrips';
-    static String businessTrip(String id) => '$_baseApi/businesstrips/$id';
-    static String putBusinessTrip(String id) => '$_baseApi/businesstrips/$id';
-    static String deleteBusinessTrip(String id) => '$_baseApi/businesstrips/$id';
-    static String approveBusinessTrip(String id) => '$_baseApi/businesstrips/$id/approve';
-    static String rejectBusinessTrip(String id) => '$_baseApi/businesstrips/$id/reject';
+    static String get businessTripMe => '$_baseApi/me/trip';
+    static String get businessTripPendingMe => '$_baseApi/pending/trip';
+    static String get businessTrips => '$_baseApi/trip';
+    static String get createBusinessTrip => '$_baseApi/trip/new';
+    static String businessTrip(String id) => '$_baseApi/trip/$id';
+    static String putBusinessTrip(String id) => '$_baseApi/trip/$id';
+    static String approveBusinessTrip(String id) => '$_baseApi/trip/$id/approve';
+    static String rejectBusinessTrip(String id) => '$_baseApi/trip/$id/reject';
 
     // DashboardService Endpoints
     static String get dashboard => '$_baseApi/dashboard';
+
+    // AttendanceService Endpoints
+    static String get attendanceMe => '$_baseApi/me/attendance';
+    static String get attendanceToday => '$_baseApi/attendance/today';
+    static String get attendanceCheckIn => '$_baseApi/attendance/check-in';
+    static String get attendanceCheckOut => '$_baseApi/attendance/check-out';
+    static String get attendanceGenerate => '$_baseApi/attendance/generate';
+    static String get attendance => '$_baseApi/attendance';
+    static String attendanceById(String id) => '$_baseApi/attendance/$id';
 }

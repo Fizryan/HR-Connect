@@ -5,6 +5,7 @@ import 'package:hr_connect/core/const/capitalize.dart';
 import 'package:hr_connect/core/const/enums.dart';
 import 'package:hr_connect/features/leave/data/model/leave_request_model.dart';
 import 'package:hr_connect/features/leave/providers/leave_provider.dart';
+import 'package:hr_connect/features/widgets/presentation/features/approval/request_detail_screen.dart';
 import 'package:hr_connect/features/widgets/shared/shared_request_card.dart';
 
 class LeaveApprovalTab extends ConsumerStatefulWidget {
@@ -269,12 +270,33 @@ class _LeaveApprovalTabState extends ConsumerState<LeaveApprovalTab> {
                         status: leave.status,
                         icon: Icons.person,
                         colorScheme: colorScheme,
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => RequestDetailScreen(
+                                title: 'Leave ${Capitalize.firstLetterUppercase(leave.leaveType.name)}',
+                                description: leave.description ?? 'No description provided.',
+                                startDate: leave.startDate,
+                                endDate: leave.endDate,
+                                status: leave.status,
+                                icon: Icons.person,
+                                onApprove: () => ref
+                                    .read(leaveNotifierProvider.notifier)
+                                    .approveLeaveRequest(leave.id),
+                                onReject: () => ref
+                                    .read(leaveNotifierProvider.notifier)
+                                    .rejectLeaveRequest(leave.id, 'Rejected by approver'),
+                              ),
+                            ),
+                          );
+                        },
                         onApprove: () => ref
                             .read(leaveNotifierProvider.notifier)
                             .approveLeaveRequest(leave.id),
                         onReject: () => ref
                             .read(leaveNotifierProvider.notifier)
-                            .rejectLeaveRequest(leave.id),
+                            .rejectLeaveRequest(leave.id, 'Rejected by approver'),
                       );
                     },
                   ),

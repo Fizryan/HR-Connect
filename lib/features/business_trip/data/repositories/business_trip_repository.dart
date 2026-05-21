@@ -9,7 +9,9 @@ abstract class BusinessTripRepository {
     String id,
     Map<String, dynamic> updateData,
   );
-  Future<Either<Failure, void>> deleteBusinessTrip(String id);
+  Future<Either<Failure, List<BusinessTripModel>>> getBusinessTripMe();
+  Future<Either<Failure, List<BusinessTripModel>>> getBusinessTripPendingMe();
+  Future<Either<Failure, void>> createBusinessTrip(Map<String, dynamic> request);
   Future<Either<Failure, void>> approveBusinessTrip(String id);
-  Future<Either<Failure, void>> rejectBusinessTrip(String id);
+  Future<Either<Failure, void>> rejectBusinessTrip(String id, String reason);
 }

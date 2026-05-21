@@ -80,4 +80,22 @@ class AuthNotifier extends AsyncNotifier<UserModel?> {
       state = AsyncValue.data(user);
     }
   }
+
+  Future<void> changePassword(String newPassword, String oldPassword) async {
+    final repository = ref.read(authRepositoryProvider);
+    final result = await repository.changePassword(newPassword, oldPassword);
+    result.fold(
+      (failure) => throw failure.message,
+      (_) => null,
+    );
+  }
+
+  Future<void> resetPassword(String id, String newPassword) async {
+    final repository = ref.read(authRepositoryProvider);
+    final result = await repository.resetPassword(id, newPassword);
+    result.fold(
+      (failure) => throw failure.message,
+      (_) => null,
+    );
+  }
 }

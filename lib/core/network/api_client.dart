@@ -15,6 +15,7 @@ class ApiClient {
 
   String? _cachedToken;
   final Map<String, Future<dynamic>> _inFlightRequests = {};
+  Future<void>? _refreshTokenFuture;
 
   ApiClient({required this.secureStorage}) {
     _dio = Dio(
@@ -56,6 +57,19 @@ class ApiClient {
           if (e.response?.statusCode == 401) {
             _logger.w('Token expired, attempting refresh...');
 
+            if (_refreshTokenFuture != null) {
+              _logger.i('Waiting for in-progress token refresh...');
+              try {
+                await _refreshTokenFuture;
+                final retryOptions = e.requestOptions;
+                retryOptions.headers['Authorization'] = 'Bearer $_cachedToken';
+                final retryResponse = await _dio.fetch(retryOptions);
+                return handler.resolve(retryResponse);
+              } catch (refreshError) {
+                return handler.reject(e);
+              }
+            }
+
             final requestToken = e.requestOptions.headers['Authorization']
                 ?.toString()
                 .replaceAll('Bearer ', '');
@@ -73,6 +87,9 @@ class ApiClient {
             );
 
             if (refreshToken != null && refreshToken.isNotEmpty) {
+              final completer = Completer<void>();
+              _refreshTokenFuture = completer.future;
+
               try {
                 final refreshDio = Dio(
                   BaseOptions(
@@ -89,8 +106,9 @@ class ApiClient {
                   data: {'refreshToken': refreshToken},
                 );
 
-                final newAccessToken = response.data['accessToken'];
-                final newRefreshToken = response.data['refreshToken'];
+                final data = response.data as Map<String, dynamic>;
+                final newAccessToken = data['accessToken'] as String?;
+                final newRefreshToken = data['refreshToken'] as String?;
 
                 if (newAccessToken != null) {
                   updateToken(newAccessToken);
@@ -106,6 +124,9 @@ class ApiClient {
                     );
                   }
 
+                  completer.complete();
+                  _refreshTokenFuture = null;
+
                   final retryOptions = e.requestOptions;
                   retryOptions.headers['Authorization'] =
                       'Bearer $newAccessToken';
@@ -115,12 +136,16 @@ class ApiClient {
                   _logger.e('Failed to retrieve new access token');
                   clearToken();
                   await secureStorage.deleteAll();
+                  completer.completeError('Failed to retrieve new access token');
+                  _refreshTokenFuture = null;
                   return handler.reject(e);
                 }
               } catch (refreshError) {
                 _logger.e('Failed to refresh token: $refreshError');
                 clearToken();
                 await secureStorage.deleteAll();
+                completer.completeError(refreshError);
+                _refreshTokenFuture = null;
                 return handler.reject(e);
               }
             } else {

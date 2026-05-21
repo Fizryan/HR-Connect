@@ -270,6 +270,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                               validator: (value) {
                                 if (value == null || value.trim().isEmpty) return 'Password is required';
                                 if (value.length < 6) return 'Password must be at least 6 characters';
+                                if (!value.contains(RegExp(r'[A-Z]'))) return 'Must contain at least one uppercase letter';
+                                if (!value.contains(RegExp(r'[0-9]'))) return 'Must contain at least one number';
+                                if (!value.contains(RegExp(r'[^a-zA-Z0-9\s]'))) return 'Must contain at least one symbol';
                                 return null;
                               },
                             ),

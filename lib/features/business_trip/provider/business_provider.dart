@@ -123,14 +123,6 @@ class BusinessNotifier extends AsyncNotifier<List<BusinessTripModel>> {
     );
   }
 
-  Future<void> deleteBusinessTrip(String id) async {
-    await _handleMutation(
-      action: () => ref.read(businessRepositoryProvider).deleteBusinessTrip(id),
-      optimisticUpdate: (current) =>
-          current.where((business) => business.id != id).toList(),
-    );
-  }
-
   Future<void> approveBusinessTrip(String id) async {
     await _handleMutation(
       action: () =>
@@ -143,14 +135,23 @@ class BusinessNotifier extends AsyncNotifier<List<BusinessTripModel>> {
     );
   }
 
-  Future<void> rejectBusinessTrip(String id) async {
+  Future<void> rejectBusinessTrip(String id, String reason) async {
     await _handleMutation(
-      action: () => ref.read(businessRepositoryProvider).rejectBusinessTrip(id),
+      action: () => ref.read(businessRepositoryProvider).rejectBusinessTrip(id, reason),
       optimisticUpdate: (current) => current.map((business) {
         return business.id == id
             ? business.copyWith(status: RequestStatus.rejected)
             : business;
       }).toList(),
+    );
+  }
+
+  Future<void> createBusinessTrip(Map<String, dynamic> request) async {
+    await _handleMutation(
+      action: () => ref.read(businessRepositoryProvider).createBusinessTrip(request),
+      onSuccess: (_) {
+        fetchBusinessTrip();
+      },
     );
   }
 }
