@@ -33,4 +33,7 @@ class ApiEndpoints {
     static String deleteBusinessTrip(String id) => '$_baseApi/businesstrips/$id';
     static String approveBusinessTrip(String id) => '$_baseApi/businesstrips/$id/approve';
     static String rejectBusinessTrip(String id) => '$_baseApi/businesstrips/$id/reject';
+
+    // DashboardService Endpoints
+    static String get dashboard => '$_baseApi/dashboard';
 }

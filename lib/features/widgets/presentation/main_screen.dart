@@ -1,18 +1,13 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:hr_connect/core/const/capitalize.dart';
 import 'package:hr_connect/core/const/enums.dart';
-import 'package:hr_connect/features/auth/providers/auth_provider.dart';
 import 'package:hr_connect/features/user_management/data/model/user_model.dart';
+import 'package:hr_connect/features/widgets/presentation/features/approval/approval_screen.dart';
+import 'package:hr_connect/features/widgets/presentation/features/attendance/attendance_screen.dart';
+import 'package:hr_connect/features/widgets/presentation/features/dashboard/dashboard_screen.dart';
 import 'package:hr_connect/features/widgets/presentation/features/request/request_screen.dart';
 import 'package:hr_connect/features/widgets/presentation/features/user_management/user_management_screen.dart';
-import 'package:hr_connect/features/widgets/presentation/features/etc/about_screen.dart';
-import 'package:hr_connect/features/widgets/presentation/features/etc/edit_profile_screen.dart';
-import 'package:hr_connect/features/widgets/presentation/features/etc/support_screen.dart';
-import 'package:hr_connect/features/widgets/presentation/features/etc/theme_screen.dart';
-import 'package:hr_connect/features/widgets/shared/profile_menu_tile.dart';
 
 class NavIndexNotifier extends Notifier<int> {
   @override
@@ -55,13 +50,13 @@ class MainScreen extends ConsumerWidget {
         label: 'Dashboard',
         icon: Icons.dashboard_outlined,
         selectedIcon: Icons.dashboard,
-        page: _buildDashboardContent(colorScheme, role),
+        page: DashboardScreen(user: user),
       ),
       _NavigationItem(
         label: 'Attendance',
         icon: Icons.calendar_today_outlined,
         selectedIcon: Icons.calendar_today,
-        page: const Center(child: Text('Attendance')),
+        page: const AttendanceScreen(),
       ),
       _NavigationItem(
         label: 'Request',
@@ -82,14 +77,16 @@ class MainScreen extends ConsumerWidget {
       );
     }
 
-    items.add(
-      _NavigationItem(
-        label: 'Profile',
-        icon: Icons.person_outline,
-        selectedIcon: Icons.person,
-        page: _buildProfileContent(context, ref, colorScheme, role, user),
-      ),
-    );
+    if (role != UserRole.staff) {
+      items.add(
+        _NavigationItem(
+          label: 'Approval',
+          icon: Icons.approval_outlined,
+          selectedIcon: Icons.approval,
+          page: const ApprovalScreen(),
+        ),
+      );
+    }
 
     return items;
   }
@@ -137,281 +134,5 @@ class MainScreen extends ConsumerWidget {
         }).toList(),
       ),
     );
-  }
-
-  Widget _buildProfileContent(
-    BuildContext context,
-    WidgetRef ref,
-    ColorScheme colorScheme,
-    UserRole role,
-    UserModel user,
-  ) {
-    return SingleChildScrollView(
-      physics: const BouncingScrollPhysics(),
-      child: Padding(
-        padding: EdgeInsets.symmetric(vertical: 20.h, horizontal: 16.w),
-        child: Column(
-          children: [
-            Row(
-              children: [
-                CachedNetworkImage(
-                  imageUrl: user.avatarUrl ?? '',
-                  imageBuilder: (context, imageProvider) => Container(
-                    padding: EdgeInsets.all(4.r),
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      border: Border.all(
-                        color: colorScheme.primary.withValues(alpha: 0.2),
-                        width: 2.w,
-                      ),
-                    ),
-                    child: CircleAvatar(
-                      radius: 40.r,
-                      backgroundImage: imageProvider,
-                    ),
-                  ),
-                  placeholder: (context, url) => CircleAvatar(
-                    radius: 40.r,
-                    backgroundColor: colorScheme.surfaceContainerHighest,
-                    child: Text(
-                      'N/A',
-                      style: TextStyle(
-                        color: colorScheme.onSurfaceVariant,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                  errorWidget: (context, url, error) => CircleAvatar(
-                    radius: 40.r,
-                    backgroundColor: colorScheme.primaryContainer,
-                    child: Icon(Icons.person, color: colorScheme.primary),
-                  ),
-                ),
-                SizedBox(width: 16.w),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        user.firstName,
-                        style: TextStyle(
-                          color: colorScheme.onSurface,
-                          fontSize: 16.sp,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                      Text(
-                        user.lastName,
-                        style: TextStyle(
-                          color: colorScheme.onSurface,
-                          fontSize: 16.sp,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                      SizedBox(height: 6.h),
-                      Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(
-                            Icons.verified,
-                            color: colorScheme.primary,
-                            size: 14.sp,
-                          ),
-                          SizedBox(width: 4.w),
-                          Text(
-                            'HRConnect | ${Capitalize.firstLetterUppercase(role.name)}',
-                            style: TextStyle(
-                              color: colorScheme.onSurfaceVariant,
-                              fontSize: 13.sp,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-            SizedBox(height: 32.h),
-            Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(24.r),
-                color: colorScheme.surfaceContainerLowest,
-                boxShadow: [
-                  BoxShadow(
-                    color: colorScheme.shadow.withValues(alpha: 0.05),
-                    blurRadius: 15.r,
-                    offset: const Offset(0, 5),
-                  ),
-                ],
-              ),
-              child: Column(
-                children: [
-                  ProfileMenuTile(
-                    icon: Icons.edit_outlined,
-                    title: 'Edit Profile',
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => EditProfileScreen(user: user),
-                        ),
-                      );
-                    },
-                  ),
-                  Divider(
-                    height: 1,
-                    indent: 56.w,
-                    endIndent: 20.w,
-                    color: colorScheme.outlineVariant,
-                  ),
-                  ProfileMenuTile(
-                    icon: Icons.info_outline_rounded,
-                    title: 'About',
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const AboutScreen(),
-                        ),
-                      );
-                    },
-                  ),
-                  Divider(
-                    height: 1,
-                    indent: 56.w,
-                    endIndent: 20.w,
-                    color: colorScheme.outlineVariant,
-                  ),
-                  ProfileMenuTile(
-                    icon: Icons.style_outlined,
-                    title: 'Theme Mode',
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const ThemeScreen(),
-                        ),
-                      );
-                    },
-                  ),
-                  Divider(
-                    height: 1,
-                    indent: 56.w,
-                    endIndent: 20.w,
-                    color: colorScheme.outlineVariant,
-                  ),
-                  ProfileMenuTile(
-                    icon: Icons.support_agent_outlined,
-                    title: 'Support',
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const SupportScreen(),
-                        ),
-                      );
-                    },
-                  ),
-                ],
-              ),
-            ),
-            SizedBox(height: 24.h),
-            Container(
-              decoration: BoxDecoration(
-                color: colorScheme.errorContainer.withValues(alpha: 0.8),
-                borderRadius: BorderRadius.circular(24.r),
-                border: Border.all(
-                  color: colorScheme.error.withValues(alpha: 0.5),
-                  width: 1.w,
-                ),
-              ),
-              child: ProfileMenuTile(
-                icon: Icons.logout_outlined,
-                title: 'Logout',
-                iconColor: colorScheme.onErrorContainer,
-                textColor: colorScheme.onErrorContainer,
-                onTap: () => _showLogoutDialog(context, ref, colorScheme),
-              ),
-            ),
-            SizedBox(height: 24.h),
-          ],
-        ),
-      ),
-    );
-  }
-
-  void _showLogoutDialog(
-    BuildContext context,
-    WidgetRef ref,
-    ColorScheme colorScheme,
-  ) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          backgroundColor: colorScheme.surfaceContainerLowest,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20.r),
-          ),
-          title: Text(
-            'Confirm Logout',
-            style: TextStyle(
-              fontSize: 20.sp,
-              fontWeight: FontWeight.bold,
-              color: colorScheme.onSurface,
-            ),
-          ),
-          content: Text(
-            'Are you sure you want to log out of your account?',
-            style: TextStyle(
-              fontSize: 14.sp,
-              color: colorScheme.onSurfaceVariant,
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              child: Text(
-                'Cancel',
-                style: TextStyle(
-                  color: colorScheme.onSurfaceVariant,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
-            FilledButton(
-              style: FilledButton.styleFrom(
-                backgroundColor: colorScheme.error,
-                foregroundColor: colorScheme.onError,
-              ),
-              onPressed: () {
-                Navigator.pop(context);
-                ref.read(authNotifierProvider.notifier).logout();
-              },
-              child: const Text('Logout'),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  Widget _buildDashboardContent(ColorScheme colorScheme, UserRole role) {
-    switch (role) {
-      case UserRole.admin:
-      case UserRole.director:
-      case UserRole.manager:
-      case UserRole.supervisor:
-      case UserRole.staff:
-      default:
-        return const Scaffold(
-          body: Center(
-            child: Text('An error occurred while loading user data.'),
-          ),
-        );
-    }
   }
 }

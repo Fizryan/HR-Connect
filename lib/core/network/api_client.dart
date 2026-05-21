@@ -153,13 +153,10 @@ class ApiClient {
 
   void _cacheRequestCooldown(String requestKey) {
     _requestCooldownTimers.remove(requestKey)?.cancel();
-    _requestCooldownTimers[requestKey] = Timer(
-      const Duration(seconds: 5),
-      () {
-        _inFlightGetRequests.remove(requestKey);
-        _requestCooldownTimers.remove(requestKey);
-      },
-    );
+    _requestCooldownTimers[requestKey] = Timer(const Duration(seconds: 5), () {
+      _inFlightGetRequests.remove(requestKey);
+      _requestCooldownTimers.remove(requestKey);
+    });
   }
 
   void updateToken(String token) {
@@ -208,9 +205,7 @@ class ApiClient {
         completer.completeError(mappedException, st);
       }
 
-      // Do NOT cache errors. Allow immediate retry.
-      _inFlightGetRequests.remove(requestKey);
-      _requestCooldownTimers.remove(requestKey)?.cancel();
+      _cacheRequestCooldown(requestKey);
 
       throw mappedException;
     }
