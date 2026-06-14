@@ -6,7 +6,10 @@ class CoreException {
         e.type == DioExceptionType.receiveTimeout ||
         e.type == DioExceptionType.sendTimeout ||
         e.type == DioExceptionType.connectionError) {
-      return ServerException(message: 'Connection timeout. Please check your internet and try again.');
+      return ServerException(
+        message:
+            'Connection timeout. Please check your internet and try again.',
+      );
     }
 
     if (e.type == DioExceptionType.cancel) {
@@ -15,11 +18,11 @@ class CoreException {
 
     String errorMessage = 'An error occurred';
 
-    if (e.response?.data != null && e.response?.data is Map<String, dynamic>) { 
+    if (e.response?.data != null && e.response?.data is Map<String, dynamic>) {
       final data = e.response?.data as Map<String, dynamic>;
       errorMessage = data['message'] as String? ?? errorMessage;
     }
-    
+
     return ServerException(message: errorMessage);
   }
 }

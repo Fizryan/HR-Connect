@@ -1,158 +1,128 @@
 import 'dart:async';
-import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fpdart/fpdart.dart';
-import 'package:hr_connect/core/const/enums.dart';
-import 'package:hr_connect/core/error/failures.dart';
+import 'package:hr_connect/core/base/base_list_notifier.dart';
+import 'package:hr_connect/core/constants/enum.dart';
 import 'package:hr_connect/core/di/providers.dart';
-import 'package:hr_connect/features/leave/data/model/leave_request_model.dart';
+import 'package:hr_connect/core/error/failures.dart';
+import 'package:hr_connect/features/auth/providers/auth_provider.dart';
+import 'package:hr_connect/features/leave/data/model/leave_model.dart';
+
+final leaveMeProvider = FutureProvider<List<LeaveModel>>((ref) async {
+  final repository = ref.read(leaveRepositoryProvider);
+  final result = await repository.getLeaveMe();
+
+  return result.fold(
+    (failure) => throw Exception(failure.message),
+    (leaves) => leaves,
+  );
+});
+
+final pendingLeaveMeProvider = Provider<AsyncValue<List<LeaveModel>>>((ref) {
+  final myLeaves = ref.watch(leaveMeProvider);
+
+  return myLeaves.whenData((leaves) {
+    return leaves
+        .where((leave) => leave.status.name.toLowerCase() == 'pending')
+        .toList();
+  });
+});
 
 final leaveNotifierProvider =
-    AsyncNotifierProvider<LeaveNotifier, List<LeaveRequestModel>>(
-      LeaveNotifier.new,
-    );
+    AsyncNotifierProvider<LeaveNotifier, List<LeaveModel>>(LeaveNotifier.new);
 
-class LeaveNotifier extends AsyncNotifier<List<LeaveRequestModel>> {
+class LeaveNotifier extends BaseListNotifier<LeaveModel> {
   DateTime? lastFetchTime;
 
   @override
-  FutureOr<List<LeaveRequestModel>> build() async {
-    final data = await _fetchLeaveRequestsLogic();
+  FutureOr<List<LeaveModel>> build() async {
+    final data = await _fetchLeaveLogic();
     lastFetchTime = DateTime.now();
     return data;
   }
 
-  Future<List<LeaveRequestModel>> _fetchLeaveRequestsLogic() async {
+  Future<List<LeaveModel>> _fetchLeaveLogic() async {
     final repository = ref.read(leaveRepositoryProvider);
-    final result = await repository.getLeaveRequests();
+    final result = await repository.getAllLeaves();
 
     return result.fold(
-      (failure) => throw failure.message,
-      (leaveRequests) => leaveRequests,
+      (failure) => throw Exception(failure.message),
+      (leaves) => leaves,
     );
   }
 
-  Future<void> fetchLeaveRequests() async {
+  Future<void> fetchLeaves() async {
     if (state.isLoading) return;
 
     final isCacheValid =
         lastFetchTime != null &&
-        DateTime.now().difference(lastFetchTime!).inMinutes < 15;
+        DateTime.now().difference(lastFetchTime!).inMinutes < 10;
 
-    if (isCacheValid && state.hasValue && state.value!.isNotEmpty) {
-      return;
-    }
+    if (isCacheValid && state.hasValue) return;
 
-    await refreshLeaveRequests();
+    await refreshLeaves();
   }
 
-  Future<void> refreshLeaveRequests() async {
+  Future<void> refreshLeaves() async {
     state = const AsyncValue.loading();
-    state = await AsyncValue.guard(_fetchLeaveRequestsLogic);
+    state = await AsyncValue.guard(_fetchLeaveLogic);
+
     if (state.hasValue) {
       lastFetchTime = DateTime.now();
     }
   }
 
-  Future<void> fetchLeaveRequestById(String id) async {
+  Future<Either<Failure, void>> createLeave(LeaveData data) async {
     final repository = ref.read(leaveRepositoryProvider);
-    final result = await repository.getLeaveRequestById(id);
-
-    result.fold(
-      (failure) {
-        debugPrint('Failed to fetch leave request: ${failure.message}');
-      },
-      (fetchedLeaveRequest) {
-        if (state.hasValue) {
-          final updatedList = state.value!.map((leaveRequest) {
-            return leaveRequest.id == id ? fetchedLeaveRequest : leaveRequest;
-          }).toList();
-          state = AsyncValue.data(updatedList);
-        }
-      },
-    );
-  }
-
-  Future<void> _handleMutation<T>({
-    required Future<Either<Failure, T>> Function() action,
-    List<LeaveRequestModel> Function(List<LeaveRequestModel> currentList)?
-    optimisticUpdate,
-    void Function(T successData)? onSuccess,
-  }) async {
-    final previousState = state;
-
-    if (optimisticUpdate != null && previousState.hasValue) {
-      state = AsyncValue.data(optimisticUpdate(previousState.value!));
-    }
-
-    final result = await action();
-
-    result.fold(
-      (failure) {
-        state = AsyncValue<List<LeaveRequestModel>>.error(
-          failure.message,
-          StackTrace.current,
-        // ignore: invalid_use_of_internal_member
-        ).copyWithPrevious(previousState);
-        Future.delayed(const Duration(seconds: 2), () {
-          if (state.hasError && state.hasValue) {
-            state = AsyncValue.data(state.value!);
-          }
-        });
-      },
-      (successData) {
-        if (onSuccess != null) {
-          onSuccess(successData);
-        }
-      },
-    );
-  }
-
-  Future<void> updateLeaveRequest(
-    String id,
-    Map<String, dynamic> updateData,
-  ) async {
-    await _handleMutation(
-      action: () =>
-          ref.read(leaveRepositoryProvider).updateLeaveRequest(id, updateData),
-      onSuccess: (updatedLeaveRequest) {
-        if (state.hasValue) {
-          final updatedList = state.value!.map((leave) {
-            return leave.id == id ? updatedLeaveRequest : leave;
-          }).toList();
-          state = AsyncValue.data(updatedList);
-        }
-      },
-    );
-  }
-
-  Future<void> approveLeaveRequest(String id) async {
-    await _handleMutation(
-      action: () => ref.read(leaveRepositoryProvider).approveLeaveRequest(id),
-      optimisticUpdate: (current) => current.map((leave) {
-        return leave.id == id
-            ? leave.copyWith(status: RequestStatus.approved)
-            : leave;
-      }).toList(),
-    );
-  }
-
-  Future<void> rejectLeaveRequest(String id, String reason) async {
-    await _handleMutation(
-      action: () => ref.read(leaveRepositoryProvider).rejectLeaveRequest(id, reason),
-      optimisticUpdate: (current) => current.map((leave) {
-        return leave.id == id
-            ? leave.copyWith(status: RequestStatus.rejected)
-            : leave;
-      }).toList(),
-    );
-  }
-
-  Future<void> createLeaveRequest(Map<String, dynamic> request) async {
-    await _handleMutation(
-      action: () => ref.read(leaveRepositoryProvider).createLeaveRequest(request),
+    return handleMutation(
+      action: () => repository.createLeave(data),
       onSuccess: (_) {
-        fetchLeaveRequests();
+        refreshLeaves();
+        ref.invalidate(leaveMeProvider);
+      },
+    );
+  }
+
+  Future<Either<Failure, void>> approveLeave(String id) async {
+    final repository = ref.read(leaveRepositoryProvider);
+    final currentUser = ref.read(authNotifierProvider).value;
+    return handleMutation(
+      action: () => repository.approveLeave(id),
+      onSuccess: (_) {
+        ref.invalidate(leaveMeProvider);
+      },
+      optimisticUpdate: (currentList) {
+        return currentList.map((leave) {
+          if (leave.id == id) {
+            return leave.copyWith(
+              status: RequestStatus.approved,
+              approverId: currentUser?.id,
+            );
+          }
+          return leave;
+        }).toList();
+      },
+    );
+  }
+
+  Future<Either<Failure, void>> rejectLeave(String id) async {
+    final repository = ref.read(leaveRepositoryProvider);
+    final currentUser = ref.read(authNotifierProvider).value;
+    return handleMutation(
+      action: () => repository.rejectLeave(id),
+      onSuccess: (_) {
+        ref.invalidate(leaveMeProvider);
+      },
+      optimisticUpdate: (currentList) {
+        return currentList.map((leave) {
+          if (leave.id == id) {
+            return leave.copyWith(
+              status: RequestStatus.rejected,
+              approverId: currentUser?.id,
+            );
+          }
+          return leave;
+        }).toList();
       },
     );
   }

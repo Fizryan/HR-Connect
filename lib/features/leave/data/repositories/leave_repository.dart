@@ -1,17 +1,13 @@
 import 'package:fpdart/fpdart.dart';
 import 'package:hr_connect/core/error/failures.dart';
-import 'package:hr_connect/features/leave/data/model/leave_request_model.dart';
+import 'package:hr_connect/features/leave/data/model/leave_model.dart';
 
 abstract class LeaveRepository {
-  Future<Either<Failure, List<LeaveRequestModel>>> getLeaveRequests();
-  Future<Either<Failure, LeaveRequestModel>> getLeaveRequestById(String id);
-  Future<Either<Failure, LeaveRequestModel>> updateLeaveRequest(
-    String id,
-    Map<String, dynamic> updateData,
-  );
-  Future<Either<Failure, List<LeaveRequestModel>>> getLeaveRequestsMe();
-  Future<Either<Failure, List<LeaveRequestModel>>> getLeaveRequestsPendingMe();
-  Future<Either<Failure, void>> createLeaveRequest(Map<String, dynamic> request);
-  Future<Either<Failure, void>> approveLeaveRequest(String id);
-  Future<Either<Failure, void>> rejectLeaveRequest(String id, String reason);
+  Future<Either<Failure, List<LeaveModel>>> getLeaveMe();
+  Future<Either<Failure, List<LeaveModel>>> getAllLeaves();
+  Future<Either<Failure, List<LeaveModel>>> getPendingLeaves();
+  Future<Either<Failure, LeaveModel>> getLeaveById(String id);
+  Future<Either<Failure, void>> createLeave(LeaveData data);
+  Future<Either<Failure, void>> approveLeave(String id);
+  Future<Either<Failure, void>> rejectLeave(String id);
 }

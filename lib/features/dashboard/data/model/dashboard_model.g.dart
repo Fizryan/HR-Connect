@@ -8,10 +8,10 @@ part of 'dashboard_model.dart';
 
 _DashboardModel _$DashboardModelFromJson(Map<String, dynamic> json) =>
     _DashboardModel(
-      attendanceRate: json['attendanceRate'] as num,
+      attendanceRate: (json['attendanceRate'] as num).toInt(),
       pendingLeave: (json['pendingLeave'] as num).toInt(),
       pendingTrip: (json['pendingTrip'] as num).toInt(),
-      totalUser: (json['totalUser'] as num).toInt(),
+      totalUser: (json['totalUser'] as num?)?.toInt(),
     );
 
 Map<String, dynamic> _$DashboardModelToJson(_DashboardModel instance) =>

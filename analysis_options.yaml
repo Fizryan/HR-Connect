@@ -30,3 +30,7 @@ analyzer:
     - android/**
     - "**/*.g.dart"
     - "**/*.freezed.dart"
+    - windows/**
+    - linux/**
+    - macos/**
+    - web/**

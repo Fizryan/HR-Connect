@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$DashboardModel {
 
- num get attendanceRate; int get pendingLeave; int get pendingTrip; int get totalUser;
+@JsonKey(name: 'attendanceRate') int get attendanceRate;@JsonKey(name: 'pendingLeave') int get pendingLeave;@JsonKey(name: 'pendingTrip') int get pendingTrip;@JsonKey(name: 'totalUser') int? get totalUser;
 /// Create a copy of DashboardModel
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -48,7 +48,7 @@ abstract mixin class $DashboardModelCopyWith<$Res>  {
   factory $DashboardModelCopyWith(DashboardModel value, $Res Function(DashboardModel) _then) = _$DashboardModelCopyWithImpl;
 @useResult
 $Res call({
- num attendanceRate, int pendingLeave, int pendingTrip, int totalUser
+@JsonKey(name: 'attendanceRate') int attendanceRate,@JsonKey(name: 'pendingLeave') int pendingLeave,@JsonKey(name: 'pendingTrip') int pendingTrip,@JsonKey(name: 'totalUser') int? totalUser
 });
 
 
@@ -65,13 +65,13 @@ class _$DashboardModelCopyWithImpl<$Res>
 
 /// Create a copy of DashboardModel
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? attendanceRate = null,Object? pendingLeave = null,Object? pendingTrip = null,Object? totalUser = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? attendanceRate = null,Object? pendingLeave = null,Object? pendingTrip = null,Object? totalUser = freezed,}) {
   return _then(_self.copyWith(
 attendanceRate: null == attendanceRate ? _self.attendanceRate : attendanceRate // ignore: cast_nullable_to_non_nullable
-as num,pendingLeave: null == pendingLeave ? _self.pendingLeave : pendingLeave // ignore: cast_nullable_to_non_nullable
+as int,pendingLeave: null == pendingLeave ? _self.pendingLeave : pendingLeave // ignore: cast_nullable_to_non_nullable
 as int,pendingTrip: null == pendingTrip ? _self.pendingTrip : pendingTrip // ignore: cast_nullable_to_non_nullable
-as int,totalUser: null == totalUser ? _self.totalUser : totalUser // ignore: cast_nullable_to_non_nullable
-as int,
+as int,totalUser: freezed == totalUser ? _self.totalUser : totalUser // ignore: cast_nullable_to_non_nullable
+as int?,
   ));
 }
 
@@ -156,7 +156,7 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( num attendanceRate,  int pendingLeave,  int pendingTrip,  int totalUser)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function(@JsonKey(name: 'attendanceRate')  int attendanceRate, @JsonKey(name: 'pendingLeave')  int pendingLeave, @JsonKey(name: 'pendingTrip')  int pendingTrip, @JsonKey(name: 'totalUser')  int? totalUser)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _DashboardModel() when $default != null:
 return $default(_that.attendanceRate,_that.pendingLeave,_that.pendingTrip,_that.totalUser);case _:
@@ -177,7 +177,7 @@ return $default(_that.attendanceRate,_that.pendingLeave,_that.pendingTrip,_that.
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( num attendanceRate,  int pendingLeave,  int pendingTrip,  int totalUser)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function(@JsonKey(name: 'attendanceRate')  int attendanceRate, @JsonKey(name: 'pendingLeave')  int pendingLeave, @JsonKey(name: 'pendingTrip')  int pendingTrip, @JsonKey(name: 'totalUser')  int? totalUser)  $default,) {final _that = this;
 switch (_that) {
 case _DashboardModel():
 return $default(_that.attendanceRate,_that.pendingLeave,_that.pendingTrip,_that.totalUser);case _:
@@ -197,7 +197,7 @@ return $default(_that.attendanceRate,_that.pendingLeave,_that.pendingTrip,_that.
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( num attendanceRate,  int pendingLeave,  int pendingTrip,  int totalUser)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function(@JsonKey(name: 'attendanceRate')  int attendanceRate, @JsonKey(name: 'pendingLeave')  int pendingLeave, @JsonKey(name: 'pendingTrip')  int pendingTrip, @JsonKey(name: 'totalUser')  int? totalUser)?  $default,) {final _that = this;
 switch (_that) {
 case _DashboardModel() when $default != null:
 return $default(_that.attendanceRate,_that.pendingLeave,_that.pendingTrip,_that.totalUser);case _:
@@ -212,13 +212,13 @@ return $default(_that.attendanceRate,_that.pendingLeave,_that.pendingTrip,_that.
 @JsonSerializable()
 
 class _DashboardModel implements DashboardModel {
-  const _DashboardModel({required this.attendanceRate, required this.pendingLeave, required this.pendingTrip, required this.totalUser});
+  const _DashboardModel({@JsonKey(name: 'attendanceRate') required this.attendanceRate, @JsonKey(name: 'pendingLeave') required this.pendingLeave, @JsonKey(name: 'pendingTrip') required this.pendingTrip, @JsonKey(name: 'totalUser') this.totalUser});
   factory _DashboardModel.fromJson(Map<String, dynamic> json) => _$DashboardModelFromJson(json);
 
-@override final  num attendanceRate;
-@override final  int pendingLeave;
-@override final  int pendingTrip;
-@override final  int totalUser;
+@override@JsonKey(name: 'attendanceRate') final  int attendanceRate;
+@override@JsonKey(name: 'pendingLeave') final  int pendingLeave;
+@override@JsonKey(name: 'pendingTrip') final  int pendingTrip;
+@override@JsonKey(name: 'totalUser') final  int? totalUser;
 
 /// Create a copy of DashboardModel
 /// with the given fields replaced by the non-null parameter values.
@@ -253,7 +253,7 @@ abstract mixin class _$DashboardModelCopyWith<$Res> implements $DashboardModelCo
   factory _$DashboardModelCopyWith(_DashboardModel value, $Res Function(_DashboardModel) _then) = __$DashboardModelCopyWithImpl;
 @override @useResult
 $Res call({
- num attendanceRate, int pendingLeave, int pendingTrip, int totalUser
+@JsonKey(name: 'attendanceRate') int attendanceRate,@JsonKey(name: 'pendingLeave') int pendingLeave,@JsonKey(name: 'pendingTrip') int pendingTrip,@JsonKey(name: 'totalUser') int? totalUser
 });
 
 
@@ -270,13 +270,13 @@ class __$DashboardModelCopyWithImpl<$Res>
 
 /// Create a copy of DashboardModel
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? attendanceRate = null,Object? pendingLeave = null,Object? pendingTrip = null,Object? totalUser = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? attendanceRate = null,Object? pendingLeave = null,Object? pendingTrip = null,Object? totalUser = freezed,}) {
   return _then(_DashboardModel(
 attendanceRate: null == attendanceRate ? _self.attendanceRate : attendanceRate // ignore: cast_nullable_to_non_nullable
-as num,pendingLeave: null == pendingLeave ? _self.pendingLeave : pendingLeave // ignore: cast_nullable_to_non_nullable
+as int,pendingLeave: null == pendingLeave ? _self.pendingLeave : pendingLeave // ignore: cast_nullable_to_non_nullable
 as int,pendingTrip: null == pendingTrip ? _self.pendingTrip : pendingTrip // ignore: cast_nullable_to_non_nullable
-as int,totalUser: null == totalUser ? _self.totalUser : totalUser // ignore: cast_nullable_to_non_nullable
-as int,
+as int,totalUser: freezed == totalUser ? _self.totalUser : totalUser // ignore: cast_nullable_to_non_nullable
+as int?,
   ));
 }
 

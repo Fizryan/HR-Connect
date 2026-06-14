@@ -1,122 +1,116 @@
-import 'package:flutter/rendering.dart';
+import 'dart:convert';
 import 'package:fpdart/fpdart.dart';
-import 'package:hr_connect/core/error/exception.dart';
+import 'package:hr_connect/core/base/base_repository.dart';
+import 'package:hr_connect/core/constants/shared_preferences.dart';
 import 'package:hr_connect/core/error/failures.dart';
-import 'package:hr_connect/features/leave/data/datasource/leave_request_remote.dart';
-import 'package:hr_connect/features/leave/data/model/leave_request_model.dart';
+import 'package:hr_connect/features/leave/data/model/leave_model.dart';
+import 'package:hr_connect/features/leave/data/remote/leave_remote.dart';
 import 'package:hr_connect/features/leave/data/repositories/leave_repository.dart';
 import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-class LeaveRepositoryImp implements LeaveRepository {
-  final LeaveRequestRemote remoteDataSource;
+class LeaveRepositoryImp extends BaseRepository implements LeaveRepository {
+  final LeaveRemote remoteDataSource;
+  final SharedPreferences sharedPreferences;
 
-  LeaveRepositoryImp({required this.remoteDataSource});
+  LeaveRepositoryImp({
+    required this.remoteDataSource,
+    required this.sharedPreferences,
+  });
 
-  Future<Either<Failure, T>> _sourceCall<T>(
-    Future<T> Function() call,
-    String fallbackErrorMessage,
-  ) async {
-    try {
-      final result = await call();
-      return Right(result);
-    } on ServerException catch (e) {
-      return Left(ServerFailure(e.message));
-    } catch (e) {
-      debugPrint('[LeaveRepository] Error: $e');
-      return Left(ServerFailure(fallbackErrorMessage));
-    }
+  @override
+  Future<Either<Failure, List<LeaveModel>>> getLeaveMe() async {
+    final apiResult = await sourceCall(
+      () async {
+        final leaves = await remoteDataSource.getLeaveMe();
+        final leaveListJson = leaves.map((leave) => leave.toJson()).toList();
+
+        await sharedPreferences.setString(
+          SharedPrefs.cachedLeaves,
+          jsonEncode(leaveListJson),
+        );
+
+        return leaves;
+      },
+      Intl.message(
+        'Failed to load leave information.',
+        name: 'loadLeaveMeFailed',
+      ),
+    );
+
+    return apiResult.fold(
+      (failure) {
+        logger.e('[LeaveRepository] API call failed, loading from cache.');
+        final cachedData = sharedPreferences.getString(
+          SharedPrefs.cachedLeaves,
+        );
+
+        if (cachedData != null && cachedData.isNotEmpty) {
+          final decodeLeaves = jsonDecode(cachedData) as List<dynamic>;
+          final cachedLeaves = decodeLeaves
+              .map(
+                (leave) => LeaveModel.fromJson(leave as Map<String, dynamic>),
+              )
+              .toList();
+          return Right(cachedLeaves);
+        }
+
+        return Left(failure);
+      },
+      (leaves) {
+        return Right(leaves);
+      },
+    );
   }
 
   @override
-  Future<Either<Failure, List<LeaveRequestModel>>> getLeaveRequests() async {
-    return _sourceCall(
-      remoteDataSource.getLeaveRequests,
+  Future<Either<Failure, List<LeaveModel>>> getAllLeaves() async {
+    return sourceCall(
+      remoteDataSource.getAllLeaves,
+      Intl.message('Failed to load leaves.', name: 'loadLeavesFailed'),
+    );
+  }
+
+  @override
+  Future<Either<Failure, List<LeaveModel>>> getPendingLeaves() async {
+    return sourceCall(
+      remoteDataSource.getPendingLeaves,
       Intl.message(
-        'Failed to load leave requests data. Please try again.',
-        name: 'loadLeaveRequestDataFailed',
+        'Failed to load pending leaves.',
+        name: 'loadPendingLeavesFailed',
       ),
     );
   }
 
   @override
-  Future<Either<Failure, LeaveRequestModel>> getLeaveRequestById(
-    String id,
-  ) async {
-    return _sourceCall(
-      () => remoteDataSource.getLeaveRequestsById(id),
-      Intl.message(
-        'Failed to load leave request data. Please try again.',
-        name: 'loadLeaveRequestDataFailed',
-      ),
+  Future<Either<Failure, LeaveModel>> getLeaveById(String id) async {
+    return sourceCall(
+      () => remoteDataSource.getLeaveById(id),
+      Intl.message('Failed to load leave.', name: 'loadLeaveFailed'),
     );
   }
 
   @override
-  Future<Either<Failure, LeaveRequestModel>> updateLeaveRequest(
-    String id,
-    Map<String, dynamic> updateData,
-  ) async {
-    return _sourceCall(
-      () => remoteDataSource.updateLeaveRequest(id, updateData),
-      Intl.message(
-        'Failed to update leave request. Please try again.',
-        name: 'updateLeaveRequestFailed',
-      ),
+  Future<Either<Failure, void>> createLeave(LeaveData data) async {
+    return sourceCall(
+      () => remoteDataSource.createLeave(data),
+      Intl.message('Failed to create leave.', name: 'createLeaveFailed'),
     );
   }
 
   @override
-  Future<Either<Failure, void>> approveLeaveRequest(String id) async {
-    return _sourceCall(
-      () => remoteDataSource.approveLeaveRequest(id),
-      Intl.message(
-        'Failed to approve leave request. Please try again.',
-        name: 'approveLeaveRequestFailed',
-      ),
+  Future<Either<Failure, void>> approveLeave(String id) async {
+    return sourceCall(
+      () => remoteDataSource.approveLeave(id),
+      Intl.message('Failed to approve leave.', name: 'approveLeaveFailed'),
     );
   }
 
   @override
-  Future<Either<Failure, void>> rejectLeaveRequest(String id, String reason) async {
-    return _sourceCall(
-      () => remoteDataSource.rejectLeaveRequest(id, reason),
-      Intl.message(
-        'Failed to reject leave request. Please try again.',
-        name: 'rejectLeaveRequestFailed',
-      ),
-    );
-  }
-
-  @override
-  Future<Either<Failure, List<LeaveRequestModel>>> getLeaveRequestsMe() async {
-    return _sourceCall(
-      remoteDataSource.getLeaveRequestsMe,
-      Intl.message(
-        'Failed to load leave requests. Please try again.',
-        name: 'loadLeaveRequestsFailed',
-      ),
-    );
-  }
-
-  @override
-  Future<Either<Failure, List<LeaveRequestModel>>> getLeaveRequestsPendingMe() async {
-    return _sourceCall(
-      remoteDataSource.getLeaveRequestsPendingMe,
-      Intl.message(
-        'Failed to load pending leave requests. Please try again.',
-        name: 'loadPendingLeaveRequestsFailed',
-      ),
-    );
-  }
-
-  @override
-  Future<Either<Failure, void>> createLeaveRequest(Map<String, dynamic> request) async {
-    return _sourceCall(
-      () => remoteDataSource.createLeaveRequest(request),
-      Intl.message(
-        'Failed to create leave request. Please try again.',
-        name: 'createLeaveRequestFailed',
-      ),
+  Future<Either<Failure, void>> rejectLeave(String id) async {
+    return sourceCall(
+      () => remoteDataSource.rejectLeave(id),
+      Intl.message('Failed to reject leave.', name: 'rejectLeaveFailed'),
     );
   }
 }

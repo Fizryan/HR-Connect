@@ -1,49 +1,36 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:hr_connect/core/const/enums.dart';
-import 'package:hr_connect/core/const/role.dart';
+import 'package:hr_connect/core/config/date_utils.dart';
+import 'package:hr_connect/core/constants/enum.dart';
 
 part 'user_model.freezed.dart';
 part 'user_model.g.dart';
 
 @freezed
-abstract class UserModel with _$UserModel {
-  const UserModel._();
+abstract class UserData with _$UserData {
+  const factory UserData({
+    @JsonKey(name: 'email') required String email,
+    @JsonKey(name: 'firstName') required String firstName,
+    @JsonKey(name: 'lastName') required String lastName,
+    @JsonKey(name: 'role') required Role role,
+    @JsonKey(name: 'avatarUrl') String? avatarUrl,
+  }) = _UserData;
 
+  factory UserData.fromJson(Map<String, dynamic> json) =>
+      _$UserDataFromJson(json);
+}
+
+@freezed
+abstract class UserModel with _$UserModel {
   const factory UserModel({
-    required String id,
-    required String email,
-    String? password,
-    required String firstName,
-    required String lastName,
-    required UserRole role,
-    String? avatarUrl,
-    @Default(true) bool isActive,
-    DateTime? createdAt,
-    DateTime? updatedAt,
+    @JsonKey(name: 'id') required String id,
+    @JsonKey(name: 'data') required UserData data,
+    @JsonKey(name: 'isActive') required bool isActive,
+    @JsonKey(name: 'createdAt', fromJson: ApiDateUtils.parseToDateTime)
+    required DateTime createdAt,
+    @JsonKey(name: 'updatedAt', fromJson: ApiDateUtils.parseToDateTime)
+    required DateTime updatedAt,
   }) = _UserModel;
 
   factory UserModel.fromJson(Map<String, dynamic> json) =>
       _$UserModelFromJson(json);
-
-  factory UserModel.fromApi(Map<String, dynamic> json) {
-    final userNode = json['user'] as Map<String, dynamic>? ?? json;
-    final dataNode = userNode['data'] as Map<String, dynamic>? ?? {};
-    final rawRole = dataNode['role'] as String? ?? '';
-    final String mappedRole = Role.rawToRole(rawRole).name;
-
-    return UserModel.fromJson({
-      'id': userNode['id'],
-      'email': dataNode['email'],
-      'password': null,
-      'firstName': dataNode['firstName'],
-      'lastName': dataNode['lastName'],
-      'role': mappedRole,
-      'avatarUrl': dataNode['avatarUrl'],
-      'isActive': userNode['isActive'] ?? true,
-      'createdAt': userNode['createdAt'],
-      'updatedAt': userNode['updatedAt'],
-    });
-  }
-
-  String get fullName => '$firstName $lastName';
 }

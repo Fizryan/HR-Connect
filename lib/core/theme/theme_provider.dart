@@ -1,11 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:hr_connect/core/const/shared_preferences.dart';
-
-final sharedPreferencesProvider = Provider<SharedPreferences>((ref) {
-  throw UnimplementedError('sharedPreferencesProvider initiation in main.dart');
-});
+import 'package:hr_connect/core/constants/shared_preferences.dart';
+import 'package:hr_connect/core/di/providers.dart';
 
 class ThemeNotifier extends Notifier<ThemeMode> {
   @override
@@ -20,12 +16,14 @@ class ThemeNotifier extends Notifier<ThemeMode> {
 
   void setThemeMode(ThemeMode mode) {
     if (state == mode) return;
-    
+
     state = mode;
-    
+
     final prefs = ref.read(sharedPreferencesProvider);
     prefs.setString(SharedPrefs.themeMode, mode.name);
   }
 }
 
-final themeNotifierProvider = NotifierProvider<ThemeNotifier, ThemeMode>(ThemeNotifier.new);
+final themeNotifierProvider = NotifierProvider<ThemeNotifier, ThemeMode>(
+  ThemeNotifier.new,
+);
