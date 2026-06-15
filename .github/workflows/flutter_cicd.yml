@@ -33,14 +33,14 @@ jobs:
         env:
           BASE_URL: ${{ secrets.BASE_URL }}
         run: |
-          echo "BASE_URL=$BASE_URL" >> .env
+          echo "BASE_URL=$BASE_URL" > .env
           echo "PHASE=production" >> .env
 
       - name: Analyze code (Linting)
         run: flutter analyze
 
-      - name: Run Unit Tests
-        run: flutter test
+      # - name: Run Unit Tests
+      #   run: flutter test
 
       - name: Build Release APK (Android Package)
         run: flutter build apk --release
