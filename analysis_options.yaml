@@ -17,3 +17,20 @@ linter:
     - sort_child_properties_last
     - curly_braces_in_flow_control_structures
     - prefer_conditional_assignment
+    - avoid_dynamic_calls
+    - cancel_subscriptions
+    - close_sinks
+    - require_trailing_commas
+
+analyzer:
+  exclude:
+    - build/**
+    - .dart_tool/**
+    - ios/**
+    - android/**
+    - "**/*.g.dart"
+    - "**/*.freezed.dart"
+    - windows/**
+    - linux/**
+    - macos/**
+    - web/**

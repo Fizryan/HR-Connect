@@ -113,7 +113,6 @@ We're cooking up some more features right now and Here is the plan for the next 
 
 ---
 
-
 ## Testing
 
 - [x] **Mock Data Implementation:** We've got testing dummy data ready (`UserDummyRemote` and `AuthDummyRemote`) so the dashboard UI can run smoothly without the backend API live.
@@ -147,7 +146,7 @@ To run the app, make sure you have Flutter installed and set up. Then, follow th
 Here are the main tools we're using:
 
 - **Flutter**
-- **Provider** (State Management with Freezed)
+- **Riverpod** (State Management with Freezed)
 - **GoRouter** (Navigation & Route Guarding)
 - **GetIt** (Dependency Injection)
 - **ScreenUtil** (Responsive UI)
