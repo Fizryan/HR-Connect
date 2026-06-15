@@ -88,7 +88,7 @@ class CustomSearchAppBar extends StatelessWidget
           onPressed: onSearchToggle,
           tooltip: 'Search & Filter',
         ),
-        if (additionalActions != null) ...additionalActions!,
+        ...?additionalActions,
         SizedBox(width: 8.w),
       ],
       bottom: bottom,
