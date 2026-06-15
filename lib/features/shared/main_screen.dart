@@ -40,6 +40,14 @@ class MainScreen extends ConsumerWidget {
       _NavDest(
         branchIndex: 1,
         destination: NavigationDestination(
+          icon: Icon(Icons.assignment_outlined, color: colorScheme.onSurface),
+          selectedIcon: Icon(Icons.assignment, color: colorScheme.onSurface),
+          label: 'Attendance',
+        ),
+      ),
+      _NavDest(
+        branchIndex: 2,
+        destination: NavigationDestination(
           icon: Icon(Icons.file_open_outlined, color: colorScheme.onSurface),
           selectedIcon: Icon(Icons.file_open, color: colorScheme.onSurface),
           label: 'Request',
@@ -48,11 +56,22 @@ class MainScreen extends ConsumerWidget {
       if (currentUser.data.role == Role.admin ||
           currentUser.data.role == Role.manager) ...[
         _NavDest(
-          branchIndex: 2,
+          branchIndex: 3,
           destination: NavigationDestination(
             icon: Icon(Icons.people_outline, color: colorScheme.onSurface),
             selectedIcon: Icon(Icons.people, color: colorScheme.onSurface),
             label: 'Management',
+          ),
+        ),
+      ],
+      if (currentUser.data.role == Role.admin ||
+          currentUser.data.role == Role.manager) ...[
+        _NavDest(
+          branchIndex: 4,
+          destination: NavigationDestination(
+            icon: Icon(Icons.approval_outlined, color: colorScheme.onSurface),
+            selectedIcon: Icon(Icons.approval, color: colorScheme.onSurface),
+            label: 'Approval',
           ),
         ),
       ],

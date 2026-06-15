@@ -20,10 +20,10 @@ class TripRemoteImpl extends BaseRemote implements TripRemote {
   TripRemoteImpl({required this.apiClient});
 
   @override
-  Future<List<TripModel>> getTripMe() async {
+  Future<List<TripModel>> getTripMe({bool forceRefresh = false}) async {
     return apiCall(() async {
       final response =
-          await apiClient.get(ApiEndpoints.businessTripMe)
+          await apiClient.get(ApiEndpoints.businessTripMe, forceRefresh: true)
               as Map<String, dynamic>;
       return (response['requests'] as List)
           .map((trip) => TripModel.fromJson(trip as Map<String, dynamic>))
@@ -32,10 +32,10 @@ class TripRemoteImpl extends BaseRemote implements TripRemote {
   }
 
   @override
-  Future<List<TripModel>> getAllTrips() async {
+  Future<List<TripModel>> getAllTrips({bool forceRefresh = false}) async {
     return apiCall(() async {
       final response =
-          await apiClient.get(ApiEndpoints.businessTrips)
+          await apiClient.get(ApiEndpoints.businessTrips, forceRefresh: true)
               as Map<String, dynamic>;
       return (response['requests'] as List)
           .map((trip) => TripModel.fromJson(trip as Map<String, dynamic>))

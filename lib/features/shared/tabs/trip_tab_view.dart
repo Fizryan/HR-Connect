@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:hr_connect/core/config/capitalize.dart';
 import 'package:hr_connect/core/constants/enum.dart';
 import 'package:hr_connect/core/theme/status_color.dart';
+import 'package:hr_connect/features/auth/providers/auth_provider.dart';
 import 'package:hr_connect/features/shared/widgets/custom_compact_tile.dart';
 import 'package:hr_connect/features/shared/widgets/custom_filter_section.dart';
 import 'package:hr_connect/features/shared/widgets/custom_list_content.dart';
@@ -13,8 +14,13 @@ import 'package:hr_connect/features/trip/provider/trip_provider.dart';
 
 class TripTabView extends ConsumerStatefulWidget {
   final String searchQuery;
+  final bool isApprovalMode;
 
-  const TripTabView({super.key, required this.searchQuery});
+  const TripTabView({
+    super.key,
+    required this.searchQuery,
+    this.isApprovalMode = false,
+  });
 
   @override
   ConsumerState<TripTabView> createState() => _TripTabViewState();
@@ -23,45 +29,64 @@ class TripTabView extends ConsumerStatefulWidget {
 class _TripTabViewState extends ConsumerState<TripTabView> {
   RequestStatus _selectedStatus = RequestStatus.all;
 
-  List<TripModel> _getFilteredTrips(List<TripModel> trips) {
-    return trips.where((trip) {
-      final matchesSearch =
-          trip.data.description.toLowerCase().contains(
-            widget.searchQuery.toLowerCase(),
-          ) ||
-          trip.data.type.toLowerCase().contains(
-            widget.searchQuery.toLowerCase(),
-          );
-
-      final matchesStatus =
-          _selectedStatus == RequestStatus.all ||
-          trip.status == _selectedStatus;
-
-      return matchesSearch && matchesStatus;
-    }).toList();
-  }
-
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
 
-    final tripState = ref.watch(tripMeProvider);
+    final tripState = widget.isApprovalMode
+        ? ref.watch(tripNotifierProvider)
+        : ref.watch(tripMeNotifierProvider);
+
+    final currentUser = ref.watch(authNotifierProvider).value;
+
+    List<TripModel> getFilteredTrips(List<TripModel> trips) {
+      return trips.where((trip) {
+        final matchesSearch =
+            trip.data.description.toLowerCase().contains(
+              widget.searchQuery.toLowerCase(),
+            ) ||
+            trip.data.type.toLowerCase().contains(
+              widget.searchQuery.toLowerCase(),
+            );
+
+        final matchesStatus =
+            _selectedStatus == RequestStatus.all ||
+            trip.status == _selectedStatus;
+
+        if (!matchesSearch || !matchesStatus) return false;
+
+        if (widget.isApprovalMode) {
+          if (currentUser == null) return false;
+
+          if (trip.requesterId == currentUser.id) return false;
+
+          return true;
+        }
+
+        return true;
+      }).toList();
+    }
 
     return tripState.when(
       loading: () => const Center(child: CircularProgressIndicator()),
       error: (error, _) => ErrorCard(error: error.toString()),
       data: (trips) {
-        final filteredTrips = _getFilteredTrips(trips);
-
+        final filteredTrips = getFilteredTrips(trips);
         final lastFetchTime = DateTime.now();
 
         return CustomListContent(
           items: filteredTrips,
           isLoading: tripState.isLoading,
           lastFetchTime: lastFetchTime,
-          emptyMessage: 'No trip requests found.',
+          emptyMessage: widget.isApprovalMode
+              ? 'No requests need your approval.'
+              : 'No trip requests found.',
           onRefresh: () async {
-            await ref.read(tripNotifierProvider.notifier).refreshTrips();
+            if (widget.isApprovalMode) {
+              await ref.read(tripNotifierProvider.notifier).refreshTrips();
+            } else {
+              await ref.read(tripMeNotifierProvider.notifier).refreshTrips();
+            }
           },
           filterSection: CustomFilterRow(
             filters: [
@@ -112,15 +137,17 @@ class _TripTabViewState extends ConsumerState<TripTabView> {
                 trip.status,
               ),
               onTap: () => context.push(
-                '/request-detail',
+                widget.isApprovalMode ? '/approval-detail' : '/request-detail',
                 extra: {
                   'id': trip.id,
+                  'requesterId': trip.requesterId,
                   'kind': RequestKind.trip,
                   'type': trip.data.type,
                   'description': trip.data.description,
                   'startDate': trip.data.startDate,
                   'endDate': trip.data.endDate,
                   'status': trip.status,
+                  'approvalId': trip.approverId,
                 },
               ),
               trailing: const Icon(Icons.chevron_right_outlined),

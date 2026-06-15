@@ -20,10 +20,11 @@ class LeaveRemoteImpl extends BaseRemote implements LeaveRemote {
   LeaveRemoteImpl({required this.apiClient});
 
   @override
-  Future<List<LeaveModel>> getLeaveMe() async {
+  Future<List<LeaveModel>> getLeaveMe({bool forceRefresh = false}) async {
     return apiCall(() async {
       final response =
-          await apiClient.get(ApiEndpoints.leaveMe) as Map<String, dynamic>;
+          await apiClient.get(ApiEndpoints.leaveMe, forceRefresh: true)
+              as Map<String, dynamic>;
       return (response['requests'] as List)
           .map((leave) => LeaveModel.fromJson(leave as Map<String, dynamic>))
           .toList();
@@ -31,10 +32,10 @@ class LeaveRemoteImpl extends BaseRemote implements LeaveRemote {
   }
 
   @override
-  Future<List<LeaveModel>> getAllLeaves() async {
+  Future<List<LeaveModel>> getAllLeaves({bool forceRefresh = false}) async {
     return apiCall(() async {
       final response =
-          await apiClient.get(ApiEndpoints.leaveRequests)
+          await apiClient.get(ApiEndpoints.leaveRequests, forceRefresh: true)
               as Map<String, dynamic>;
       return (response['requests'] as List)
           .map((leave) => LeaveModel.fromJson(leave as Map<String, dynamic>))
@@ -89,7 +90,8 @@ class LeaveRemoteImpl extends BaseRemote implements LeaveRemote {
   @override
   Future<void> rejectLeave(String id) async {
     return apiCall(() async {
-      await apiClient.post(ApiEndpoints.rejectLeaveRequest(id));
+      final Map<String, dynamic> payload = {'reason': 'rejected'};
+      await apiClient.post(ApiEndpoints.rejectLeaveRequest(id), data: payload);
     });
   }
 }

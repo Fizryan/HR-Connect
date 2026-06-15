@@ -1,19 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:go_router/go_router.dart';
 import 'package:hr_connect/features/shared/tabs/leave_tab_view.dart';
 import 'package:hr_connect/features/shared/tabs/trip_tab_view.dart';
 import 'package:hr_connect/features/shared/widgets/custom_search_appbar.dart';
 
-class RequestScreen extends ConsumerStatefulWidget {
-  const RequestScreen({super.key});
+class ApprovalScreen extends ConsumerStatefulWidget {
+  const ApprovalScreen({super.key});
 
   @override
-  ConsumerState<RequestScreen> createState() => _RequestScreenState();
+  ConsumerState<ApprovalScreen> createState() => _ApprovalScreenState();
 }
 
-class _RequestScreenState extends ConsumerState<RequestScreen>
+class _ApprovalScreenState extends ConsumerState<ApprovalScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
   final TextEditingController _searchController = TextEditingController();
@@ -50,7 +49,7 @@ class _RequestScreenState extends ConsumerState<RequestScreen>
 
     return Scaffold(
       appBar: CustomSearchAppBar(
-        title: 'Request',
+        title: 'Approval',
         hintText: 'Search request description...',
         isSearchActive: _isSearchActive,
         searchController: _searchController,
@@ -77,19 +76,9 @@ class _RequestScreenState extends ConsumerState<RequestScreen>
       body: TabBarView(
         controller: _tabController,
         children: [
-          LeaveTabView(searchQuery: _searchQuery),
-          TripTabView(searchQuery: _searchQuery),
+          LeaveTabView(searchQuery: _searchQuery, isApprovalMode: true),
+          TripTabView(searchQuery: _searchQuery, isApprovalMode: true),
         ],
-      ),
-      floatingActionButton: FloatingActionButton.small(
-        heroTag: 'request_fab',
-        onPressed: () {
-          context.push('/add-request');
-        },
-        backgroundColor: colorScheme.primaryContainer,
-        foregroundColor: colorScheme.onPrimaryContainer,
-        elevation: 0,
-        child: Icon(Icons.add_rounded, size: 24.sp),
       ),
     );
   }

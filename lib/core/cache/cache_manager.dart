@@ -20,6 +20,7 @@ class CacheManagerImpl implements CacheManager {
         SharedPrefs.cachedDashboard,
         SharedPrefs.cachedLeaves,
         SharedPrefs.cachedTrips,
+        SharedPrefs.cachedAttendance,
       ];
 
       for (final key in keysToRemove) {

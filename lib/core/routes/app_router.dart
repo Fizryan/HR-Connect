@@ -4,19 +4,22 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hr_connect/core/config/env_config.dart';
 import 'package:hr_connect/core/constants/enum.dart';
+import 'package:hr_connect/features/attendance/presentation/attendance_screen.dart';
 import 'package:hr_connect/features/auth/providers/auth_provider.dart';
 import 'package:hr_connect/features/dashboard/presentation/dashboard_screen.dart';
-import 'package:hr_connect/features/shared/screen/about_screen.dart';
-import 'package:hr_connect/features/shared/screen/add_request_screen.dart';
-import 'package:hr_connect/features/shared/screen/change_password_screen.dart';
-import 'package:hr_connect/features/shared/screen/edit_profile_screen.dart';
-import 'package:hr_connect/features/shared/screen/request_detail_screen.dart';
-import 'package:hr_connect/features/shared/screen/request_screen.dart';
+import 'package:hr_connect/features/shared/screen/approval/approval_detail_screen.dart';
+import 'package:hr_connect/features/shared/screen/approval/approval_screen.dart';
+import 'package:hr_connect/features/shared/screen/etc/about_screen.dart';
+import 'package:hr_connect/features/shared/screen/request/add_request_screen.dart';
+import 'package:hr_connect/features/shared/screen/etc/change_password_screen.dart';
+import 'package:hr_connect/features/shared/screen/management/edit_profile_screen.dart';
+import 'package:hr_connect/features/shared/screen/request/request_detail_screen.dart';
+import 'package:hr_connect/features/shared/screen/request/request_screen.dart';
 import 'package:hr_connect/features/user_management/data/model/user_model.dart';
 import 'package:hr_connect/features/auth/presentation/login_screen.dart';
 import 'package:hr_connect/features/shared/main_screen.dart';
-import 'package:hr_connect/features/shared/screen/support_screen.dart';
-import 'package:hr_connect/features/shared/screen/theme_screen.dart';
+import 'package:hr_connect/features/shared/screen/etc/support_screen.dart';
+import 'package:hr_connect/features/shared/screen/etc/theme_screen.dart';
 import 'package:hr_connect/features/shared/splash_screen.dart';
 import 'package:hr_connect/features/user_management/presentation/add_user_screen.dart';
 import 'package:hr_connect/features/user_management/presentation/edit_user_screen.dart';
@@ -137,6 +140,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: '/request-detail',
+        name: 'request detail',
         builder: (context, state) {
           final args = state.extra as Map<String, dynamic>;
           return RequestDetailScreen(
@@ -155,6 +159,24 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         name: 'add request',
         builder: (context, state) => const AddRequestScreen(),
       ),
+      GoRoute(
+        path: '/approval-detail',
+        name: 'approval detail',
+        builder: (context, state) {
+          final args = state.extra as Map<String, dynamic>;
+          return ApprovalDetailScreen(
+            requestId: args['id'] as String,
+            requesterId: args['requesterId'] as String,
+            requestKind: args['kind'] as RequestKind,
+            type: args['type'] as String,
+            description: args['description'] as String,
+            startDate: args['startDate'] as DateTime,
+            endDate: args['endDate'] as DateTime,
+            status: args['status'] as RequestStatus,
+            approvalId: args['approvalId'] as String,
+          );
+        },
+      ),
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) {
           return MainScreen(navigationShell: navigationShell);
@@ -172,6 +194,15 @@ final goRouterProvider = Provider<GoRouter>((ref) {
           StatefulShellBranch(
             routes: [
               GoRoute(
+                path: '/attendance',
+                name: 'attendance',
+                builder: (context, state) => const AttendanceScreen(),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
                 path: '/request',
                 name: 'request',
                 builder: (context, state) => const RequestScreen(),
@@ -183,8 +214,16 @@ final goRouterProvider = Provider<GoRouter>((ref) {
               GoRoute(
                 path: '/management',
                 name: 'management',
-                builder: (context, state) =>
-                    const Scaffold(body: UserManagementScreen()),
+                builder: (context, state) => const UserManagementScreen(),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/approval',
+                name: 'approval',
+                builder: (context, state) => const ApprovalScreen(),
               ),
             ],
           ),

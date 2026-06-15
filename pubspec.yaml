@@ -1,7 +1,7 @@
 name: hr_connect
 description: "HR-Connect is a modern human resources management system designed to streamline corporate operations. Ensuring that every HR workflow from daily operations remains efficient, secure, and centralized."
 publish_to: "none"
-version: 0.1.0
+version: 1.0.0
 
 environment:
   sdk: ^3.9.2
@@ -43,6 +43,7 @@ dependencies:
 
   # Scanner
   mobile_scanner: ^7.2.0
+  qr_flutter: ^4.1.0
 
 dev_dependencies:
   flutter_test:

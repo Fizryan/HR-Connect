@@ -17,3 +17,7 @@ export 'package:hr_connect/features/leave/data/repositories/leave_repository_imp
 export 'package:hr_connect/features/trip/data/remote/trip_remote.dart';
 export 'package:hr_connect/features/trip/data/repositories/trip_repository.dart';
 export 'package:hr_connect/features/trip/data/repositories/trip_repository_imp.dart';
+
+export 'package:hr_connect/features/attendance/data/remote/attendance_remote.dart';
+export 'package:hr_connect/features/attendance/data/repositories/attendance_repository.dart';
+export 'package:hr_connect/features/attendance/data/repositories/attendance_repository_imp.dart';

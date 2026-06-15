@@ -12,7 +12,6 @@ class RequestDetailScreen extends StatelessWidget {
   final String description;
   final DateTime startDate;
   final DateTime endDate;
-
   final RequestStatus status;
 
   const RequestDetailScreen({
@@ -115,7 +114,6 @@ class RequestDetailScreen extends StatelessWidget {
               ),
             ),
             SizedBox(height: 16.h),
-
             _buildInfoTile(
               context,
               icon: Icons.category_outlined,
@@ -138,7 +136,6 @@ class RequestDetailScreen extends StatelessWidget {
               ),
             ),
             SizedBox(height: 16.h),
-
             _buildInfoTile(
               context,
               icon: Icons.calendar_today_rounded,

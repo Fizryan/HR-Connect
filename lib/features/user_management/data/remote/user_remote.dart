@@ -20,10 +20,11 @@ class UserRemoteImpl extends BaseRemote implements UserRemote {
   UserRemoteImpl({required this.apiClient});
 
   @override
-  Future<UserModel> getUserInfo() async {
+  Future<UserModel> getUserInfo({bool forceRefresh = false}) async {
     return apiCall(() async {
       final response =
-          await apiClient.get(ApiEndpoints.profile) as Map<String, dynamic>;
+          await apiClient.get(ApiEndpoints.profile, forceRefresh: true)
+              as Map<String, dynamic>;
       return UserModel.fromJson(response['user'] as Map<String, dynamic>);
     });
   }

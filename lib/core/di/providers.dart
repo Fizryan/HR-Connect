@@ -98,3 +98,15 @@ final tripRepositoryProvider = Provider<TripRepository>((ref) {
     sharedPreferences: ref.watch(sharedPreferencesProvider),
   );
 });
+
+final attendanceRemoteProvider = Provider<AttendanceRemote>((ref) {
+  final apiClient = ref.watch(apiClientProvider);
+  return AttendanceRemoteImpl(apiClient: apiClient);
+});
+
+final attendanceRepositoryProvider = Provider<AttendanceRepository>((ref) {
+  return AttendanceRepositoryImp(
+    remoteDataSource: ref.watch(attendanceRemoteProvider),
+    sharedPreferences: ref.watch(sharedPreferencesProvider),
+  );
+});

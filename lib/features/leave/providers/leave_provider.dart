@@ -1,86 +1,31 @@
-import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fpdart/fpdart.dart';
-import 'package:hr_connect/core/base/base_list_notifier.dart';
 import 'package:hr_connect/core/constants/enum.dart';
 import 'package:hr_connect/core/di/providers.dart';
 import 'package:hr_connect/core/error/failures.dart';
 import 'package:hr_connect/features/auth/providers/auth_provider.dart';
 import 'package:hr_connect/features/leave/data/model/leave_model.dart';
+import 'package:hr_connect/features/leave/providers/base_leave_provider.dart';
 
-final leaveMeProvider = FutureProvider<List<LeaveModel>>((ref) async {
-  final repository = ref.read(leaveRepositoryProvider);
-  final result = await repository.getLeaveMe();
+final leaveMeNotifierProvider =
+    AsyncNotifierProvider<LeaveMeNotifier, List<LeaveModel>>(
+      LeaveMeNotifier.new,
+    );
 
-  return result.fold(
-    (failure) => throw Exception(failure.message),
-    (leaves) => leaves,
-  );
-});
-
-final pendingLeaveMeProvider = Provider<AsyncValue<List<LeaveModel>>>((ref) {
-  final myLeaves = ref.watch(leaveMeProvider);
-
-  return myLeaves.whenData((leaves) {
-    return leaves
-        .where((leave) => leave.status.name.toLowerCase() == 'pending')
-        .toList();
-  });
-});
+class LeaveMeNotifier extends BaseSharedLeaveNotifier {
+  @override
+  Future<Either<Failure, List<LeaveModel>>> fetchFromRepository() {
+    return ref.read(leaveRepositoryProvider).getLeaveMe();
+  }
+}
 
 final leaveNotifierProvider =
     AsyncNotifierProvider<LeaveNotifier, List<LeaveModel>>(LeaveNotifier.new);
 
-class LeaveNotifier extends BaseListNotifier<LeaveModel> {
-  DateTime? lastFetchTime;
-
+class LeaveNotifier extends BaseSharedLeaveNotifier {
   @override
-  FutureOr<List<LeaveModel>> build() async {
-    final data = await _fetchLeaveLogic();
-    lastFetchTime = DateTime.now();
-    return data;
-  }
-
-  Future<List<LeaveModel>> _fetchLeaveLogic() async {
-    final repository = ref.read(leaveRepositoryProvider);
-    final result = await repository.getAllLeaves();
-
-    return result.fold(
-      (failure) => throw Exception(failure.message),
-      (leaves) => leaves,
-    );
-  }
-
-  Future<void> fetchLeaves() async {
-    if (state.isLoading) return;
-
-    final isCacheValid =
-        lastFetchTime != null &&
-        DateTime.now().difference(lastFetchTime!).inMinutes < 10;
-
-    if (isCacheValid && state.hasValue) return;
-
-    await refreshLeaves();
-  }
-
-  Future<void> refreshLeaves() async {
-    state = const AsyncValue.loading();
-    state = await AsyncValue.guard(_fetchLeaveLogic);
-
-    if (state.hasValue) {
-      lastFetchTime = DateTime.now();
-    }
-  }
-
-  Future<Either<Failure, void>> createLeave(LeaveData data) async {
-    final repository = ref.read(leaveRepositoryProvider);
-    return handleMutation(
-      action: () => repository.createLeave(data),
-      onSuccess: (_) {
-        refreshLeaves();
-        ref.invalidate(leaveMeProvider);
-      },
-    );
+  Future<Either<Failure, List<LeaveModel>>> fetchFromRepository() {
+    return ref.read(leaveRepositoryProvider).getAllLeaves();
   }
 
   Future<Either<Failure, void>> approveLeave(String id) async {
@@ -89,7 +34,7 @@ class LeaveNotifier extends BaseListNotifier<LeaveModel> {
     return handleMutation(
       action: () => repository.approveLeave(id),
       onSuccess: (_) {
-        ref.invalidate(leaveMeProvider);
+        ref.invalidate(leaveRepositoryProvider);
       },
       optimisticUpdate: (currentList) {
         return currentList.map((leave) {
@@ -111,7 +56,7 @@ class LeaveNotifier extends BaseListNotifier<LeaveModel> {
     return handleMutation(
       action: () => repository.rejectLeave(id),
       onSuccess: (_) {
-        ref.invalidate(leaveMeProvider);
+        ref.invalidate(leaveNotifierProvider);
       },
       optimisticUpdate: (currentList) {
         return currentList.map((leave) {

@@ -24,14 +24,14 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
   @override
   Widget build(BuildContext context) {
     final dashboardState = ref.watch(dashboardNotifierProvider);
-    final leaveState = ref.watch(leaveMeProvider);
-    final tripState = ref.watch(tripMeProvider);
+    final leaveState = ref.watch(leaveMeNotifierProvider);
+    final tripState = ref.watch(tripMeNotifierProvider);
 
     return RefreshIndicator(
       onRefresh: () async {
         ref.invalidate(dashboardNotifierProvider);
-        ref.invalidate(leaveMeProvider);
-        ref.invalidate(tripMeProvider);
+        ref.invalidate(leaveMeNotifierProvider);
+        ref.invalidate(tripMeNotifierProvider);
         await Future.delayed(const Duration(milliseconds: 500));
       },
       child: SingleChildScrollView(
@@ -45,7 +45,10 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
             SizedBox(height: 24.h),
             dashboardState.when(
               loading: () => const Center(child: CircularProgressIndicator()),
-              error: (err, _) => ErrorCard(error: err.toString()),
+              error: (err, _) => Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16.w),
+                child: ErrorCard(error: err.toString()),
+              ),
               data: (dashboard) => MetricsGrid(dashboard: dashboard),
             ),
             SizedBox(height: 32.h),
@@ -58,7 +61,10 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
             ),
             leaveState.when(
               loading: () => const Center(child: CircularProgressIndicator()),
-              error: (err, _) => ErrorCard(error: err.toString()),
+              error: (err, _) => Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16.w),
+                child: ErrorCard(error: err.toString()),
+              ),
               data: (leaves) => RecentList(
                 items: leaves,
                 emptyMesage: 'No recent leave requests',

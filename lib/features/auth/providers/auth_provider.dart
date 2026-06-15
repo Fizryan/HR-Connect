@@ -69,15 +69,17 @@ class AuthNotifier extends AsyncNotifier<UserModel?> {
     final authRepository = ref.read(authRepositoryProvider);
     await authRepository.logout();
 
-    ref.invalidate(dashboardNotifierProvider);
-    ref.invalidate(leaveMeProvider);
-    ref.invalidate(tripMeProvider);
-    ref.invalidate(userNotifierProvider);
-
     ref.read(apiClientProvider).clearMemoryCache();
 
     final cacheManager = ref.read(cacheManagerProvider);
     await cacheManager.clearAllUserData();
+
+    ref.invalidate(dashboardNotifierProvider);
+    ref.invalidate(leaveMeNotifierProvider);
+    ref.invalidate(tripMeNotifierProvider);
+    ref.invalidate(userNotifierProvider);
+    ref.invalidate(leaveNotifierProvider);
+    ref.invalidate(tripNotifierProvider);
 
     state = const AsyncValue.data(null);
   }

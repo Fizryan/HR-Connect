@@ -175,7 +175,6 @@ class ApiClient {
 
   void updateToken(String token) {
     _cachedToken = token;
-    _logger.i('[ApiClient] Token cache has been updated.');
   }
 
   void clearToken() {

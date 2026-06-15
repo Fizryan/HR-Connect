@@ -104,7 +104,7 @@ class _AddRequestScreenState extends ConsumerState<AddRequestScreen> {
           startDate: _startDate!,
           endDate: _endDate!,
         );
-        await ref.read(leaveNotifierProvider.notifier).createLeave(data);
+        await ref.read(leaveMeNotifierProvider.notifier).createLeave(data);
       } else {
         final data = TripData(
           type: _selectedCategory!,
@@ -112,7 +112,7 @@ class _AddRequestScreenState extends ConsumerState<AddRequestScreen> {
           startDate: _startDate!,
           endDate: _endDate!,
         );
-        await ref.read(tripNotifierProvider.notifier).createTrip(data);
+        await ref.read(tripMeNotifierProvider.notifier).createTrip(data);
       }
 
       if (!mounted) return;
