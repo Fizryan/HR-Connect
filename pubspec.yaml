@@ -1,7 +1,7 @@
 name: hr_connect
 description: "HR-Connect is a modern human resources management system designed to streamline corporate operations. Ensuring that every HR workflow from daily operations remains efficient, secure, and centralized."
 publish_to: "none"
-version: 1.0.0
+version: 1.0.1
 
 environment:
   sdk: ^3.9.2
