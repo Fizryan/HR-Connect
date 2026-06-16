@@ -1,6 +1,8 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:hr_connect/core/config/date_utils.dart';
+import 'package:hr_connect/core/config/safe_model_parser.dart';
 import 'package:hr_connect/core/constants/enum.dart';
+import 'package:hr_connect/features/user_management/data/model/user_model.dart';
 
 part 'trip_model.freezed.dart';
 part 'trip_model.g.dart';
@@ -24,10 +26,13 @@ abstract class TripData with _$TripData {
 abstract class TripModel with _$TripModel {
   const factory TripModel({
     @JsonKey(name: 'id') required String id,
-    @JsonKey(name: 'requesterId') required String requesterId,
     @JsonKey(name: 'data') required TripData data,
     @JsonKey(name: 'status') required RequestStatus status,
-    @JsonKey(name: 'approverId') String? approverId,
+    @JsonKey(name: 'requester') required UserData requester,
+    @JsonKey(name: 'approver')
+    @SafeModelParser<UserData>(UserData.fromJson)
+    UserData? approver,
+    @JsonKey(name: 'rejectReason') String? rejectReason,
   }) = _TripModel;
 
   factory TripModel.fromJson(Map<String, dynamic> json) =>

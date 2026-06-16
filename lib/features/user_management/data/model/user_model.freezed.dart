@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$UserData {
 
-@JsonKey(name: 'email') String get email;@JsonKey(name: 'firstName') String get firstName;@JsonKey(name: 'lastName') String get lastName;@JsonKey(name: 'role') Role get role;@JsonKey(name: 'avatarUrl') String? get avatarUrl;
+@JsonKey(name: 'email') String get email;@JsonKey(name: 'firstName') String get firstName;@JsonKey(name: 'lastName') String get lastName;@JsonKey(name: 'role', unknownEnumValue: Role.unknown) Role get role;@JsonKey(name: 'avatarUrl') String? get avatarUrl;
 /// Create a copy of UserData
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -48,7 +48,7 @@ abstract mixin class $UserDataCopyWith<$Res>  {
   factory $UserDataCopyWith(UserData value, $Res Function(UserData) _then) = _$UserDataCopyWithImpl;
 @useResult
 $Res call({
-@JsonKey(name: 'email') String email,@JsonKey(name: 'firstName') String firstName,@JsonKey(name: 'lastName') String lastName,@JsonKey(name: 'role') Role role,@JsonKey(name: 'avatarUrl') String? avatarUrl
+@JsonKey(name: 'email') String email,@JsonKey(name: 'firstName') String firstName,@JsonKey(name: 'lastName') String lastName,@JsonKey(name: 'role', unknownEnumValue: Role.unknown) Role role,@JsonKey(name: 'avatarUrl') String? avatarUrl
 });
 
 
@@ -157,7 +157,7 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function(@JsonKey(name: 'email')  String email, @JsonKey(name: 'firstName')  String firstName, @JsonKey(name: 'lastName')  String lastName, @JsonKey(name: 'role')  Role role, @JsonKey(name: 'avatarUrl')  String? avatarUrl)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function(@JsonKey(name: 'email')  String email, @JsonKey(name: 'firstName')  String firstName, @JsonKey(name: 'lastName')  String lastName, @JsonKey(name: 'role', unknownEnumValue: Role.unknown)  Role role, @JsonKey(name: 'avatarUrl')  String? avatarUrl)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _UserData() when $default != null:
 return $default(_that.email,_that.firstName,_that.lastName,_that.role,_that.avatarUrl);case _:
@@ -178,7 +178,7 @@ return $default(_that.email,_that.firstName,_that.lastName,_that.role,_that.avat
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function(@JsonKey(name: 'email')  String email, @JsonKey(name: 'firstName')  String firstName, @JsonKey(name: 'lastName')  String lastName, @JsonKey(name: 'role')  Role role, @JsonKey(name: 'avatarUrl')  String? avatarUrl)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function(@JsonKey(name: 'email')  String email, @JsonKey(name: 'firstName')  String firstName, @JsonKey(name: 'lastName')  String lastName, @JsonKey(name: 'role', unknownEnumValue: Role.unknown)  Role role, @JsonKey(name: 'avatarUrl')  String? avatarUrl)  $default,) {final _that = this;
 switch (_that) {
 case _UserData():
 return $default(_that.email,_that.firstName,_that.lastName,_that.role,_that.avatarUrl);case _:
@@ -198,7 +198,7 @@ return $default(_that.email,_that.firstName,_that.lastName,_that.role,_that.avat
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function(@JsonKey(name: 'email')  String email, @JsonKey(name: 'firstName')  String firstName, @JsonKey(name: 'lastName')  String lastName, @JsonKey(name: 'role')  Role role, @JsonKey(name: 'avatarUrl')  String? avatarUrl)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function(@JsonKey(name: 'email')  String email, @JsonKey(name: 'firstName')  String firstName, @JsonKey(name: 'lastName')  String lastName, @JsonKey(name: 'role', unknownEnumValue: Role.unknown)  Role role, @JsonKey(name: 'avatarUrl')  String? avatarUrl)?  $default,) {final _that = this;
 switch (_that) {
 case _UserData() when $default != null:
 return $default(_that.email,_that.firstName,_that.lastName,_that.role,_that.avatarUrl);case _:
@@ -213,13 +213,13 @@ return $default(_that.email,_that.firstName,_that.lastName,_that.role,_that.avat
 @JsonSerializable()
 
 class _UserData implements UserData {
-  const _UserData({@JsonKey(name: 'email') required this.email, @JsonKey(name: 'firstName') required this.firstName, @JsonKey(name: 'lastName') required this.lastName, @JsonKey(name: 'role') required this.role, @JsonKey(name: 'avatarUrl') this.avatarUrl});
+  const _UserData({@JsonKey(name: 'email') required this.email, @JsonKey(name: 'firstName') required this.firstName, @JsonKey(name: 'lastName') required this.lastName, @JsonKey(name: 'role', unknownEnumValue: Role.unknown) required this.role, @JsonKey(name: 'avatarUrl') this.avatarUrl});
   factory _UserData.fromJson(Map<String, dynamic> json) => _$UserDataFromJson(json);
 
 @override@JsonKey(name: 'email') final  String email;
 @override@JsonKey(name: 'firstName') final  String firstName;
 @override@JsonKey(name: 'lastName') final  String lastName;
-@override@JsonKey(name: 'role') final  Role role;
+@override@JsonKey(name: 'role', unknownEnumValue: Role.unknown) final  Role role;
 @override@JsonKey(name: 'avatarUrl') final  String? avatarUrl;
 
 /// Create a copy of UserData
@@ -255,7 +255,7 @@ abstract mixin class _$UserDataCopyWith<$Res> implements $UserDataCopyWith<$Res>
   factory _$UserDataCopyWith(_UserData value, $Res Function(_UserData) _then) = __$UserDataCopyWithImpl;
 @override @useResult
 $Res call({
-@JsonKey(name: 'email') String email,@JsonKey(name: 'firstName') String firstName,@JsonKey(name: 'lastName') String lastName,@JsonKey(name: 'role') Role role,@JsonKey(name: 'avatarUrl') String? avatarUrl
+@JsonKey(name: 'email') String email,@JsonKey(name: 'firstName') String firstName,@JsonKey(name: 'lastName') String lastName,@JsonKey(name: 'role', unknownEnumValue: Role.unknown) Role role,@JsonKey(name: 'avatarUrl') String? avatarUrl
 });
 
 

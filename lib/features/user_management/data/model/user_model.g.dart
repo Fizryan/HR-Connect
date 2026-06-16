@@ -10,7 +10,7 @@ _UserData _$UserDataFromJson(Map<String, dynamic> json) => _UserData(
   email: json['email'] as String,
   firstName: json['firstName'] as String,
   lastName: json['lastName'] as String,
-  role: $enumDecode(_$RoleEnumMap, json['role']),
+  role: $enumDecode(_$RoleEnumMap, json['role'], unknownValue: Role.unknown),
   avatarUrl: json['avatarUrl'] as String?,
 );
 

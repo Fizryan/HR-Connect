@@ -60,12 +60,11 @@ class MainScreen extends ConsumerWidget {
           destination: NavigationDestination(
             icon: Icon(Icons.people_outline, color: colorScheme.onSurface),
             selectedIcon: Icon(Icons.people, color: colorScheme.onSurface),
-            label: 'Management',
+            label: 'Manage',
           ),
         ),
       ],
-      if (currentUser.data.role == Role.admin ||
-          currentUser.data.role == Role.manager) ...[
+      if (currentUser.data.role != Role.staff) ...[
         _NavDest(
           branchIndex: 4,
           destination: NavigationDestination(

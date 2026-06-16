@@ -9,5 +9,5 @@ abstract class LeaveRepository {
   Future<Either<Failure, LeaveModel>> getLeaveById(String id);
   Future<Either<Failure, void>> createLeave(LeaveData data);
   Future<Either<Failure, void>> approveLeave(String id);
-  Future<Either<Failure, void>> rejectLeave(String id);
+  Future<Either<Failure, void>> rejectLeave(String id, String reason);
 }

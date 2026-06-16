@@ -287,7 +287,7 @@ as DateTime,
 /// @nodoc
 mixin _$LeaveModel {
 
-@JsonKey(name: 'id') String get id;@JsonKey(name: 'requesterId') String get requesterId;@JsonKey(name: 'data') LeaveData get data;@JsonKey(name: 'status') RequestStatus get status;@JsonKey(name: 'approverId') String? get approverId;
+@JsonKey(name: 'id') String get id;@JsonKey(name: 'data') LeaveData get data;@JsonKey(name: 'status') RequestStatus get status;@JsonKey(name: 'requester') UserData get requester;@JsonKey(name: 'approver')@SafeModelParser<UserData>(UserData.fromJson) UserData? get approver;@JsonKey(name: 'rejectReason') String? get rejectReason;
 /// Create a copy of LeaveModel
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -300,16 +300,16 @@ $LeaveModelCopyWith<LeaveModel> get copyWith => _$LeaveModelCopyWithImpl<LeaveMo
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is LeaveModel&&(identical(other.id, id) || other.id == id)&&(identical(other.requesterId, requesterId) || other.requesterId == requesterId)&&(identical(other.data, data) || other.data == data)&&(identical(other.status, status) || other.status == status)&&(identical(other.approverId, approverId) || other.approverId == approverId));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is LeaveModel&&(identical(other.id, id) || other.id == id)&&(identical(other.data, data) || other.data == data)&&(identical(other.status, status) || other.status == status)&&(identical(other.requester, requester) || other.requester == requester)&&(identical(other.approver, approver) || other.approver == approver)&&(identical(other.rejectReason, rejectReason) || other.rejectReason == rejectReason));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,requesterId,data,status,approverId);
+int get hashCode => Object.hash(runtimeType,id,data,status,requester,approver,rejectReason);
 
 @override
 String toString() {
-  return 'LeaveModel(id: $id, requesterId: $requesterId, data: $data, status: $status, approverId: $approverId)';
+  return 'LeaveModel(id: $id, data: $data, status: $status, requester: $requester, approver: $approver, rejectReason: $rejectReason)';
 }
 
 
@@ -320,11 +320,11 @@ abstract mixin class $LeaveModelCopyWith<$Res>  {
   factory $LeaveModelCopyWith(LeaveModel value, $Res Function(LeaveModel) _then) = _$LeaveModelCopyWithImpl;
 @useResult
 $Res call({
-@JsonKey(name: 'id') String id,@JsonKey(name: 'requesterId') String requesterId,@JsonKey(name: 'data') LeaveData data,@JsonKey(name: 'status') RequestStatus status,@JsonKey(name: 'approverId') String? approverId
+@JsonKey(name: 'id') String id,@JsonKey(name: 'data') LeaveData data,@JsonKey(name: 'status') RequestStatus status,@JsonKey(name: 'requester') UserData requester,@JsonKey(name: 'approver')@SafeModelParser<UserData>(UserData.fromJson) UserData? approver,@JsonKey(name: 'rejectReason') String? rejectReason
 });
 
 
-$LeaveDataCopyWith<$Res> get data;
+$LeaveDataCopyWith<$Res> get data;$UserDataCopyWith<$Res> get requester;$UserDataCopyWith<$Res>? get approver;
 
 }
 /// @nodoc
@@ -337,13 +337,14 @@ class _$LeaveModelCopyWithImpl<$Res>
 
 /// Create a copy of LeaveModel
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? requesterId = null,Object? data = null,Object? status = null,Object? approverId = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? data = null,Object? status = null,Object? requester = null,Object? approver = freezed,Object? rejectReason = freezed,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
-as String,requesterId: null == requesterId ? _self.requesterId : requesterId // ignore: cast_nullable_to_non_nullable
 as String,data: null == data ? _self.data : data // ignore: cast_nullable_to_non_nullable
 as LeaveData,status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
-as RequestStatus,approverId: freezed == approverId ? _self.approverId : approverId // ignore: cast_nullable_to_non_nullable
+as RequestStatus,requester: null == requester ? _self.requester : requester // ignore: cast_nullable_to_non_nullable
+as UserData,approver: freezed == approver ? _self.approver : approver // ignore: cast_nullable_to_non_nullable
+as UserData?,rejectReason: freezed == rejectReason ? _self.rejectReason : rejectReason // ignore: cast_nullable_to_non_nullable
 as String?,
   ));
 }
@@ -355,6 +356,27 @@ $LeaveDataCopyWith<$Res> get data {
   
   return $LeaveDataCopyWith<$Res>(_self.data, (value) {
     return _then(_self.copyWith(data: value));
+  });
+}/// Create a copy of LeaveModel
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$UserDataCopyWith<$Res> get requester {
+  
+  return $UserDataCopyWith<$Res>(_self.requester, (value) {
+    return _then(_self.copyWith(requester: value));
+  });
+}/// Create a copy of LeaveModel
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$UserDataCopyWith<$Res>? get approver {
+    if (_self.approver == null) {
+    return null;
+  }
+
+  return $UserDataCopyWith<$Res>(_self.approver!, (value) {
+    return _then(_self.copyWith(approver: value));
   });
 }
 }
@@ -438,10 +460,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function(@JsonKey(name: 'id')  String id, @JsonKey(name: 'requesterId')  String requesterId, @JsonKey(name: 'data')  LeaveData data, @JsonKey(name: 'status')  RequestStatus status, @JsonKey(name: 'approverId')  String? approverId)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function(@JsonKey(name: 'id')  String id, @JsonKey(name: 'data')  LeaveData data, @JsonKey(name: 'status')  RequestStatus status, @JsonKey(name: 'requester')  UserData requester, @JsonKey(name: 'approver')@SafeModelParser<UserData>(UserData.fromJson)  UserData? approver, @JsonKey(name: 'rejectReason')  String? rejectReason)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _LeaveModel() when $default != null:
-return $default(_that.id,_that.requesterId,_that.data,_that.status,_that.approverId);case _:
+return $default(_that.id,_that.data,_that.status,_that.requester,_that.approver,_that.rejectReason);case _:
   return orElse();
 
 }
@@ -459,10 +481,10 @@ return $default(_that.id,_that.requesterId,_that.data,_that.status,_that.approve
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function(@JsonKey(name: 'id')  String id, @JsonKey(name: 'requesterId')  String requesterId, @JsonKey(name: 'data')  LeaveData data, @JsonKey(name: 'status')  RequestStatus status, @JsonKey(name: 'approverId')  String? approverId)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function(@JsonKey(name: 'id')  String id, @JsonKey(name: 'data')  LeaveData data, @JsonKey(name: 'status')  RequestStatus status, @JsonKey(name: 'requester')  UserData requester, @JsonKey(name: 'approver')@SafeModelParser<UserData>(UserData.fromJson)  UserData? approver, @JsonKey(name: 'rejectReason')  String? rejectReason)  $default,) {final _that = this;
 switch (_that) {
 case _LeaveModel():
-return $default(_that.id,_that.requesterId,_that.data,_that.status,_that.approverId);case _:
+return $default(_that.id,_that.data,_that.status,_that.requester,_that.approver,_that.rejectReason);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -479,10 +501,10 @@ return $default(_that.id,_that.requesterId,_that.data,_that.status,_that.approve
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function(@JsonKey(name: 'id')  String id, @JsonKey(name: 'requesterId')  String requesterId, @JsonKey(name: 'data')  LeaveData data, @JsonKey(name: 'status')  RequestStatus status, @JsonKey(name: 'approverId')  String? approverId)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function(@JsonKey(name: 'id')  String id, @JsonKey(name: 'data')  LeaveData data, @JsonKey(name: 'status')  RequestStatus status, @JsonKey(name: 'requester')  UserData requester, @JsonKey(name: 'approver')@SafeModelParser<UserData>(UserData.fromJson)  UserData? approver, @JsonKey(name: 'rejectReason')  String? rejectReason)?  $default,) {final _that = this;
 switch (_that) {
 case _LeaveModel() when $default != null:
-return $default(_that.id,_that.requesterId,_that.data,_that.status,_that.approverId);case _:
+return $default(_that.id,_that.data,_that.status,_that.requester,_that.approver,_that.rejectReason);case _:
   return null;
 
 }
@@ -494,14 +516,15 @@ return $default(_that.id,_that.requesterId,_that.data,_that.status,_that.approve
 @JsonSerializable()
 
 class _LeaveModel implements LeaveModel {
-  const _LeaveModel({@JsonKey(name: 'id') required this.id, @JsonKey(name: 'requesterId') required this.requesterId, @JsonKey(name: 'data') required this.data, @JsonKey(name: 'status') required this.status, @JsonKey(name: 'approverId') this.approverId});
+  const _LeaveModel({@JsonKey(name: 'id') required this.id, @JsonKey(name: 'data') required this.data, @JsonKey(name: 'status') required this.status, @JsonKey(name: 'requester') required this.requester, @JsonKey(name: 'approver')@SafeModelParser<UserData>(UserData.fromJson) this.approver, @JsonKey(name: 'rejectReason') this.rejectReason});
   factory _LeaveModel.fromJson(Map<String, dynamic> json) => _$LeaveModelFromJson(json);
 
 @override@JsonKey(name: 'id') final  String id;
-@override@JsonKey(name: 'requesterId') final  String requesterId;
 @override@JsonKey(name: 'data') final  LeaveData data;
 @override@JsonKey(name: 'status') final  RequestStatus status;
-@override@JsonKey(name: 'approverId') final  String? approverId;
+@override@JsonKey(name: 'requester') final  UserData requester;
+@override@JsonKey(name: 'approver')@SafeModelParser<UserData>(UserData.fromJson) final  UserData? approver;
+@override@JsonKey(name: 'rejectReason') final  String? rejectReason;
 
 /// Create a copy of LeaveModel
 /// with the given fields replaced by the non-null parameter values.
@@ -516,16 +539,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _LeaveModel&&(identical(other.id, id) || other.id == id)&&(identical(other.requesterId, requesterId) || other.requesterId == requesterId)&&(identical(other.data, data) || other.data == data)&&(identical(other.status, status) || other.status == status)&&(identical(other.approverId, approverId) || other.approverId == approverId));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _LeaveModel&&(identical(other.id, id) || other.id == id)&&(identical(other.data, data) || other.data == data)&&(identical(other.status, status) || other.status == status)&&(identical(other.requester, requester) || other.requester == requester)&&(identical(other.approver, approver) || other.approver == approver)&&(identical(other.rejectReason, rejectReason) || other.rejectReason == rejectReason));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,requesterId,data,status,approverId);
+int get hashCode => Object.hash(runtimeType,id,data,status,requester,approver,rejectReason);
 
 @override
 String toString() {
-  return 'LeaveModel(id: $id, requesterId: $requesterId, data: $data, status: $status, approverId: $approverId)';
+  return 'LeaveModel(id: $id, data: $data, status: $status, requester: $requester, approver: $approver, rejectReason: $rejectReason)';
 }
 
 
@@ -536,11 +559,11 @@ abstract mixin class _$LeaveModelCopyWith<$Res> implements $LeaveModelCopyWith<$
   factory _$LeaveModelCopyWith(_LeaveModel value, $Res Function(_LeaveModel) _then) = __$LeaveModelCopyWithImpl;
 @override @useResult
 $Res call({
-@JsonKey(name: 'id') String id,@JsonKey(name: 'requesterId') String requesterId,@JsonKey(name: 'data') LeaveData data,@JsonKey(name: 'status') RequestStatus status,@JsonKey(name: 'approverId') String? approverId
+@JsonKey(name: 'id') String id,@JsonKey(name: 'data') LeaveData data,@JsonKey(name: 'status') RequestStatus status,@JsonKey(name: 'requester') UserData requester,@JsonKey(name: 'approver')@SafeModelParser<UserData>(UserData.fromJson) UserData? approver,@JsonKey(name: 'rejectReason') String? rejectReason
 });
 
 
-@override $LeaveDataCopyWith<$Res> get data;
+@override $LeaveDataCopyWith<$Res> get data;@override $UserDataCopyWith<$Res> get requester;@override $UserDataCopyWith<$Res>? get approver;
 
 }
 /// @nodoc
@@ -553,13 +576,14 @@ class __$LeaveModelCopyWithImpl<$Res>
 
 /// Create a copy of LeaveModel
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? requesterId = null,Object? data = null,Object? status = null,Object? approverId = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? data = null,Object? status = null,Object? requester = null,Object? approver = freezed,Object? rejectReason = freezed,}) {
   return _then(_LeaveModel(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
-as String,requesterId: null == requesterId ? _self.requesterId : requesterId // ignore: cast_nullable_to_non_nullable
 as String,data: null == data ? _self.data : data // ignore: cast_nullable_to_non_nullable
 as LeaveData,status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
-as RequestStatus,approverId: freezed == approverId ? _self.approverId : approverId // ignore: cast_nullable_to_non_nullable
+as RequestStatus,requester: null == requester ? _self.requester : requester // ignore: cast_nullable_to_non_nullable
+as UserData,approver: freezed == approver ? _self.approver : approver // ignore: cast_nullable_to_non_nullable
+as UserData?,rejectReason: freezed == rejectReason ? _self.rejectReason : rejectReason // ignore: cast_nullable_to_non_nullable
 as String?,
   ));
 }
@@ -572,6 +596,27 @@ $LeaveDataCopyWith<$Res> get data {
   
   return $LeaveDataCopyWith<$Res>(_self.data, (value) {
     return _then(_self.copyWith(data: value));
+  });
+}/// Create a copy of LeaveModel
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$UserDataCopyWith<$Res> get requester {
+  
+  return $UserDataCopyWith<$Res>(_self.requester, (value) {
+    return _then(_self.copyWith(requester: value));
+  });
+}/// Create a copy of LeaveModel
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$UserDataCopyWith<$Res>? get approver {
+    if (_self.approver == null) {
+    return null;
+  }
+
+  return $UserDataCopyWith<$Res>(_self.approver!, (value) {
+    return _then(_self.copyWith(approver: value));
   });
 }
 }

@@ -34,7 +34,7 @@ void main() {
 
     const secureStorage = FlutterSecureStorage();
 
-    apiClient = ApiClient(secureStorage: secureStorage);
+    apiClient = ApiClient(secureStorage: secureStorage, onUnauthorized: () {});
     authRemote = AuthRemoteImpl(apiClient: apiClient);
     userRemote = UserRemoteImpl(apiClient: apiClient);
     dashboardRemote = DashboardRemoteImpl(apiClient: apiClient);

@@ -6,6 +6,10 @@ import 'package:hr_connect/core/app_info/data/repositories/app_info_repository_i
 import 'package:hr_connect/core/cache/cache_manager.dart';
 import 'package:hr_connect/core/di/features_export_di.dart';
 import 'package:hr_connect/core/network/api_client.dart';
+import 'package:hr_connect/features/auth/providers/auth_provider.dart';
+import 'package:hr_connect/features/avatar/data/remote/avatar_remote.dart';
+import 'package:hr_connect/features/avatar/data/repositories/avatar_repository.dart';
+import 'package:hr_connect/features/avatar/data/repositories/avatar_repository_imp.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 final secureStorageProvider = Provider<FlutterSecureStorage>((ref) {
@@ -21,7 +25,12 @@ final sharedPreferencesProvider = Provider<SharedPreferences>((ref) {
 
 final apiClientProvider = Provider<ApiClient>((ref) {
   final secureStorage = ref.watch(secureStorageProvider);
-  return ApiClient(secureStorage: secureStorage);
+  return ApiClient(
+    secureStorage: secureStorage,
+    onUnauthorized: () {
+      ref.read(authNotifierProvider.notifier).logout();
+    },
+  );
 });
 
 final cacheManagerProvider = Provider<CacheManager>((ref) {
@@ -109,4 +118,13 @@ final attendanceRepositoryProvider = Provider<AttendanceRepository>((ref) {
     remoteDataSource: ref.watch(attendanceRemoteProvider),
     sharedPreferences: ref.watch(sharedPreferencesProvider),
   );
+});
+
+final avatarRemoteProvider = Provider<AvatarRemote>((ref) {
+  final apiClient = ref.watch(apiClientProvider);
+  return AvatarRemoteImpl(apiClient: apiClient);
+});
+
+final avatarRepositoryProvider = Provider<AvatarRepository>((ref) {
+  return AvatarRepositoryImp(remoteDataSource: ref.watch(avatarRemoteProvider));
 });

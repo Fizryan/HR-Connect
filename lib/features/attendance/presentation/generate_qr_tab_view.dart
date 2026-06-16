@@ -1,9 +1,9 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:hr_connect/features/attendance/providers/attendance_provider.dart';
 import 'package:hr_connect/features/shared/widgets/custom_button.dart';
-import 'package:qr_flutter/qr_flutter.dart';
 
 class GenerateQrTabView extends ConsumerWidget {
   const GenerateQrTabView({super.key});
@@ -13,7 +13,7 @@ class GenerateQrTabView extends ConsumerWidget {
     final colorScheme = Theme.of(context).colorScheme;
 
     final qrState = ref.watch(attendanceQrNotifier);
-    final qrData = qrState.value;
+    final qrData = qrState.asData?.value;
     final isGenerating = qrState.isLoading;
 
     return Padding(
@@ -48,9 +48,7 @@ class GenerateQrTabView extends ConsumerWidget {
               height: 1.5,
             ),
           ),
-
           SizedBox(height: 40.h),
-
           CustomButton(
             text: qrData == null ? 'Generate QR Code' : 'Regenerate QR',
             isLoading: isGenerating,
@@ -101,12 +99,21 @@ class GenerateQrTabView extends ConsumerWidget {
     }
 
     return Center(
-      child: QrImageView(
-        data: data,
-        version: QrVersions.auto,
-        size: 200.w,
-        backgroundColor: Colors.white,
-        errorCorrectionLevel: QrErrorCorrectLevel.Q,
+      child: CachedNetworkImage(
+        imageUrl: data,
+        fit: BoxFit.contain,
+        width: 240.w,
+        height: 240.w,
+        placeholder: (context, url) => Center(
+          child: CircularProgressIndicator(color: colorScheme.primary),
+        ),
+        errorWidget: (context, url, error) => Center(
+          child: Icon(
+            Icons.broken_image_outlined,
+            color: colorScheme.error,
+            size: 48.sp,
+          ),
+        ),
       ),
     );
   }

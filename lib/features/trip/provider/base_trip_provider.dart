@@ -53,8 +53,12 @@ abstract class BaseSharedTripNotifier extends BaseListNotifier<TripModel> {
     return handleMutation(
       action: () => repository.createTrip(data),
       onSuccess: (_) {
-        ref.invalidate(tripMeNotifierProvider);
-        ref.invalidate(tripNotifierProvider);
+        refreshTrips();
+        if (this is TripMeNotifier) {
+          ref.invalidate(tripNotifierProvider);
+        } else if (this is TripNotifier) {
+          ref.invalidate(tripMeNotifierProvider);
+        }
       },
     );
   }

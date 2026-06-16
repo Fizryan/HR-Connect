@@ -107,9 +107,9 @@ class LeaveRepositoryImp extends BaseRepository implements LeaveRepository {
   }
 
   @override
-  Future<Either<Failure, void>> rejectLeave(String id) async {
+  Future<Either<Failure, void>> rejectLeave(String id, String reason) async {
     return sourceCall(
-      () => remoteDataSource.rejectLeave(id),
+      () => remoteDataSource.rejectLeave(id, reason),
       Intl.message('Failed to reject leave.', name: 'rejectLeaveFailed'),
     );
   }

@@ -28,6 +28,7 @@ class _ScanQrTabViewState extends ConsumerState<ScanQrTabView>
     _scannerController = MobileScannerController(
       detectionSpeed: DetectionSpeed.noDuplicates,
       facing: CameraFacing.back,
+      cameraResolution: const Size(1280, 720),
     );
   }
 
@@ -60,6 +61,13 @@ class _ScanQrTabViewState extends ConsumerState<ScanQrTabView>
     final String? rawValue = barcodes.first.rawValue;
     if (rawValue == null) return;
 
+    String token;
+    if (rawValue.contains('#')) {
+      token = rawValue.split('#').last;
+    } else {
+      token = rawValue;
+    }
+
     setState(() {
       _isProcessing = true;
       _isScannerActive = false;
@@ -70,8 +78,8 @@ class _ScanQrTabViewState extends ConsumerState<ScanQrTabView>
     try {
       final provider = ref.read(attendanceMeProvider.notifier);
       final result = _selectedType == QrType.checkin
-          ? await provider.checkInAt(rawValue)
-          : await provider.checkOutAt(rawValue);
+          ? await provider.checkInAt(token)
+          : await provider.checkOutAt(token);
 
       if (!mounted) return;
 

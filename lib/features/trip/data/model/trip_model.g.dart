@@ -22,19 +22,23 @@ Map<String, dynamic> _$TripDataToJson(_TripData instance) => <String, dynamic>{
 
 _TripModel _$TripModelFromJson(Map<String, dynamic> json) => _TripModel(
   id: json['id'] as String,
-  requesterId: json['requesterId'] as String,
   data: TripData.fromJson(json['data'] as Map<String, dynamic>),
   status: $enumDecode(_$RequestStatusEnumMap, json['status']),
-  approverId: json['approverId'] as String?,
+  requester: UserData.fromJson(json['requester'] as Map<String, dynamic>),
+  approver: json['approver'] == null
+      ? null
+      : UserData.fromJson(json['approver'] as Map<String, dynamic>),
+  rejectReason: json['rejectReason'] as String?,
 );
 
 Map<String, dynamic> _$TripModelToJson(_TripModel instance) =>
     <String, dynamic>{
       'id': instance.id,
-      'requesterId': instance.requesterId,
       'data': instance.data,
       'status': _$RequestStatusEnumMap[instance.status]!,
-      'approverId': instance.approverId,
+      'requester': instance.requester,
+      'approver': instance.approver,
+      'rejectReason': instance.rejectReason,
     };
 
 const _$RequestStatusEnumMap = {

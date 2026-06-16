@@ -53,8 +53,12 @@ abstract class BaseSharedLeaveNotifier extends BaseListNotifier<LeaveModel> {
     return handleMutation(
       action: () => repository.createLeave(data),
       onSuccess: (_) {
-        ref.invalidate(leaveMeNotifierProvider);
-        ref.invalidate(leaveNotifierProvider);
+        refreshLeaves();
+        if (this is LeaveMeNotifier) {
+          ref.invalidate(leaveNotifierProvider);
+        } else if (this is LeaveNotifier) {
+          ref.invalidate(leaveMeNotifierProvider);
+        }
       },
     );
   }

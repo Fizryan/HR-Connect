@@ -9,5 +9,5 @@ abstract class TripRepository {
   Future<Either<Failure, TripModel>> getTripById(String id);
   Future<Either<Failure, void>> createTrip(TripData data);
   Future<Either<Failure, void>> approveTrip(String id);
-  Future<Either<Failure, void>> rejectTrip(String id);
+  Future<Either<Failure, void>> rejectTrip(String id, String reason);
 }

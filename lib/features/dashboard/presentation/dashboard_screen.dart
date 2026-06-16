@@ -45,10 +45,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
             SizedBox(height: 24.h),
             dashboardState.when(
               loading: () => const Center(child: CircularProgressIndicator()),
-              error: (err, _) => Padding(
-                padding: EdgeInsets.symmetric(horizontal: 16.w),
-                child: ErrorCard(error: err.toString()),
-              ),
+              error: (err, _) => ErrorCard(error: err.toString()),
               data: (dashboard) => MetricsGrid(dashboard: dashboard),
             ),
             SizedBox(height: 32.h),
@@ -56,7 +53,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
               title: 'Recent Leave Requests',
               showSeeAll: leaveState.hasValue && leaveState.value!.isNotEmpty,
               onSeeAll: () {
-                context.push('/leave');
+                context.go('/request');
               },
             ),
             leaveState.when(
@@ -84,7 +81,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
               title: 'Recent Trip Requests',
               showSeeAll: tripState.hasValue && tripState.value!.isNotEmpty,
               onSeeAll: () {
-                context.push('/trip');
+                context.go('/request');
               },
             ),
             tripState.when(

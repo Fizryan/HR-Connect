@@ -11,7 +11,7 @@ abstract class UserData with _$UserData {
     @JsonKey(name: 'email') required String email,
     @JsonKey(name: 'firstName') required String firstName,
     @JsonKey(name: 'lastName') required String lastName,
-    @JsonKey(name: 'role') required Role role,
+    @JsonKey(name: 'role', unknownEnumValue: Role.unknown) required Role role,
     @JsonKey(name: 'avatarUrl') String? avatarUrl,
   }) = _UserData;
 

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:go_router/go_router.dart';
+import 'package:hr_connect/core/config/approval_policy.dart';
 import 'package:hr_connect/core/config/capitalize.dart';
 import 'package:hr_connect/core/constants/enum.dart';
 import 'package:hr_connect/core/error/failures.dart';
@@ -12,30 +13,32 @@ import 'package:hr_connect/features/leave/providers/leave_provider.dart';
 import 'package:hr_connect/features/shared/widgets/custom_confirm_dialog.dart';
 import 'package:hr_connect/features/shared/widgets/custom_snackbar.dart';
 import 'package:hr_connect/features/trip/provider/trip_provider.dart';
-import 'package:hr_connect/features/user_management/providers/user_provider.dart';
+import 'package:hr_connect/features/user_management/data/model/user_model.dart';
 
 class ApprovalDetailScreen extends ConsumerStatefulWidget {
   final String requestId;
-  final String requesterId;
+  final UserData requester;
   final RequestKind requestKind;
   final String type;
   final String description;
   final DateTime startDate;
   final DateTime endDate;
-  final String approvalId;
+  final UserData? approval;
+  final String? reason;
   final RequestStatus status;
 
   const ApprovalDetailScreen({
     super.key,
     required this.requestId,
-    required this.requesterId,
+    required this.requester,
     required this.requestKind,
     required this.type,
     required this.description,
     required this.startDate,
     required this.endDate,
     required this.status,
-    this.approvalId = '',
+    this.approval,
+    this.reason,
   });
 
   @override
@@ -46,7 +49,80 @@ class ApprovalDetailScreen extends ConsumerStatefulWidget {
 class _ApprovalDetailScreenState extends ConsumerState<ApprovalDetailScreen> {
   bool _isProcessing = false;
 
-  void _confirmAction(bool isApprove) {
+  void _showRejectReasonDialog() {
+    final formKey = GlobalKey<FormState>();
+    final reasonController = TextEditingController();
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16.r),
+          ),
+          title: Text(
+            'Reject Request',
+            style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold),
+          ),
+          content: Form(
+            key: formKey,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Please provide a reason for rejecting this request:',
+                  style: TextStyle(fontSize: 14.sp),
+                ),
+                SizedBox(height: 12.h),
+                TextFormField(
+                  controller: reasonController,
+                  maxLines: 3,
+                  autofocus: true,
+                  decoration: InputDecoration(
+                    hintText: 'e.g., Urgent project coverage required',
+                    hintStyle: TextStyle(fontSize: 13.sp),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12.r),
+                    ),
+                    contentPadding: EdgeInsets.all(12.w),
+                  ),
+                  validator: (value) {
+                    if (value == null || value.trim().isEmpty) {
+                      return 'Reason is required to reject';
+                    }
+                    return null;
+                  },
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => context.pop(),
+              child: const Text('Cancel'),
+            ),
+            FilledButton(
+              style: FilledButton.styleFrom(
+                backgroundColor: Theme.of(context).colorScheme.error,
+              ),
+              onPressed: () {
+                if (formKey.currentState!.validate()) {
+                  final reason = reasonController.text.trim();
+                  context.pop();
+                  _confirmAction(false, reason);
+                }
+              },
+              child: const Text('Next'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _confirmAction(bool isApprove, String reason) {
     final actionName = isApprove ? 'Approve' : 'Reject';
     final requestName = widget.requestKind == RequestKind.leave
         ? 'Leave'
@@ -59,11 +135,11 @@ class _ApprovalDetailScreenState extends ConsumerState<ApprovalDetailScreen> {
           'Are you sure you want to ${actionName.toLowerCase()} this request?',
       confirmButtonText: 'Yes, $actionName',
       isDestructive: !isApprove,
-      onConfirm: () => _processRequest(isApprove),
+      onConfirm: () => _processRequest(isApprove, reason),
     );
   }
 
-  Future<void> _processRequest(bool isApprove) async {
+  Future<void> _processRequest(bool isApprove, String reason) async {
     setState(() => _isProcessing = true);
 
     try {
@@ -77,7 +153,7 @@ class _ApprovalDetailScreenState extends ConsumerState<ApprovalDetailScreen> {
         } else {
           result = await ref
               .read(leaveNotifierProvider.notifier)
-              .rejectLeave(widget.requestId);
+              .rejectLeave(widget.requestId, reason);
         }
       } else {
         if (isApprove) {
@@ -87,7 +163,7 @@ class _ApprovalDetailScreenState extends ConsumerState<ApprovalDetailScreen> {
         } else {
           result = await ref
               .read(tripNotifierProvider.notifier)
-              .rejectTrip(widget.requestId);
+              .rejectTrip(widget.requestId, reason);
         }
       }
 
@@ -125,32 +201,7 @@ class _ApprovalDetailScreenState extends ConsumerState<ApprovalDetailScreen> {
     final durationInDays =
         widget.endDate.difference(widget.startDate).inDays + 1;
 
-    String displayApprovalName = widget.approvalId;
-    final isValidId = widget.approvalId.isNotEmpty;
-
-    if (isValidId) {
-      final usersState = ref.watch(userNotifierProvider);
-      if (usersState.hasValue) {
-        try {
-          final approver = usersState.value!.firstWhere(
-            (u) => u.id == widget.approvalId,
-          );
-          displayApprovalName =
-              '${approver.data.firstName} ${approver.data.lastName}'.trim();
-        } catch (_) {
-          displayApprovalName = 'Unknown User (${widget.approvalId})';
-        }
-      } else {
-        displayApprovalName = 'Loading...';
-      }
-    }
-
-    final currentUser = ref.watch(authNotifierProvider).value;
-
-    final isOwnRequest = currentUser?.id == widget.requesterId;
-
-    final showActionButtons =
-        widget.status == RequestStatus.pending && !isOwnRequest;
+    final currentUser = ref.read(authNotifierProvider).value;
 
     return Scaffold(
       backgroundColor: colorScheme.surface,
@@ -228,44 +279,33 @@ class _ApprovalDetailScreenState extends ConsumerState<ApprovalDetailScreen> {
               ),
             ),
             SizedBox(height: 32.h),
-
-            if (isOwnRequest && widget.status == RequestStatus.pending) ...[
-              Container(
-                padding: EdgeInsets.all(12.w),
-                decoration: BoxDecoration(
-                  color: colorScheme.errorContainer.withValues(alpha: 0.5),
-                  borderRadius: BorderRadius.circular(12.r),
-                ),
-                child: Row(
-                  children: [
-                    Icon(
-                      Icons.info_outline_rounded,
-                      color: colorScheme.error,
-                      size: 20.sp,
-                    ),
-                    SizedBox(width: 12.w),
-                    Expanded(
-                      child: Text(
-                        'You cannot approve or reject your own request.',
-                        style: TextStyle(
-                          fontSize: 13.sp,
-                          color: colorScheme.error,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
+            Text(
+              'Approver Information',
+              style: TextStyle(
+                fontSize: 16.sp,
+                fontWeight: FontWeight.bold,
+                color: colorScheme.primary,
               ),
-              SizedBox(height: 24.h),
-            ],
-
-            if (isValidId) ...[
+            ),
+            SizedBox(height: 16.h),
+            if (widget.approval != null) ...[
               _buildInfoTile(
                 context,
                 icon: Icons.person,
                 label: 'Processed By',
-                value: displayApprovalName,
+                value:
+                    widget.approval!.firstName.isNotEmpty &&
+                        widget.approval!.lastName.isNotEmpty
+                    ? '${widget.approval!.firstName} ${widget.approval!.lastName}'
+                    : 'N/A',
+              ),
+            ],
+            if (widget.reason != null) ...[
+              _buildInfoTile(
+                context,
+                icon: Icons.description_outlined,
+                label: 'Rejected Reason',
+                value: widget.reason!,
               ),
             ],
             Text(
@@ -277,6 +317,21 @@ class _ApprovalDetailScreenState extends ConsumerState<ApprovalDetailScreen> {
               ),
             ),
             SizedBox(height: 16.h),
+            _buildInfoTile(
+              context,
+              icon: Icons.person_outline,
+              label: 'Requester',
+              value:
+                  '${Capitalize.firstLetterUppercase(widget.requester.firstName)} ${Capitalize.firstLetterUppercase(widget.requester.lastName)}',
+            ),
+            _buildInfoTile(
+              context,
+              icon: Icons.admin_panel_settings_outlined,
+              label: 'Role',
+              value: Capitalize.firstLetterUppercase(
+                widget.requester.role.name,
+              ),
+            ),
             _buildInfoTile(
               context,
               icon: Icons.category_outlined,
@@ -323,7 +378,8 @@ class _ApprovalDetailScreenState extends ConsumerState<ApprovalDetailScreen> {
           ],
         ),
       ),
-      bottomNavigationBar: showActionButtons
+      bottomNavigationBar:
+          ApprovalPolicy.canApprove(widget.requester, currentUser!.data)
           ? SafeArea(
               child: Padding(
                 padding: EdgeInsets.fromLTRB(24.w, 12.h, 24.w, 24.h),
@@ -341,7 +397,7 @@ class _ApprovalDetailScreenState extends ConsumerState<ApprovalDetailScreen> {
                         ),
                         onPressed: _isProcessing
                             ? null
-                            : () => _confirmAction(false),
+                            : _showRejectReasonDialog,
                         child: Text(
                           'Reject',
                           style: TextStyle(
@@ -364,7 +420,7 @@ class _ApprovalDetailScreenState extends ConsumerState<ApprovalDetailScreen> {
                         ),
                         onPressed: _isProcessing
                             ? null
-                            : () => _confirmAction(true),
+                            : () => _confirmAction(true, 'Approved'),
                         child: _isProcessing
                             ? SizedBox(
                                 height: 20.h,

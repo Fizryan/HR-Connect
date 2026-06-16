@@ -48,4 +48,8 @@ class ApiEndpoints {
   static String get attendanceGenerate => '$_baseApi/attendance/generate';
   static String get attendance => '$_baseApi/attendance';
   static String attendanceById(String id) => '$_baseApi/attendance/$id';
+
+  // Avatar Endpoints
+  static String avatarUpload() => '$_baseApi/avatars/upload';
+  static String getAvatarUrl(String filename) => '$_baseApi/avatars/$filename';
 }

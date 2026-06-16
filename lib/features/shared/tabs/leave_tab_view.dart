@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hr_connect/core/config/capitalize.dart';
+import 'package:hr_connect/core/config/approval_policy.dart';
 import 'package:hr_connect/core/constants/enum.dart';
 import 'package:hr_connect/core/theme/status_color.dart';
 import 'package:hr_connect/features/auth/providers/auth_provider.dart';
@@ -33,11 +34,18 @@ class _LeaveTabViewState extends ConsumerState<LeaveTabView> {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
 
-    final leaveState = widget.isApprovalMode
-        ? ref.watch(leaveNotifierProvider)
-        : ref.watch(leaveMeNotifierProvider);
-
     final currentUser = ref.watch(authNotifierProvider).value;
+    final isAuthorize = currentUser?.data.role == Role.admin;
+
+    final AsyncValue<List<LeaveModel>> leaveState;
+
+    if (widget.isApprovalMode && isAuthorize) {
+      leaveState = ref.watch(leaveNotifierProvider);
+    } else if (widget.isApprovalMode) {
+      leaveState = ref.watch(leavePendingNotifierProvider);
+    } else {
+      leaveState = ref.watch(leaveMeNotifierProvider);
+    }
 
     List<LeaveModel> getFilteredLeaves(List<LeaveModel> leaves) {
       return leaves.where((leave) {
@@ -58,9 +66,7 @@ class _LeaveTabViewState extends ConsumerState<LeaveTabView> {
         if (widget.isApprovalMode) {
           if (currentUser == null) return false;
 
-          if (leave.requesterId == currentUser.id) return false;
-
-          return true;
+          return ApprovalPolicy.canApprove(leave.requester, currentUser.data);
         }
 
         return true;
@@ -82,8 +88,12 @@ class _LeaveTabViewState extends ConsumerState<LeaveTabView> {
               ? 'No requests need your approval.'
               : 'No leave requests found.',
           onRefresh: () async {
-            if (widget.isApprovalMode) {
+            if (widget.isApprovalMode && isAuthorize) {
               await ref.read(leaveNotifierProvider.notifier).refreshLeaves();
+            } else if (widget.isApprovalMode) {
+              await ref
+                  .read(leavePendingNotifierProvider.notifier)
+                  .refreshLeaves();
             } else {
               await ref.read(leaveMeNotifierProvider.notifier).refreshLeaves();
             }
@@ -140,14 +150,15 @@ class _LeaveTabViewState extends ConsumerState<LeaveTabView> {
                 widget.isApprovalMode ? '/approval-detail' : '/request-detail',
                 extra: {
                   'id': leave.id,
-                  'requesterId': leave.requesterId,
+                  'requester': leave.requester,
                   'kind': RequestKind.leave,
                   'type': leave.data.type,
                   'description': leave.data.description,
                   'startDate': leave.data.startDate,
                   'endDate': leave.data.endDate,
                   'status': leave.status,
-                  'approvalId': leave.approverId,
+                  'approval': leave.approver,
+                  'reason': leave.rejectReason,
                 },
               ),
               trailing: const Icon(Icons.chevron_right_outlined),

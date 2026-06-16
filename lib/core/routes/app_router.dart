@@ -71,15 +71,22 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         if (isGoingToLogin || isAtSplash) return '/';
 
         final currentUser = authState.value!.data.role;
-        final isAuthorize =
-            currentUser == Role.admin || currentUser == Role.manager;
 
         final isManagementPath =
             state.uri.path.startsWith('/management') ||
             state.uri.path.startsWith('/add-user') ||
             state.uri.path.startsWith('/edit-user');
 
-        if (isManagementPath && !isAuthorize) {
+        final isApprovalPath =
+            state.uri.path.startsWith('/approval') ||
+            state.uri.path.startsWith('/approval-detail');
+
+        if (isManagementPath &&
+            !(currentUser == Role.admin || currentUser == Role.manager)) {
+          return '/';
+        }
+
+        if (isApprovalPath && currentUser == Role.staff) {
           return '/';
         }
 
@@ -166,14 +173,15 @@ final goRouterProvider = Provider<GoRouter>((ref) {
           final args = state.extra as Map<String, dynamic>;
           return ApprovalDetailScreen(
             requestId: args['id'] as String,
-            requesterId: args['requesterId'] as String,
+            requester: args['requester'] as UserData,
             requestKind: args['kind'] as RequestKind,
             type: args['type'] as String,
             description: args['description'] as String,
             startDate: args['startDate'] as DateTime,
             endDate: args['endDate'] as DateTime,
             status: args['status'] as RequestStatus,
-            approvalId: args['approvalId'] as String,
+            approval: args['approval'] as UserData?,
+            reason: args['reason'] as String?,
           );
         },
       ),
@@ -212,8 +220,8 @@ final goRouterProvider = Provider<GoRouter>((ref) {
           StatefulShellBranch(
             routes: [
               GoRoute(
-                path: '/management',
-                name: 'management',
+                path: '/manage',
+                name: 'manage',
                 builder: (context, state) => const UserManagementScreen(),
               ),
             ],

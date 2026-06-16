@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:hr_connect/core/config/env_config.dart';
 import 'package:hr_connect/core/config/logger_config.dart';
@@ -18,11 +19,12 @@ class ApiClient {
   final CircuitBreaker _circuitBreaker = CircuitBreaker();
   final MemoryCache _cacheManager = MemoryCache();
   final Map<String, Future<dynamic>> _inFlightRequests = {};
+  final VoidCallback onUnauthorized;
 
   String? _cachedToken;
   Future<void>? _refreshTokenFuture;
 
-  ApiClient({required this.secureStorage}) {
+  ApiClient({required this.secureStorage, required this.onUnauthorized}) {
     _dio = Dio(
       BaseOptions(
         baseUrl: EnvConfig.baseUrl,
@@ -59,6 +61,10 @@ class ApiClient {
         },
         onError: (DioException e, handler) async {
           if (e.response?.statusCode == 401) {
+            if (_cachedToken == null) {
+              return handler.next(e);
+            }
+
             _logger.w('Token expired, attempting refresh...');
 
             if (_refreshTokenFuture != null) {
@@ -143,6 +149,7 @@ class ApiClient {
                   _logger.e('Failed to retrieve new access token');
                   clearToken();
                   await secureStorage.deleteAll();
+                  onUnauthorized();
                   completer.completeError(
                     'Failed to retrieve new access token',
                   );
@@ -153,6 +160,7 @@ class ApiClient {
                 _logger.e('Failed to refresh token: $refreshError');
                 clearToken();
                 await secureStorage.deleteAll();
+                onUnauthorized();
                 completer.completeError(refreshError);
                 _refreshTokenFuture = null;
                 return handler.reject(e);
@@ -161,6 +169,7 @@ class ApiClient {
               _logger.e('Refresh token is empty or null');
               clearToken();
               await secureStorage.deleteAll();
+              onUnauthorized();
               return handler.reject(e);
             }
           }
@@ -178,6 +187,7 @@ class ApiClient {
   }
 
   void clearToken() {
+    if (_cachedToken == null) return;
     _cachedToken = null;
     _logger.i('[ApiClient] Token cache has been completely cleared.');
   }
@@ -285,12 +295,7 @@ class ApiClient {
     final result = await _handleRequest(
       'GET',
       path,
-      () => _dio.get(
-        path,
-        data: data,
-        queryParameters: queryParameters,
-        options: Options(headers: headers),
-      ),
+      () => _dio.get(path, data: data, queryParameters: queryParameters),
       data: data,
       queryParameters: queryParameters,
     );

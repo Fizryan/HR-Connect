@@ -5,6 +5,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hr_connect/core/config/capitalize.dart';
 import 'package:hr_connect/features/auth/providers/auth_provider.dart';
+import 'package:hr_connect/features/avatar/provider/avatar_provider.dart';
 import 'package:hr_connect/features/shared/widgets/custom_confirm_dialog.dart';
 import 'package:hr_connect/features/user_management/data/model/user_model.dart';
 
@@ -18,6 +19,9 @@ class ProfileCard extends ConsumerWidget {
 
     final currentUser = ref.watch(authNotifierProvider).value;
 
+    final tokenAsync = ref.watch(accessTokenProvider);
+    final token = tokenAsync.asData?.value;
+
     if (currentUser == null) {
       return Container(
         height: 76.h,
@@ -29,19 +33,28 @@ class ProfileCard extends ConsumerWidget {
       );
     }
 
+    final avatarUrl = currentUser.data.avatarUrl ?? '';
+
     return Container(
       padding: EdgeInsets.all(16.r),
       child: Row(
         children: [
-          CachedNetworkImage(
-            imageUrl: currentUser.data.avatarUrl ?? '',
-            imageBuilder: (context, imageProvider) =>
-                CircleAvatar(radius: 22.r, backgroundImage: imageProvider),
-            placeholder: (context, url) =>
-                _buildFallbackAvatar(colorScheme, currentUser),
-            errorWidget: (context, url, error) =>
-                _buildFallbackAvatar(colorScheme, currentUser),
-          ),
+          avatarUrl.isEmpty
+              ? _buildFallbackAvatar(colorScheme, currentUser)
+              : CachedNetworkImage(
+                  imageUrl: avatarUrl,
+                  httpHeaders: token != null
+                      ? {'Authorization': 'Bearer $token'}
+                      : null,
+                  imageBuilder: (context, imageProvider) => CircleAvatar(
+                    radius: 22.r,
+                    backgroundImage: imageProvider,
+                  ),
+                  placeholder: (context, url) =>
+                      _buildFallbackAvatar(colorScheme, currentUser),
+                  errorWidget: (context, url, error) =>
+                      _buildFallbackAvatar(colorScheme, currentUser),
+                ),
           SizedBox(width: 16.w),
           Expanded(
             child: Column(

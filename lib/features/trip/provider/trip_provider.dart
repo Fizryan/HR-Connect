@@ -17,6 +17,18 @@ class TripMeNotifier extends BaseSharedTripNotifier {
   }
 }
 
+final tripPendingNotifierProvider =
+    AsyncNotifierProvider<TripPendingNotifier, List<TripModel>>(
+      TripPendingNotifier.new,
+    );
+
+class TripPendingNotifier extends BaseSharedTripNotifier {
+  @override
+  Future<Either<Failure, List<TripModel>>> fetchFromRepository() {
+    return ref.read(tripRepositoryProvider).getPendingTrips();
+  }
+}
+
 final tripNotifierProvider =
     AsyncNotifierProvider<TripNotifier, List<TripModel>>(TripNotifier.new);
 
@@ -39,7 +51,7 @@ class TripNotifier extends BaseSharedTripNotifier {
           if (trip.id == id) {
             return trip.copyWith(
               status: RequestStatus.approved,
-              approverId: currenUser?.id,
+              approver: currenUser?.data,
             );
           }
           return trip;
@@ -48,11 +60,11 @@ class TripNotifier extends BaseSharedTripNotifier {
     );
   }
 
-  Future<Either<Failure, void>> rejectTrip(String id) async {
+  Future<Either<Failure, void>> rejectTrip(String id, String reason) async {
     final repository = ref.read(tripRepositoryProvider);
     final currenUser = ref.read(authNotifierProvider).value;
     return handleMutation(
-      action: () => repository.rejectTrip(id),
+      action: () => repository.rejectTrip(id, reason),
       onSuccess: (_) {
         ref.invalidate(tripNotifierProvider);
       },
@@ -61,7 +73,8 @@ class TripNotifier extends BaseSharedTripNotifier {
           if (trip.id == id) {
             return trip.copyWith(
               status: RequestStatus.rejected,
-              approverId: currenUser?.id,
+              approver: currenUser?.data,
+              rejectReason: reason,
             );
           }
           return trip;

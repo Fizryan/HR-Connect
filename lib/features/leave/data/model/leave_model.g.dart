@@ -23,19 +23,23 @@ Map<String, dynamic> _$LeaveDataToJson(_LeaveData instance) =>
 
 _LeaveModel _$LeaveModelFromJson(Map<String, dynamic> json) => _LeaveModel(
   id: json['id'] as String,
-  requesterId: json['requesterId'] as String,
   data: LeaveData.fromJson(json['data'] as Map<String, dynamic>),
   status: $enumDecode(_$RequestStatusEnumMap, json['status']),
-  approverId: json['approverId'] as String?,
+  requester: UserData.fromJson(json['requester'] as Map<String, dynamic>),
+  approver: json['approver'] == null
+      ? null
+      : UserData.fromJson(json['approver'] as Map<String, dynamic>),
+  rejectReason: json['rejectReason'] as String?,
 );
 
 Map<String, dynamic> _$LeaveModelToJson(_LeaveModel instance) =>
     <String, dynamic>{
       'id': instance.id,
-      'requesterId': instance.requesterId,
       'data': instance.data,
       'status': _$RequestStatusEnumMap[instance.status]!,
-      'approverId': instance.approverId,
+      'requester': instance.requester,
+      'approver': instance.approver,
+      'rejectReason': instance.rejectReason,
     };
 
 const _$RequestStatusEnumMap = {

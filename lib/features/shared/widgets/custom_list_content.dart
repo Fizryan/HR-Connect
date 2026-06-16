@@ -7,7 +7,6 @@ class CustomListContent<T> extends StatelessWidget {
   final String? error;
   final DateTime? lastFetchTime;
   final String emptyMessage;
-
   final Future<void> Function() onRefresh;
   final Widget Function(T item) itemBuilder;
   final Widget? filterSection;
@@ -73,21 +72,29 @@ class CustomListContent<T> extends StatelessWidget {
         ],
         ?filterSection,
         Expanded(
-          child: items.isEmpty
-              ? Center(
-                  child: Text(
-                    emptyMessage,
-                    style: TextStyle(
-                      color: colorScheme.onSurfaceVariant,
-                      fontSize: 15.sp,
-                    ),
-                  ),
-                )
-              : RefreshIndicator(
-                  onRefresh: onRefresh,
-                  backgroundColor: colorScheme.surfaceContainerHighest,
-                  color: colorScheme.primary,
-                  child: ListView.separated(
+          child: RefreshIndicator(
+            onRefresh: onRefresh,
+            backgroundColor: colorScheme.surfaceContainerHighest,
+            color: colorScheme.primary,
+            child: items.isEmpty
+                ? ListView(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    children: [
+                      SizedBox(
+                        height: MediaQuery.of(context).size.height * 0.5,
+                        child: Center(
+                          child: Text(
+                            emptyMessage,
+                            style: TextStyle(
+                              color: colorScheme.onSurfaceVariant,
+                              fontSize: 15.sp,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  )
+                : ListView.separated(
                     physics: const AlwaysScrollableScrollPhysics(
                       parent: ClampingScrollPhysics(),
                     ),
@@ -101,7 +108,7 @@ class CustomListContent<T> extends StatelessWidget {
                     ),
                     itemBuilder: (context, index) => itemBuilder(items[index]),
                   ),
-                ),
+          ),
         ),
       ],
     );

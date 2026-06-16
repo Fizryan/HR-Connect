@@ -19,6 +19,18 @@ class LeaveMeNotifier extends BaseSharedLeaveNotifier {
   }
 }
 
+final leavePendingNotifierProvider =
+    AsyncNotifierProvider<LeavePendingNotifier, List<LeaveModel>>(
+      LeavePendingNotifier.new,
+    );
+
+class LeavePendingNotifier extends BaseSharedLeaveNotifier {
+  @override
+  Future<Either<Failure, List<LeaveModel>>> fetchFromRepository() {
+    return ref.read(leaveRepositoryProvider).getPendingLeaves();
+  }
+}
+
 final leaveNotifierProvider =
     AsyncNotifierProvider<LeaveNotifier, List<LeaveModel>>(LeaveNotifier.new);
 
@@ -41,7 +53,7 @@ class LeaveNotifier extends BaseSharedLeaveNotifier {
           if (leave.id == id) {
             return leave.copyWith(
               status: RequestStatus.approved,
-              approverId: currentUser?.id,
+              approver: currentUser?.data,
             );
           }
           return leave;
@@ -50,11 +62,11 @@ class LeaveNotifier extends BaseSharedLeaveNotifier {
     );
   }
 
-  Future<Either<Failure, void>> rejectLeave(String id) async {
+  Future<Either<Failure, void>> rejectLeave(String id, String reason) async {
     final repository = ref.read(leaveRepositoryProvider);
     final currentUser = ref.read(authNotifierProvider).value;
     return handleMutation(
-      action: () => repository.rejectLeave(id),
+      action: () => repository.rejectLeave(id, reason),
       onSuccess: (_) {
         ref.invalidate(leaveNotifierProvider);
       },
@@ -63,7 +75,8 @@ class LeaveNotifier extends BaseSharedLeaveNotifier {
           if (leave.id == id) {
             return leave.copyWith(
               status: RequestStatus.rejected,
-              approverId: currentUser?.id,
+              approver: currentUser?.data,
+              rejectReason: reason,
             );
           }
           return leave;

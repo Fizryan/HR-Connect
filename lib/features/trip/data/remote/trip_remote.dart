@@ -11,7 +11,7 @@ abstract class TripRemote {
   Future<TripModel> getTripById(String id);
   Future<void> createTrip(TripData data);
   Future<void> approveTrip(String id);
-  Future<void> rejectTrip(String id);
+  Future<void> rejectTrip(String id, String reason);
 }
 
 class TripRemoteImpl extends BaseRemote implements TripRemote {
@@ -88,9 +88,12 @@ class TripRemoteImpl extends BaseRemote implements TripRemote {
   }
 
   @override
-  Future<void> rejectTrip(String id) async {
+  Future<void> rejectTrip(String id, String reason) async {
     return apiCall(() async {
-      await apiClient.post(ApiEndpoints.rejectBusinessTrip(id));
+      await apiClient.post(
+        ApiEndpoints.rejectBusinessTrip(id),
+        data: {'reason': reason},
+      );
     });
   }
 }

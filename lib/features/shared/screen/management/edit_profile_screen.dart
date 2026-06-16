@@ -1,15 +1,20 @@
+import 'dart:io';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hr_connect/core/config/validator.dart';
 import 'package:hr_connect/features/auth/providers/auth_provider.dart';
+import 'package:hr_connect/features/avatar/provider/avatar_provider.dart';
 import 'package:hr_connect/features/shared/widgets/custom_button.dart';
 import 'package:hr_connect/features/shared/widgets/custom_confirm_dialog.dart';
 import 'package:hr_connect/features/shared/widgets/custom_text_field.dart';
 import 'package:hr_connect/features/user_management/data/model/user_model.dart';
 import 'package:hr_connect/features/user_management/providers/user_provider.dart';
+import 'package:image_picker/image_picker.dart';
 
 class EditProfileScreen extends ConsumerStatefulWidget {
   const EditProfileScreen({super.key});
@@ -55,11 +60,58 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
       title: 'Update Profile',
       description: 'Are you sure you want to change the profile name?',
       confirmButtonText: 'Confirm',
-      onConfirm: () => _saveProfile,
+      onConfirm: _saveProfile,
     );
   }
 
-  Future<void> _saveProfile(UserModel currentUser) async {
+  Future<void> _pickAndUploadAvatar() async {
+    try {
+      final picker = ImagePicker();
+      final XFile? image = await picker.pickImage(
+        source: ImageSource.gallery,
+        maxWidth: 512,
+        maxHeight: 512,
+      );
+      if (image == null) return;
+
+      final file = File(image.path);
+      await ref
+          .read(avatarNotifierProvider.notifier)
+          .uploadAndUpdateProfile(file);
+
+      if (!mounted) return;
+      final uploadState = ref.read(avatarNotifierProvider);
+      if (uploadState.hasError) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to upload avatar: ${uploadState.error}'),
+          ),
+        );
+      } else if (uploadState.hasValue) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Avatar uploaded successfully!')),
+        );
+      }
+    } on PlatformException catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to upload avatar: ${e.message}')),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Failed to upload avatar: $e')));
+      }
+    }
+  }
+
+  Future<void> _saveProfile() async {
+    final currentUser = ref.read(authNotifierProvider).value;
+
+    if (currentUser == null) return;
+
     setState(() {
       _isSaving = true;
     });
@@ -210,7 +262,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                       ),
                     ),
                     GestureDetector(
-                      onTap: () {}, // TODO: Implement avatar upload
+                      onTap: _pickAndUploadAvatar,
                       child: Container(
                         padding: EdgeInsets.all(8.r),
                         decoration: BoxDecoration(

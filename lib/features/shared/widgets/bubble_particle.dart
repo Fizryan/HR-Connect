@@ -30,6 +30,8 @@ class _BubbleFieldState extends State<BubbleField>
   final List<BubbleParticle> _particles = [];
   final Random _random = Random();
   Size _size = Size.zero;
+  bool _isVisible = true;
+  Duration _lastElapsed = Duration.zero;
 
   @override
   void initState() {
@@ -53,12 +55,14 @@ class _BubbleFieldState extends State<BubbleField>
       final x = radius + _random.nextDouble() * (_size.width - radius * 2);
       final y = radius + _random.nextDouble() * (_size.height - radius * 2);
 
+      const scale = 60.0;
+
       _particles.add(
         BubbleParticle(
           position: Offset(x, y),
           velocity: Offset(
-            (_random.nextDouble() - 0.5) * 1.5,
-            (_random.nextDouble() - 0.5) * 1.5,
+            (_random.nextDouble() - 0.5) * 1.5 * scale,
+            (_random.nextDouble() - 0.5) * 1.5 * scale,
           ),
           radius: radius,
           opacity: _random.nextDouble() * 0.08 + 0.03,
@@ -68,11 +72,20 @@ class _BubbleFieldState extends State<BubbleField>
   }
 
   void _tick() {
-    if (_size == Size.zero) return;
-    if (!mounted) return;
+    if (_size == Size.zero || !mounted) return;
+
+    final now = _controller.lastElapsedDuration ?? Duration.zero;
+
+    if (_lastElapsed == Duration.zero) {
+      _lastElapsed = now;
+      return;
+    }
+
+    final dt = (now - _lastElapsed).inMicroseconds / 1000000.0;
+    _lastElapsed = now;
 
     for (final p in _particles) {
-      p.position += p.velocity;
+      p.position += Offset(p.velocity.dx * dt, p.velocity.dy * dt);
 
       if (p.position.dx - p.radius <= 0) {
         p.position = Offset(p.radius, p.position.dy);
@@ -123,6 +136,24 @@ class _BubbleFieldState extends State<BubbleField>
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final route = ModalRoute.of(context);
+    final isCurrent = route?.isCurrent ?? true;
+    if (_isVisible != isCurrent) {
+      _isVisible = isCurrent;
+      if (_isVisible) {
+        if (_particles.isNotEmpty) {
+          _lastElapsed = Duration.zero;
+          _controller.repeat();
+        }
+      } else {
+        _controller.stop();
+      }
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -142,13 +173,16 @@ class _BubbleFieldState extends State<BubbleField>
 
         final colorScheme = Theme.of(context).colorScheme;
 
-        return RepaintBoundary(
-          child: CustomPaint(
-            size: _size,
-            painter: BubblePainter(
-              particles: _particles,
-              color: colorScheme.primary,
-              repaint: _controller,
+        return TickerMode(
+          enabled: _isVisible,
+          child: RepaintBoundary(
+            child: CustomPaint(
+              size: _size,
+              painter: BubblePainter(
+                particles: _particles,
+                color: colorScheme.primary,
+                repaint: _controller,
+              ),
             ),
           ),
         );

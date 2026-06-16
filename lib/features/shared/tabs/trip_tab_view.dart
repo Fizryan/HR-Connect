@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:hr_connect/core/config/approval_policy.dart';
 import 'package:hr_connect/core/config/capitalize.dart';
 import 'package:hr_connect/core/constants/enum.dart';
 import 'package:hr_connect/core/theme/status_color.dart';
@@ -33,11 +34,19 @@ class _TripTabViewState extends ConsumerState<TripTabView> {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
 
-    final tripState = widget.isApprovalMode
-        ? ref.watch(tripNotifierProvider)
-        : ref.watch(tripMeNotifierProvider);
-
     final currentUser = ref.watch(authNotifierProvider).value;
+
+    final isAuthorize = currentUser?.data.role == Role.admin;
+
+    final AsyncValue<List<TripModel>> tripState;
+
+    if (widget.isApprovalMode && isAuthorize) {
+      tripState = ref.watch(tripNotifierProvider);
+    } else if (widget.isApprovalMode) {
+      tripState = ref.watch(tripPendingNotifierProvider);
+    } else {
+      tripState = ref.watch(tripMeNotifierProvider);
+    }
 
     List<TripModel> getFilteredTrips(List<TripModel> trips) {
       return trips.where((trip) {
@@ -58,9 +67,7 @@ class _TripTabViewState extends ConsumerState<TripTabView> {
         if (widget.isApprovalMode) {
           if (currentUser == null) return false;
 
-          if (trip.requesterId == currentUser.id) return false;
-
-          return true;
+          return ApprovalPolicy.canApprove(trip.requester, currentUser.data);
         }
 
         return true;
@@ -82,8 +89,12 @@ class _TripTabViewState extends ConsumerState<TripTabView> {
               ? 'No requests need your approval.'
               : 'No trip requests found.',
           onRefresh: () async {
-            if (widget.isApprovalMode) {
+            if (widget.isApprovalMode && isAuthorize) {
               await ref.read(tripNotifierProvider.notifier).refreshTrips();
+            } else if (widget.isApprovalMode) {
+              await ref
+                  .read(tripPendingNotifierProvider.notifier)
+                  .refreshTrips();
             } else {
               await ref.read(tripMeNotifierProvider.notifier).refreshTrips();
             }
@@ -140,14 +151,15 @@ class _TripTabViewState extends ConsumerState<TripTabView> {
                 widget.isApprovalMode ? '/approval-detail' : '/request-detail',
                 extra: {
                   'id': trip.id,
-                  'requesterId': trip.requesterId,
+                  'requester': trip.requester,
                   'kind': RequestKind.trip,
                   'type': trip.data.type,
                   'description': trip.data.description,
                   'startDate': trip.data.startDate,
                   'endDate': trip.data.endDate,
                   'status': trip.status,
-                  'approvalId': trip.approverId,
+                  'approval': trip.approver,
+                  'reason': trip.rejectReason,
                 },
               ),
               trailing: const Icon(Icons.chevron_right_outlined),

@@ -11,7 +11,7 @@ abstract class LeaveRemote {
   Future<LeaveModel> getLeaveById(String id);
   Future<void> createLeave(LeaveData data);
   Future<void> approveLeave(String id);
-  Future<void> rejectLeave(String id);
+  Future<void> rejectLeave(String id, String reason);
 }
 
 class LeaveRemoteImpl extends BaseRemote implements LeaveRemote {
@@ -88,10 +88,12 @@ class LeaveRemoteImpl extends BaseRemote implements LeaveRemote {
   }
 
   @override
-  Future<void> rejectLeave(String id) async {
+  Future<void> rejectLeave(String id, String reason) async {
     return apiCall(() async {
-      final Map<String, dynamic> payload = {'reason': 'rejected'};
-      await apiClient.post(ApiEndpoints.rejectLeaveRequest(id), data: payload);
+      await apiClient.post(
+        ApiEndpoints.rejectLeaveRequest(id),
+        data: {'reason': reason},
+      );
     });
   }
 }

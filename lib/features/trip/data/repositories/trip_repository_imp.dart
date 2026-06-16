@@ -103,9 +103,9 @@ class TripRepositoryImp extends BaseRepository implements TripRepository {
   }
 
   @override
-  Future<Either<Failure, void>> rejectTrip(String id) async {
+  Future<Either<Failure, void>> rejectTrip(String id, String reason) async {
     return sourceCall(
-      () => remoteDataSource.rejectTrip(id),
+      () => remoteDataSource.rejectTrip(id, reason),
       Intl.message('Failed to reject trip.', name: 'rejectTripFailed'),
     );
   }
